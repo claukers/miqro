@@ -1,7 +1,7 @@
 import { Util, SimpleMap } from "@miqro/core";
 import { resolve } from "path";
 import { readFileSync } from "fs";
-import { checkModule } from "../../utils";
+import { Database } from "@miqro/database";
 
 export const main = async (): Promise<void> => {
   const outfile = process.argv[3];
@@ -19,8 +19,6 @@ export const main = async (): Promise<void> => {
   }
 
   const modelList = models.split(",").map(o => o.trim());
-
-  const { Database } = checkModule(`@miqro/database`);
 
 
   Util.loadConfig();

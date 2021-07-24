@@ -1,13 +1,11 @@
 import { Util } from "@miqro/core";
 import { createInterface } from "readline";
-import { checkModule } from "../../utils";
+import { Database } from "@miqro/database";
 
 export const main = (): void => {
   if (process.argv.length !== 3) {
     throw new Error(`invalid number of args`);
   }
-
-  const { Database } = checkModule(`@miqro/database`);
 
   Util.loadConfig();
   const logger = Util.getLogger("db:console");

@@ -1,7 +1,7 @@
 import { Util, SimpleMap } from "@miqro/core";
 import { resolve } from "path";
 import { writeFileSync } from "fs";
-import { checkModule } from "../../utils";
+import { Database } from "@miqro/database";
 
 export const main = async (): Promise<void> => {
   const logger = console;
@@ -13,8 +13,6 @@ export const main = async (): Promise<void> => {
   if (typeof outfile !== "string") {
     throw new Error(`<outfile> must be a string!`);
   }
-
-  const { Database } = checkModule(`@miqro/database`);
 
   Util.loadConfig();
   const db = Database.getInstance();

@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { templates } from "../template";
-import { checkModule } from "../../utils";
+import { loadSequelizeRC } from "@miqro/database";
 
 export const main = (): void => {
   const logger = console;
@@ -15,7 +15,7 @@ export const main = (): void => {
     throw new Error(`<modelname> must be a string!`);
   }
 
-  const { loadSequelizeRC } = checkModule(`@miqro/database`);
+  
 
   const config = loadSequelizeRC();
   if (!existsSync(config.modelsFolder)) {
