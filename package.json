@@ -25,7 +25,8 @@
   "license": "ISC",
   "dependencies": {
     "@miqro/core": "^1.1.9",
-    "@miqro/database": "^1.0.11"
+    "@miqro/database": "^1.0.11",
+    "@miqro/runner": "^1.1.4"
   },
   "devDependencies": {
     "@types/node": "^16.4.2",
