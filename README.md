@@ -14,8 +14,6 @@ this module is just a **cli** for the following npm modules.
 
 - some helpers for starting a cluster with auto restart if crash [@miqro/runner](https://www.npmjs.com/package/@miqro/runner)
 
-## quick start
-
 ## quickstart
 
 ```
