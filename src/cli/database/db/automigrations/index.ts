@@ -1,7 +1,7 @@
 import { getLogger } from "@miqro/core";
 import fs from "fs";
 import path from "path";
-import { checkModule } from "../../../utils";
+import hash from "object-hash";
 import { loadSequelizeRC } from "@miqro/database";
 import { executeMigration, getMigration, parseDifference, reverseModels, sortActions, writeMigration } from "./migrate";
 
@@ -95,8 +95,7 @@ export const makemigrationsImpl = (): string | undefined | null => {
     process.env.PWD = process.cwd();
   }
 
-  const hash = checkModule(`object-hash`, true);
-  const { diff } = checkModule(`deep-diff`, true);
+
 
   const {
     migrationsFolder,
@@ -145,7 +144,7 @@ export const makemigrationsImpl = (): string | undefined | null => {
 
     currentState.tables = reverseModels(sequelize, models, logger, hash);
 
-    const actions = parseDifference(previousState.tables, currentState.tables, logger, diff);
+    const actions = parseDifference(previousState.tables, currentState.tables, logger);
 
     // sort actions
     sortActions(actions);

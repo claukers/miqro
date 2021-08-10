@@ -1,7 +1,8 @@
 import fs from "fs";
 
 import path from "path";
-import { checkModule } from "../../../utils";
+import { diff } from "deep-diff";
+import { ARRAY, DataTypes, Sequelize } from "sequelize";
 
 /* tslint:disable */
 
@@ -9,10 +10,6 @@ const reverseSequelizeColType = (col: any, prefix = "Sequelize."): string => {
   const attrName = col.type.key;
   const attrObj = col.type;
   const options = (col.type.options) ? col.type.options : {};
-
-  const Sequelize = checkModule(`sequelize`);
-
-  const DataTypes = Sequelize.DataTypes;
 
   // noinspection SpellCheckingInspection,DuplicateCaseLabelJS
   switch (attrName) {
@@ -132,15 +129,15 @@ const reverseSequelizeColType = (col: any, prefix = "Sequelize."): string => {
 const reverseSequelizeDefValueType = (defaultValue: any, prefix = "Sequelize."): any => {
   if (typeof defaultValue === "object") {
     if (defaultValue.constructor && defaultValue.constructor.name) {
-      return {internal: true, value: prefix + defaultValue.constructor.name};
+      return { internal: true, value: prefix + defaultValue.constructor.name };
     }
   }
 
   if (typeof defaultValue === "function") {
-    return {notSupported: true, value: ""};
+    return { notSupported: true, value: "" };
   }
 
-  return {value: defaultValue};
+  return { value: defaultValue };
 };
 
 const parseIndex = (idx: any, hash: any): any => {
@@ -179,8 +176,6 @@ const parseIndex = (idx: any, hash: any): any => {
 /* eslint-disable  @typescript-eslint/explicit-module-boundary-types */
 export const reverseModels = (sequelize: any, models: any, logger: any, hash: any): any => {
   const tables = {};
-
-  const Sequelize = checkModule(`sequelize`);
 
   delete models.default;
 
@@ -243,7 +238,7 @@ export const reverseModels = (sequelize: any, models: any, logger: any, hash: an
           }
           // noinspection JSUnfilteredForInLoop
           attributes[column].type = {
-            key: Sequelize.ARRAY.key
+            key: ARRAY.key
           };
         }
       }
@@ -323,7 +318,7 @@ export interface DiffAction {
   depends?: any;
 }
 
-export const parseDifference = (previousState: any, currentState: any, logger: any, diff: any): DiffAction[] => {
+export const parseDifference = (previousState: any, currentState: any, logger: any): DiffAction[] => {
   //    log(JSON.stringify(currentState, null, 4));
   const actions: DiffAction[] = [];
   const difference = diff(previousState, currentState);
@@ -367,7 +362,7 @@ export const parseDifference = (previousState: any, currentState: any, logger: a
                     actionType: "addIndex",
                     tableName,
                     depends: [tableName]
-                  }, ...{...df.rhs.indexes[_i]}
+                  }, ...{ ...df.rhs.indexes[_i] }
                 });
               }
             }
@@ -419,7 +414,7 @@ export const parseDifference = (previousState: any, currentState: any, logger: a
           // new index
           if (df.path && df.path[1] === "indexes") {
             const tableName = df.path[0];
-            const index = {...df.rhs};
+            const index = { ...df.rhs };
             index.actionType = "addIndex";
             index.tableName = tableName;
             index.depends = [tableName];
@@ -771,7 +766,7 @@ export const getMigration = (actions: any): any => {
     }
   }
 
-  return {commandsUp, consoleOut};
+  return { commandsUp, consoleOut };
 };
 
 export const writeMigration = (revision: any, migration: any, migrationsDir: any, name = "", comment = ""): any => {
@@ -832,7 +827,7 @@ module.exports = {
 
   fs.writeFileSync(filename, template);
 
-  return {filename, info};
+  return { filename, info };
 };
 
 export const executeMigration = (queryInterface: any, filename: any, pos: any, cb: any, logger: any): any => {
@@ -847,8 +842,6 @@ export const executeMigration = (queryInterface: any, filename: any, pos: any, c
     logger.info("Set position to " + pos);
     mig.pos = pos;
   }
-
-  const Sequelize = checkModule(`sequelize`);
 
   mig.up(queryInterface, Sequelize).then(
     () => {
