@@ -1,4 +1,4 @@
-import { Util, SimpleMap } from "@miqro/core";
+import { loadConfig, SimpleMap } from "@miqro/core";
 import { resolve } from "path";
 import { readFileSync } from "fs";
 import { Database } from "@miqro/database";
@@ -21,7 +21,7 @@ export const main = async (): Promise<void> => {
   const modelList = models.split(",").map(o => o.trim());
 
 
-  Util.loadConfig();
+  loadConfig();
   const db = Database.getInstance();
   await db.start();
   const out: SimpleMap<any[]> = JSON.parse(readFileSync(resolve(process.cwd(), outfile)).toString());

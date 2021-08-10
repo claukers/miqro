@@ -1,4 +1,4 @@
-import { Util, ConfigPathResolver } from "@miqro/core";
+import { loadConfig, ConfigPathResolver } from "@miqro/core";
 import { seed } from "../db";
 import { resolve } from "path";
 
@@ -11,7 +11,7 @@ export const main = (): void => {
     throw new Error(`arguments: <seed_file>`);
   }
 
-  Util.loadConfig();
+  loadConfig();
 
   const filePath = resolve(ConfigPathResolver.getBaseDirname(), process.argv[3]);
 

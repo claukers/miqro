@@ -1,4 +1,4 @@
-import { ConfigPathResolver, Util } from "@miqro/core";
+import { ConfigPathResolver, loadConfig } from "@miqro/core";
 import { mkdirSync, writeFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
@@ -56,7 +56,7 @@ export const main = (minimal = false): void => {
 
   const identifier = process.argv[3].toLocaleLowerCase();
 
-  Util.getConfig();
+  loadConfig();
 
   const split = identifier.split("_");
 

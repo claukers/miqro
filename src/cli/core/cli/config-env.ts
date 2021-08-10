@@ -1,4 +1,4 @@
-import { Util } from "@miqro/core";
+import { loadConfig } from "@miqro/core";
 
 export const main = (): void => {
   const logger = console;
@@ -7,7 +7,7 @@ export const main = (): void => {
     throw new Error(`invalid number of args`);
   }
 
-  const configOut = Util.getConfig();
+  const configOut = loadConfig();
 
   const config = configOut.combined;
   const keys = Object.keys(config);

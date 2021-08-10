@@ -1,4 +1,4 @@
-import { getLogger, Util } from "@miqro/core";
+import { getLogger, loadConfig } from "@miqro/core";
 import { getDOCJSON } from "../util";
 
 export const main = (): void => {
@@ -10,7 +10,7 @@ export const main = (): void => {
   const dirname = process.argv[3];
   const subPath = process.argv[4];
 
-  Util.getConfig();
+  loadConfig();
 
   console.log(JSON.stringify(getDOCJSON({ dirname, subPath }, getLogger("miqro")), undefined, 2));
 }

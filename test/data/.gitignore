@@ -1,5 +1,0 @@
-config/log.js
-config/db.js
-logs/
-node_modules/
-*.sqlite3

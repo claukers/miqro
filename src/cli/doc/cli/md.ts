@@ -1,9 +1,7 @@
-import { ConfigPathResolver, getLogger, GroupPolicy, ParseOption, ParseOptionMap, parseOptionMap2ParseOptionList } from "@miqro/core";
+import { ConfigPathResolver, getLogger, GroupPolicy, loadConfig, ParseOption, ParseOptionMap } from "@miqro/core";
 import { resolve } from "path";
 import { writeFileSync } from "fs";
 
-
-import { Util } from "@miqro/core";
 import { getDOCJSON } from "../util";
 
 export const main = (): void => {
@@ -16,7 +14,25 @@ export const main = (): void => {
   const subPath = process.argv[4];
   const outPath = process.argv[5];
 
-  Util.getConfig();
+  loadConfig();
+
+  const parseOptionMap2ParseOptionList = (map: ParseOptionMap): ParseOption[] => {
+    return Object.keys(map).map(name => {
+      const val = map[name];
+      return typeof val !== "object" ? {
+        name,
+        required: true,
+        type: val
+      } : val.required === undefined ? {
+        ...val,
+        required: true,
+        name
+      } : {
+        ...val,
+        name
+      };
+    });
+  }
 
   const docJSON = getDOCJSON({ dirname, subPath }, getLogger("miqro"));
 

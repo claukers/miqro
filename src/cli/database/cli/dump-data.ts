@@ -1,4 +1,4 @@
-import { Util, SimpleMap } from "@miqro/core";
+import { loadConfig, SimpleMap } from "@miqro/core";
 import { resolve } from "path";
 import { writeFileSync } from "fs";
 import { Database } from "@miqro/database";
@@ -14,7 +14,7 @@ export const main = async (): Promise<void> => {
     throw new Error(`<outfile> must be a string!`);
   }
 
-  Util.loadConfig();
+  loadConfig();
   const db = Database.getInstance();
   await db.start();
   const out: SimpleMap<any[]> = {};

@@ -15,28 +15,24 @@
     "prepare": "npm run build",
     "prebuild": "rm -Rf dist;",
     "build": "tsc",
-    "pretest": "rm test/data/test.sqlite3; npm run build",
-    "test:db": "cd test/data && NODE_ENV=test node ../../dist/cli/cli.js db:migrate && NODE_ENV=test node ../../dist/cli/cli.js db:seed:all",
-    "test": "npm run test:db",
+    "test": "echo 'test disabled'",
     "lint": "eslint ./src --ext ts",
     "fixlint": "eslint ./src --ext ts --fix"
   },
   "author": "claukers",
   "license": "ISC",
   "dependencies": {
-    "@miqro/core": "^1.1.9",
-    "@miqro/database": "^1.0.11",
-    "@miqro/runner": "^1.1.4"
+    "@miqro/core": "^1.1.19",
+    "@miqro/database": "^1.0.15",
+    "@miqro/runner": "^1.1.4",
+    "deep-diff": "^1.0.2",
+    "object-hash": "^2.2.0"
   },
   "devDependencies": {
-    "@types/node": "^16.4.2",
-    "@typescript-eslint/eslint-plugin": "^4.28.4",
-    "@typescript-eslint/parser": "^4.28.4",
-    "deep-diff": "^1.0.2",
-    "eslint": "^7.31.0",
-    "object-hash": "^2.2.0",
-    "sequelize-cli": "^6.2.0",
-    "sqlite3": "^5.0.2",
+    "@types/node": "^16.4.13",
+    "@typescript-eslint/eslint-plugin": "^4.29.1",
+    "@typescript-eslint/parser": "^4.29.1",
+    "eslint": "^7.32.0",
     "typescript": "^4.3.5"
   },
   "engines": {

@@ -1,4 +1,4 @@
-import { Util } from "@miqro/core";
+import { getLogger } from "@miqro/core";
 import fs from "fs";
 import path from "path";
 import { checkModule } from "../../../utils";
@@ -7,7 +7,7 @@ import { executeMigration, getMigration, parseDifference, reverseModels, sortAct
 
 // noinspection JSUnusedGlobalSymbols
 export const migrateImpl = async (): Promise<void> => {
-  const logger = Util.getLogger("migrate");
+  const logger = getLogger("migrate");
   const options = {
     rev: 0,
     pos: 0,
@@ -94,7 +94,7 @@ export const makemigrationsImpl = (): string | undefined | null => {
   if (!process.env.PWD) {
     process.env.PWD = process.cwd();
   }
-  
+
   const hash = checkModule(`object-hash`, true);
   const { diff } = checkModule(`deep-diff`, true);
 
@@ -104,7 +104,7 @@ export const makemigrationsImpl = (): string | undefined | null => {
   } = loadSequelizeRC();
 
   // noinspection SpellCheckingInspection
-  const logger = Util.getLogger("makemigrations");
+  const logger = getLogger("makemigrations");
 
   try {
     if (!fs.existsSync(modelsFolder)) {

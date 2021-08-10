@@ -1,4 +1,4 @@
-import { Util } from "@miqro/core";
+import { getLogger, loadConfig } from "@miqro/core";
 import { createInterface } from "readline";
 import { Database } from "@miqro/database";
 
@@ -7,8 +7,8 @@ export const main = (): void => {
     throw new Error(`invalid number of args`);
   }
 
-  Util.loadConfig();
-  const logger = Util.getLogger("db:console");
+  loadConfig();
+  const logger = getLogger("db:console");
   const rl = createInterface({
     input: process.stdin,
     output: process.stdout

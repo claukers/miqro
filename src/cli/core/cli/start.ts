@@ -1,4 +1,4 @@
-import { Util } from "@miqro/core";
+import { loadConfig } from "@miqro/core";
 import { execSync } from "../../utils";
 
 export const main = (): void => {
@@ -7,7 +7,7 @@ export const main = (): void => {
     throw new Error(`invalid number of args`);
   }
 
-  Util.getConfig();
+  loadConfig();
 
   execSync(`npx @miqro/runner ${process.argv.slice(3).join(" ")}`);
 }
