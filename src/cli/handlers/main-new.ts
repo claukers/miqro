@@ -4,7 +4,7 @@ import { resolve } from "path";
 
 const mainTemplates = {
   ts: (minimal = false) =>
-    `import { App, checkEnvVariables, getLogger } from "@miqro/core";
+    `import { App, Context, checkEnvVariables, getLogger, ReadBuffer, JSONParser } from "@miqro/core";
 ${!minimal ? `import { APIRouter, middleware } from "@miqro/handlers";\nimport { resolve } from "path";` : ""}
 
 /*
@@ -19,13 +19,17 @@ const logger = getLogger("server");
 const app = new App();
 ${!minimal ? `app.use(middleware());\napp.use(APIRouter({
   dirname: resolve(__dirname, "api")
-}));` : ""}
+}));` : `app.get("/api/health", [ReadBuffer(), JSONParser(), async (ctx: Context) => {
+  ctx.json({
+    status: "OK"
+  });
+}]);`}
 app.listen(PORT, () => {
   logger.info("listening on " + PORT);
 });
 `,
   js: (minimal = false) =>
-    `const { App, checkEnvVariables, getLogger } = require("@miqro/core");
+    `const { App, checkEnvVariables, getLogger, ReadBuffer, JSONParser } = require("@miqro/core");
 ${!minimal ? `const { APIRouter, middleware } = require("@miqro/handlers");
 const { resolve } = require("path");`: ""}
 
@@ -41,7 +45,11 @@ const logger = getLogger("server");
 const app = new App();
 ${!minimal ? `app.use(middleware());\napp.use(APIRouter({
   dirname: resolve(__dirname, "api")
-}));` : ""}
+}));` : `app.get("/api/health", [ReadBuffer(), JSONParser(), async (ctx) => {
+  ctx.json({
+    status: "OK"
+  });
+}]);`}
 app.listen(PORT, () => {
   logger.info("listening on " + PORT);
 });
