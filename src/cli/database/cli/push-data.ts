@@ -1,7 +1,7 @@
 import { loadConfig, SimpleMap } from "@miqro/core";
 import { resolve } from "path";
 import { readFileSync } from "fs";
-import { Database } from "@miqro/database";
+import { loadSequelize } from "@miqro/database";
 
 export const main = async (): Promise<void> => {
   const outfile = process.argv[3];
@@ -22,13 +22,12 @@ export const main = async (): Promise<void> => {
 
 
   loadConfig();
-  const db = Database.getInstance();
-  await db.start();
+  const db = loadSequelize();
   const out: SimpleMap<any[]> = JSON.parse(readFileSync(resolve(process.cwd(), outfile)).toString());
   for (const modelName of modelList) {
     if (out[modelName] && db.models[modelName]) {
       await db.models[modelName].bulkCreate(out[modelName]);
     }
   }
-  await db.stop();
+  await db.close();
 }

@@ -2,6 +2,7 @@ import fs from "fs";
 
 import path from "path";
 import { diff } from "deep-diff";
+import hash from "object-hash";
 import { ARRAY, DataTypes, Sequelize } from "sequelize";
 
 /* tslint:disable */
@@ -174,7 +175,7 @@ const parseIndex = (idx: any, hash: any): any => {
 };
 
 /* eslint-disable  @typescript-eslint/explicit-module-boundary-types */
-export const reverseModels = (sequelize: any, models: any, logger: any, hash: any): any => {
+export const reverseModels = (sequelize: any, models: any, logger: any): any => {
   const tables = {};
 
   delete models.default;

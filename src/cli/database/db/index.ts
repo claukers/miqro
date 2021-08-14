@@ -32,6 +32,7 @@ export const initDBConfig = (): boolean => {
     const sequelizercPath = resolve(ConfigPathResolver.getBaseDirname(), ".sequelizerc");
     if (existsSync(sequelizercPath)) {
       logger.warn(`.sequelizerc already exists!. init will do nothing.`);
+      return false;
     } else {
       const dbFolder = resolve(ConfigPathResolver.getBaseDirname(), "db");
       const migrationsFolder = resolve(dbFolder, "migrations");

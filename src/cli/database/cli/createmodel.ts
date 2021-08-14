@@ -15,17 +15,17 @@ export const main = (): void => {
     throw new Error(`<modelname> must be a string!`);
   }
 
-  
+
 
   const config = loadSequelizeRC();
-  if (!existsSync(config.modelsFolder)) {
-    logger.warn(`models folder [${config.modelsFolder}] doesnt exists!`);
-    logger.warn(`creating [${config.modelsFolder}]!`);
-    mkdirSync(config.modelsFolder, {
+  if (!existsSync(config["models-path"])) {
+    logger.warn(`models folder [${config["models-path"]}] doesnt exists!`);
+    logger.warn(`creating [${config["models-path"]}]!`);
+    mkdirSync(config["models-path"], {
       recursive: true
     });
   }
-  const modelPath = resolve(config.modelsFolder, `${modelname.toLowerCase()}.js`);
+  const modelPath = resolve(config["models-path"], `${modelname.toLowerCase()}.js`);
 
   if (existsSync(modelPath)) {
     throw new Error(`${modelPath} already exists!`);

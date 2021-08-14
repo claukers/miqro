@@ -1,7 +1,7 @@
 import { loadConfig, SimpleMap } from "@miqro/core";
 import { resolve } from "path";
 import { writeFileSync } from "fs";
-import { Database } from "@miqro/database";
+import { loadSequelize } from "@miqro/database";
 
 export const main = async (): Promise<void> => {
   const logger = console;
@@ -15,8 +15,7 @@ export const main = async (): Promise<void> => {
   }
 
   loadConfig();
-  const db = Database.getInstance();
-  await db.start();
+  const db = loadSequelize();
   const out: SimpleMap<any[]> = {};
   logger.info(`beware that if the model is not implicitly defined in db.models it will be dumped.`);
   const models = Object.keys(db.models);
@@ -24,6 +23,6 @@ export const main = async (): Promise<void> => {
     const rows = await db.models[modelName].findAll();
     out[modelName] = rows;
   }
-  await db.stop();
+  await db.close();
   writeFileSync(resolve(process.cwd(), outfile), JSON.stringify(out, undefined, 2));
 }

@@ -1,6 +1,6 @@
 import { getLogger, loadConfig } from "@miqro/core";
 import { createInterface } from "readline";
-import { Database } from "@miqro/database";
+import { loadSequelize } from "@miqro/database";
 
 export const main = (): void => {
   if (process.argv.length !== 3) {
@@ -13,10 +13,7 @@ export const main = (): void => {
     input: process.stdin,
     output: process.stdout
   });
-  const db = Database.getInstance();
-  db.on("error", (e) => {
-    logger.error(e);
-  });
+  const db = loadSequelize();
   const questionLoop = () => {
     rl.question('>', async (query) => {
       try {

@@ -1,9 +1,22 @@
-import {initDBConfig} from "../db";
+import { execSync } from "../../utils";
+import { initDBConfig } from "../db";
 
 export const main = (): void => {
   if (process.argv.length !== 3) {
     throw new Error(`invalid number of args`);
   }
 
-  initDBConfig();
+  if (initDBConfig()) {
+    execSync(
+      `npm install sequelize --save`
+    );
+
+    execSync(
+      `npm install sequelize-cli --save-dev`
+    );
+
+    execSync(
+      `npm install @miqro/database --save`
+    );
+  }
 };
