@@ -19,15 +19,19 @@ export const main = (): void => {
 
 
   const config = loadSequelizeRC();
-  if (!existsSync(config["models-path"])) {
-    logger.warn(`models folder [${config["models-path"]}] doesnt exists!`);
-    logger.warn(`creating [${config["models-path"]}]!`);
-    mkdirSync(config["models-path"], {
+
+  const typescript = existsSync(resolve(ConfigPathResolver.getBaseDirname(), "tsconfig.json")) ? true : false;
+  const modelsFolder = typescript ? resolve(ConfigPathResolver.getBaseDirname(), "src", "models") : config["models-path"];
+
+  if (!existsSync(modelsFolder)) {
+    logger.warn(`models folder [${modelsFolder}] doesnt exists!`);
+    logger.warn(`creating [${modelsFolder}]!`);
+    mkdirSync(modelsFolder, {
       recursive: true
     });
   }
-  const typescript = existsSync(resolve(ConfigPathResolver.getBaseDirname(), "tsconfig.json")) ? true : false;
-  const modelPath = typescript ? resolve(ConfigPathResolver.getBaseDirname(), "src", "models", `${modelname.toLowerCase()}.ts`) : resolve(config["models-path"], `${modelname.toLowerCase()}.js`);
+
+  const modelPath = resolve(modelsFolder, `${modelname.toLowerCase()}${typescript ? ".ts" : ".js"}`);
 
   if (existsSync(modelPath)) {
     throw new Error(`${modelPath} already exists!`);
