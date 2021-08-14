@@ -56,12 +56,32 @@ API_HEALTH_GET=false
 
 ## add sequelize integration
 
-```npx miqro db:init```
+```
+npx miqro db:init
+```
 
 ```typescript
 import { loadSequelize } from "@miqro/database";
 
 const sequelize = loadSequelize();
+```
+
+## start in cluster mode
+
+```
+npm install @miqro/runner --save
+```
+
+to start with 10
+
+```
+CLUSTER_COUNT=10 npx @miqro/runner dist/main.js
+```
+
+to disable auto restart when the process crashes.
+
+```
+CLUSTER_COUNT=10 DISABLE_RESTART=false npx @miqro/runner dist/main.js
 ```
 
 ## auto generate migrations for changes to models
