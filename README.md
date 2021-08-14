@@ -54,6 +54,17 @@ APIRouter is a FeatureRouter so to disable routes you can set an ENV VAR with th
 API_HEALTH_GET=false
 ```
 
+## sequelize integration
+
+```npx miqro db:init```
+
+```typescript
+import { loadSequelize } from "@miqro/database";
+
+const sequelize = loadSequelize();
+```
+
+
 ## cli for development
 
 ```npm install miqro --save-dev```
