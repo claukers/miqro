@@ -8,7 +8,7 @@ import { execSync } from "../../utils";
 const logger = console;
 
 // noinspection SpellCheckingInspection
-export const initDBConfig = (): boolean => {
+export const initDBConfig = (modelsPath?: string, typescript?: boolean): boolean => {
   try {
     const initDir = (p: string): void => {
       if (!existsSync(p)) {
@@ -34,14 +34,15 @@ export const initDBConfig = (): boolean => {
       logger.warn(`.sequelizerc already exists!. init will do nothing.`);
       return false;
     } else {
+      const typescript = existsSync(resolve(ConfigPathResolver.getBaseDirname(), "tsconfig.json")) ? true : false;
       const dbFolder = resolve(ConfigPathResolver.getBaseDirname(), "db");
       const migrationsFolder = resolve(dbFolder, "migrations");
-      const modelsFolder = resolve(dbFolder, "models");
+      const modelsFolder = typescript ? resolve("src", "models") : resolve(dbFolder, "models");
       const seedersFolder = resolve(dbFolder, "seeders");
-      const modelLoaderPath = resolve(modelsFolder, "index.js");
+      const modelLoaderPath = resolve(modelsFolder, typescript ? "index.ts" : "index.js");
       const dbConfigFilePath = resolve(dbFolder, "connection.js");
       // noinspection SpellCheckingInspection
-      initFile(sequelizercPath, templates.sequelizerc);
+      initFile(sequelizercPath, templates.sequelizerc(typescript));
       initDir(dbFolder);
       initFile(dbConfigFilePath, templates.dbConfig);
       initDir(migrationsFolder);

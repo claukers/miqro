@@ -64,6 +64,10 @@ import { loadSequelize } from "@miqro/database";
 const sequelize = loadSequelize();
 ```
 
+## auto generate migrations for changes to models
+
+```npx miqro db:makemigration```
+
 
 ## cli for development
 

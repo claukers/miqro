@@ -2,12 +2,14 @@
 const modelsIndex =
   `'use strict';
 
+const { loadSequelizeRC } = require('@miqro/database');
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
-const sequelizerc = require(path.resolve(__dirname, '..', '..', '.sequelizerc'));
+const sequelizerc = loadSequelizeRC();
 const config = require(sequelizerc.config);
+const modelsPath = sequelizerc['models-path'];
 const db = {};
 
 let sequelize;
@@ -18,12 +20,12 @@ if (config.use_env_variable) {
 }
 
 fs
-  .readdirSync(__dirname)
+  .readdirSync(modelsPath)
   .filter(file => {
     return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
   })
   .forEach(file => {
-    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+    const model = require(path.join(modelsPath, file))(sequelize, Sequelize.DataTypes);
     db[model.name] = model;
   });
 
@@ -33,10 +35,9 @@ Object.keys(db).forEach(modelName => {
   }
 });
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
-
 module.exports = db;
+module.exports.sequelize = sequelize;
+module.exports.Sequelize = Sequelize;
 
 `;
 // noinspection SpellCheckingInspection
@@ -68,19 +69,47 @@ module.exports = {
 };
 `;
 // noinspection SpellCheckingInspection
-const sequelizerc =
+const sequelizerc = (typescript?: boolean) =>
   `const path = require("path");
 
 module.exports = {
   "config": path.resolve(__dirname, "db", "connection.js"),
   "migrations-path": path.resolve(__dirname, "db", "migrations"),
   "seeders-path": path.resolve(__dirname, "db", "seeders"),
-  "models-path": path.resolve(__dirname, "db", "models"),
+  ${typescript ? `"models-path": path.resolve(__dirname, "dist", "models")` : `"models-path": path.resolve(__dirname, "db", "models")`},
 };
 `;
 
-const exampleModel = (modelName: string): string => {
-  return `module.exports = (sequelize, DataTypes) => {
+const exampleModel = (modelName: string, typescript?: boolean): string => {
+  return typescript ? `import { Sequelize, DataTypes, ModelCtor, Model } from "sequelize";
+  
+  export type ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}Model = Model<{ name: string; timestamp: number; }>;
+  export type ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}ModelCtor = ModelCtor<${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}Model>;
+
+  module.exports = (sequelize: Sequelize): ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}ModelCtor => {
+    const ${modelName} = sequelize.define<${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}Model>("${modelName}", {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: ""
+      },
+      timestamp: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      }
+    }, {});
+    /* eslint-disable  @typescript-eslint/ban-ts-comment */
+    // @ts-ignore
+    ${modelName}.associate = function (models) {
+      // associations can be defined here
+      // ${modelName}.belongsTo(models.....)
+    };
+    return ${modelName};
+  };
+
+
+  ` : `module.exports = (sequelize, DataTypes) => {
   const ${modelName} = sequelize.define("${modelName}", {
     name: {
       type: DataTypes.STRING,

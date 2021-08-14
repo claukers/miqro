@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { templates } from "../template";
 import { loadSequelizeRC } from "@miqro/database";
+import { ConfigPathResolver } from "@miqro/core";
 
 export const main = (): void => {
   const logger = console;
@@ -25,12 +26,14 @@ export const main = (): void => {
       recursive: true
     });
   }
-  const modelPath = resolve(config["models-path"], `${modelname.toLowerCase()}.js`);
+  const typescript = existsSync(resolve(ConfigPathResolver.getBaseDirname(), "tsconfig.json")) ? true : false;
+  const modelPath = typescript ? resolve(ConfigPathResolver.getBaseDirname(), "src", "models", `${modelname.toLowerCase()}.ts`) : resolve(config["models-path"], `${modelname.toLowerCase()}.js`);
 
   if (existsSync(modelPath)) {
     throw new Error(`${modelPath} already exists!`);
   }
   logger.info(`creating [${modelPath}]!`);
-  writeFileSync(modelPath, templates.exampleModel(modelname));
+
+  writeFileSync(modelPath, templates.exampleModel(modelname, typescript));
 
 }
