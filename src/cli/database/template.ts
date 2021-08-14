@@ -83,29 +83,33 @@ module.exports = {
 const exampleModel = (modelName: string, typescript?: boolean): string => {
   return typescript ? `import { Sequelize, DataTypes, ModelCtor, Model } from "sequelize";
   
-  export type ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}Model = Model<{ name: string; timestamp: number; }>;
-  export type ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}ModelCtor = ModelCtor<${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}Model>;
+export interface ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)} { 
+  name: string; 
+  timestamp: number; 
+};
+export type ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}Model = Model<${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}>;
+export type ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}ModelCtor = ModelCtor<${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}Model>;
 
-  module.exports = (sequelize: Sequelize): ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}ModelCtor => {
-    const ${modelName} = sequelize.define<${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}Model>("${modelName}", {
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: ""
-      },
-      timestamp: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0
-      }
-    }, {});
-    /* eslint-disable  @typescript-eslint/ban-ts-comment */
-    // @ts-ignore
-    ${modelName}.associate = function (models) {
-      // associations can be defined here
-      // ${modelName}.belongsTo(models.....)
-    };
-    return ${modelName};
+module.exports = (sequelize: Sequelize): ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}ModelCtor => {
+  const ${modelName} = sequelize.define<${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}Model>("${modelName}", {
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: ""
+    },
+    timestamp: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    }
+  }, {});
+  /* eslint-disable  @typescript-eslint/ban-ts-comment */
+  // @ts-ignore
+  ${modelName}.associate = function (models) {
+    // associations can be defined here
+    // ${modelName}.belongsTo(models.....)
+  };
+  return ${modelName};
   };
 
 
