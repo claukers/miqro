@@ -1,4 +1,4 @@
-import { ConfigPathResolver, getLogger, GroupPolicy, loadConfig, ParseOption, ParseOptionMap } from "@miqro/core";
+import { ConfigPathResolver, getLogger, GroupPolicy, loadConfig, Method, ParseOption, ParseOptionMap } from "@miqro/core";
 import { resolve } from "path";
 import { writeFileSync } from "fs";
 
@@ -44,12 +44,16 @@ export const main = (): void => {
     }
 
   };
-  const methodUrlTable = (options: { path: string; methods: string[] }): string => {
+  const methodUrlTable = (options: { path: string; method: Method | Method[] }): string => {
     const rows: string[] = [];
     const paths = (options.path as any) instanceof Array ? options.path : [options.path];
     for (const p of paths) {
-      for (const m of options.methods) {
-        rows.push(`|${m}|${p}|`);
+      if (options.method instanceof Array) {
+        for (const m of options.method) {
+          rows.push(`|${m}|${p}|`);
+        }
+      } else {
+        rows.push(`|${options.method}|${p}|`);
       }
     }
     return `|method|path|\n|----|----|\n${rows.join("\n")}`;
@@ -193,10 +197,10 @@ export const main = (): void => {
       bodyTables.push(bodyTable);
     }
 
-    const results = doc.results instanceof Array ? doc.results : [doc.results];
+    const results = doc.result instanceof Array ? doc.result : [doc.result];
     const resultTables = [];
     for (const r of results) {
-      let resultsTable = doc.results ? parseOptionTable(r) : "";
+      let resultsTable = doc.result ? parseOptionTable(r) : "";
       if (resultsTable.split("\n").length > 1) {
         resultsTable = `#### response.data${r.description ? ` (${r.description})` : ""}\n\n${resultsTable}`;
       } else {
@@ -205,11 +209,8 @@ export const main = (): void => {
       resultTables.push(resultsTable);
     }
 
-    const pTable = policyTable(doc.policy);
-
     return `### ${doc.featureName}\n\n` +
       `${doc.description ? `${doc.description}\n\n` : ""}` +
-      `${pTable ? `${pTable}\n\n` : ""}` +
       `#### endpoint\n\n` +
       `${methodUrlTable(doc)}\n\n` +
       // `${paramsTable ? `${paramsTable}\n\n` : ""}` +

@@ -4,8 +4,8 @@ import { resolve } from "path";
 
 const mainTemplates = {
   ts: (minimal = false) =>
-    `import { App, Context, checkEnvVariables, getLogger, ReadBuffer, JSONParser } from "@miqro/core";
-${!minimal ? `import { APIRouter, middleware } from "@miqro/handlers";\nimport { resolve } from "path";` : ""}
+    `${minimal ? `import { APIRouter, App, checkEnvVariables, getLogger, ReadBuffer, JSONParser } from "@miqro/core";`: `import { APIRouter, App, checkEnvVariables, getLogger } from "@miqro/core";`}
+${!minimal ? `import { middleware } from "@miqro/handlers";\nimport { resolve } from "path";` : ""}
 
 /*
 To be start as a main file
@@ -29,8 +29,8 @@ app.listen(PORT, () => {
 });
 `,
   js: (minimal = false) =>
-    `const { App, checkEnvVariables, getLogger, ReadBuffer, JSONParser } = require("@miqro/core");
-${!minimal ? `const { APIRouter, middleware } = require("@miqro/handlers");
+    `${minimal ? `const { APIRouter, App, checkEnvVariables, getLogger, ReadBuffer, JSONParser } = require("@miqro/core");`: `const { APIRouter, App, checkEnvVariables, getLogger } = require("@miqro/core");`}
+${!minimal ? `const { middleware } = require("@miqro/handlers");
 const { resolve } = require("path");`: ""}
 
 /*

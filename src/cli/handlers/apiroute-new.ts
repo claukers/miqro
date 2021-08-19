@@ -4,8 +4,7 @@ import { resolve } from "path";
 
 const templates = {
   ts:
-    `import { APIRoute } from "@miqro/handlers";
-import { Context } from "@miqro/core";
+    `import { APIRoute, Context } from "@miqro/core";
 
 const route: APIRoute = {
   query: false,
