@@ -3,10 +3,11 @@ import { mkdirSync, writeFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
 const templates = {
-  ts:
+  ts: (path: string) =>
     `import { APIRoute, Context } from "@miqro/core";
 
 const route: APIRoute = {
+  path: "${path}",
   method: "POST",
   query: false,
   body: [
@@ -35,8 +36,9 @@ const route: APIRoute = {
 
 export default route;
 `,
-  js:
+  js: (path: string) =>
     `module.exports = {
+  path: "${path}",
   method: "POST",
   query: false,
   body: [
@@ -97,5 +99,5 @@ export const main = (): void => {
     recursive: true
   });
 
-  writeFileSync(filePath, templates[ext]);
+  writeFileSync(filePath, templates[ext](`/${split[0]}`));
 }
