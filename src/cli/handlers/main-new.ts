@@ -19,7 +19,7 @@ const logger = getLogger("server");
 const app = new App();
 ${!minimal ? `app.use(middleware());\napp.use(APIRouter({
   dirname: resolve(__dirname, "api")
-}));` : `app.get("/api/health", [ReadBuffer(), JSONParser(), async (ctx: Context) => {
+}, logger));` : `app.get("/api/health", [ReadBuffer(), JSONParser(), async (ctx: Context) => {
   ctx.json({
     status: "OK"
   });
@@ -45,7 +45,7 @@ const logger = getLogger("server");
 const app = new App();
 ${!minimal ? `app.use(middleware());\napp.use(APIRouter({
   dirname: resolve(__dirname, "api")
-}));` : `app.get("/api/health", [ReadBuffer(), JSONParser(), async (ctx) => {
+}, logger));` : `app.get("/api/health", [ReadBuffer(), JSONParser(), async (ctx) => {
   ctx.json({
     status: "OK"
   });

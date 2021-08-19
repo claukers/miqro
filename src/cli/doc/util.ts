@@ -3,7 +3,7 @@ import { traverseAPIRouteDir } from "@miqro/core/dist/handler/api-router-utils";
 import { basename, resolve } from "path";
 
 export const getDOCJSON = ({ dirname, subPath }: { dirname: string; subPath: string; }, logger: Logger): {
-  path: string;
+  path: string | string[];
   method: Method | Method[];
   description: string;
   params: false | ParseOptions | ParseOptions[];
@@ -12,7 +12,7 @@ export const getDOCJSON = ({ dirname, subPath }: { dirname: string; subPath: str
   result: ParseOptions | ParseOptions[];
   featureName: string;
 }[] => {
-  const apiTraverse = traverseAPIRouteDir(logger, basename(dirname).toUpperCase(), resolve(ConfigPathResolver.getBaseDirname(), dirname), subPath);
+  const apiTraverse = traverseAPIRouteDir(basename(dirname).toUpperCase(), resolve(ConfigPathResolver.getBaseDirname(), dirname), subPath, undefined, logger);
   const docJSON = Object.keys(apiTraverse).map(featureName => {
     const { path, method, apiHandlerOptions } = apiTraverse[featureName];
     const { params, description, query, body, result } = apiHandlerOptions;

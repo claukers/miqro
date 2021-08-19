@@ -7,6 +7,7 @@ const templates = {
     `import { APIRoute, Context } from "@miqro/core";
 
 const route: APIRoute = {
+  method: "POST",
   query: false,
   body: [
     {
@@ -25,17 +26,18 @@ const route: APIRoute = {
       mode: "remove_extra"
     }
   ],
-  handler: [async (ctx: Context) => {
+  handler: async (ctx: Context) => {
     return {
       text: \`Hello \${ctx.body.name}!\`
     }
-  }]
+  }
 };
 
 export default route;
 `,
   js:
     `module.exports = {
+  method: "POST",
   query: false,
   body: [
     {
@@ -54,11 +56,11 @@ export default route;
       mode: "remove_extra"
     }
   ],
-  handler: [async (ctx) => {
+  handler: async (ctx) => {
     return {
       text: \`Hello \${ctx.body.name}!\`
     }
-  }]
+  }
 };
 `
 }

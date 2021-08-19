@@ -44,7 +44,7 @@ export const main = (): void => {
     }
 
   };
-  const methodUrlTable = (options: { path: string; method: Method | Method[] }): string => {
+  const methodUrlTable = (options: { path: string | string[]; method: Method | Method[] }): string => {
     const rows: string[] = [];
     const paths = (options.path as any) instanceof Array ? options.path : [options.path];
     for (const p of paths) {
