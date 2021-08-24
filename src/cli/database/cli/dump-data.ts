@@ -14,11 +14,11 @@ export const main = async (): Promise<void> => {
     throw new Error(`<outfile> must be a string!`);
   }
 
-  const [LIMIT_COUNT] = checkEnvVariables(["LIMIT_COUNT"], ["100"]);
-  const limit = parseInt(LIMIT_COUNT, 10);
+  const [LIMIT] = checkEnvVariables(["LIMIT"], ["100"]);
+  const limit = parseInt(LIMIT, 10);
 
-  if (!isNaN(limit) || limit <= 0) {
-    throw new Error(`LIMIT_COUNT must be a number grater than 0!`);
+  if (isNaN(limit) || limit <= 0) {
+    throw new Error(`LIMIT must be a number grater than 0!`);
   }
 
   loadConfig();
@@ -34,15 +34,7 @@ export const main = async (): Promise<void> => {
       offset,
       limit
     })).rows.length > 0) {
-      out[modelName] = out[modelName].concat(rows.map(r => {
-        const ret = r;
-        for (const v of r.dataValues) {
-          if (r.v instanceof Buffer) {
-            ret[v] = r.v.toString("utf-8");
-          }
-        }
-        return ret;
-      }));
+      out[modelName] = out[modelName].concat(rows.rows);
       offset += limit;
     }
   }

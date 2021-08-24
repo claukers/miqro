@@ -21,7 +21,7 @@ export const main = async (): Promise<void> => {
   const [BULK_CREATE_COUNT] = checkEnvVariables(["BULK_CREATE_COUNT"], ["100"]);
   const bulkCount = parseInt(BULK_CREATE_COUNT, 10);
 
-  if (!isNaN(bulkCount) || bulkCount < 0) {
+  if (isNaN(bulkCount) || bulkCount < 0) {
     throw new Error(`BULK_CREATE_COUNT must be a number grater or equal than 0!`);
   }
 
@@ -32,7 +32,14 @@ export const main = async (): Promise<void> => {
   const out: SimpleMap<any[]> = JSON.parse(readFileSync(resolve(process.cwd(), outfile)).toString());
   for (const modelName of modelList) {
     if (out[modelName] && db.models[modelName]) {
-      const list = out[modelName];
+      const list = out[modelName].map(i => {
+        const ret = {};
+        const attrs = Object.keys(i);
+        for (const a of attrs) {
+          ret[a] = i[a] && i[a].type === "Buffer" ? Buffer.from(i[a]) : i[a];
+        }
+        return ret;
+      });
       if (bulkCount === 0) {
         for (const m of list) {
           await db.models[modelName].create(m);
