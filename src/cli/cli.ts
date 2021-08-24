@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 //@miqro/core
 import { CLIUtil } from "@miqro/core";
-import { main as start } from "./core/cli/start";
 import { mainJS as newJS } from "./core/cli/new";
 import { mainTS as newTS } from "./core/cli/new";
 import { mainMinimalTS as newMinimalTS } from "./core/cli/new";
@@ -54,9 +53,7 @@ CLIUtil.cliFlow({
 
   ["new:route"]: { cb: newRoute, description: "\t\tcreates a new route" },
 
-  ["start"]: { cb: start, description: "\t\t\tstart a nodejs script in cluster mode and restart if crash." },
-
-  ["db:console"]: { cb: consoleCMD, description: "\t\truns a readline interface that send the input as a query" },
+  ["db:console"]: { section: "sequelize helpers", cb: consoleCMD, description: "\t\truns a readline interface that send the input as a query" },
   ["db:dump:data"]: { cb: dumpData, description: "\t\tdump the data of the database (only defined models)" },
   ["db:push:data"]: { cb: pushData, description: "\t\tpush a dump to the database" },
   ["db:automigrate"]: { cb: autoMigrate, description: "\t\truns makemigrations and migrate together" },
@@ -64,12 +61,12 @@ CLIUtil.cliFlow({
     cb: makeMigrations,
     description: "\tseeks changes in your models and creates migrations"
   },
-  ["db:migrate:status"]: { cb: migrationStatus, description: "\talias for npx sequelize-cli db:migrate:status" },
+  ["db:init"]: { cb: dbInit, description: "\t\t\tinit sequelize configuration." },
+  ["db:create:model"]: { cb: createModel, description: "\t\tcreates an example model" },
+  ["db:migrate:status"]: { section: "alias of sequelize-cli", cb: migrationStatus, description: "\talias for npx sequelize-cli db:migrate:status" },
   ["db:migrate"]: { cb: migrate, description: "\t\talias for npx sequelize-cli db:migrate" },
   ["db:seed:all"]: { cb: seedAll, description: "\t\talias for npx sequelize-cli db:seed:all" },
   ["db:seed"]: { cb: seed, description: "\t\t\talias for npx sequelize-cli db:seed" },
   ["db:seed:undo:all"]: { cb: undoSeedAll, description: "\talias for npx sequelize-cli db:seed:undo:all" },
-  ["db:seed:undo"]: { cb: undoSeed, description: "\t\talias for npx sequelize-cli db:seed:undo" },
-  ["db:create:model"]: { cb: createModel, description: "\t\tcreates an example model" },
-  ["db:init"]: { cb: dbInit, description: "\t\t\tinit sequelize configuration." }
+  ["db:seed:undo"]: { cb: undoSeed, description: "\t\talias for npx sequelize-cli db:seed:undo" }
 }, "npx miqro <command> [args]", console);
