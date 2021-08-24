@@ -14,9 +14,5 @@ export const main = (): void => {
     execSync(
       `npm install sequelize-cli --save-dev`
     );
-
-    execSync(
-      `npm install @miqro/database --save`
-    );
   }
 };

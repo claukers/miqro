@@ -64,12 +64,12 @@ CLIUtil.cliFlow({
     cb: makeMigrations,
     description: "\tseeks changes in your models and creates migrations"
   },
-  ["db:migrate:status"]: { cb: migrationStatus, description: "\tnpx sequelize-cli db:migrate:status" },
-  ["db:migrate"]: { cb: migrate, description: "\t\tnpx sequelize-cli db:migrate" },
-  ["db:seed:all"]: { cb: seedAll, description: "\t\tnpx sequelize-cli db:seed:all" },
-  ["db:seed"]: { cb: seed, description: "\t\t\tnpx sequelize-cli db:seed" },
-  ["db:seed:undo:all"]: { cb: undoSeedAll, description: "\tnpx sequelize-cli db:seed:undo:all" },
-  ["db:seed:undo"]: { cb: undoSeed, description: "\t\tnpx sequelize-cli db:seed:undo" },
+  ["db:migrate:status"]: { cb: migrationStatus, description: "\talias for npx sequelize-cli db:migrate:status" },
+  ["db:migrate"]: { cb: migrate, description: "\t\talias for npx sequelize-cli db:migrate" },
+  ["db:seed:all"]: { cb: seedAll, description: "\t\talias for npx sequelize-cli db:seed:all" },
+  ["db:seed"]: { cb: seed, description: "\t\t\talias for npx sequelize-cli db:seed" },
+  ["db:seed:undo:all"]: { cb: undoSeedAll, description: "\talias for npx sequelize-cli db:seed:undo:all" },
+  ["db:seed:undo"]: { cb: undoSeed, description: "\t\talias for npx sequelize-cli db:seed:undo" },
   ["db:create:model"]: { cb: createModel, description: "\t\tcreates an example model" },
   ["db:init"]: { cb: dbInit, description: "\t\t\tinit sequelize configuration." }
 }, "npx miqro <command> [args]", console);

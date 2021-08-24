@@ -2,12 +2,14 @@
 const modelsIndex =
   `'use strict';
 
-const { loadSequelizeRC } = require('@miqro/database');
+const { ConfigPathResolver } = require('@miqro/core');
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
-const sequelizerc = loadSequelizeRC();
+
+const sequelizerc = require(ConfigPathResolver.getSequelizeRCFilePath());
+
 const config = require(sequelizerc.config);
 const modelsPath = sequelizerc['models-path'];
 const db = {};
