@@ -8,7 +8,7 @@ import { execSync } from "../../utils";
 const logger = console;
 
 // noinspection SpellCheckingInspection
-export const initDBConfig = (modelsPath?: string, typescript?: boolean): boolean => {
+export const initDBConfig = (): boolean => {
   try {
     const initDir = (p: string): void => {
       if (!existsSync(p)) {

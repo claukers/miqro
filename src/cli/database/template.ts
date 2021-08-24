@@ -69,7 +69,7 @@ module.exports = {
 };
 `;
 // noinspection SpellCheckingInspection
-const sequelizerc = (typescript?: boolean) =>
+const sequelizerc = (typescript?: boolean): string =>
   `const path = require("path");
 
 module.exports = {

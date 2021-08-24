@@ -1,4 +1,4 @@
-import { ConfigPathResolver, getLogger, GroupPolicy, loadConfig, Method, ParseOption, ParseOptionMap } from "@miqro/core";
+import { ConfigPathResolver, getLogger, loadConfig, Method, ParseOption, ParseOptionMap } from "@miqro/core";
 import { resolve } from "path";
 import { writeFileSync } from "fs";
 
@@ -36,14 +36,6 @@ export const main = (): void => {
 
   const docJSON = getDOCJSON({ dirname, subPath }, getLogger("miqro"));
 
-  const policyTable = (policy: GroupPolicy | undefined | false): string => {
-    if (policy) {
-      return `|policy|groups|\n|----|----|\n|${policy.groupPolicy}|${policy.groups.join(", ")}|`;
-    } else {
-      return "```no policy provided!!```";
-    }
-
-  };
   const methodUrlTable = (options: { path: string | string[]; method: Method | Method[] }): string => {
     const rows: string[] = [];
     const paths = (options.path as any) instanceof Array ? options.path : [options.path];
