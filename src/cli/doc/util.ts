@@ -14,8 +14,7 @@ export const getDOCJSON = ({ dirname, subPath }: { dirname: string; subPath: str
 }[] => {
   const apiTraverse = traverseAPIRouteDir(basename(dirname).toUpperCase(), resolve(ConfigPathResolver.getBaseDirname(), dirname), subPath, undefined, logger);
   const docJSON = Object.keys(apiTraverse).map(featureName => {
-    const { path, method, apiHandlerOptions } = apiTraverse[featureName];
-    const { params, description, query, body, result } = apiHandlerOptions;
+    const { path, method, description, params, query, body, result } = apiTraverse[featureName];
     return {
       path,
       method,
