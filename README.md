@@ -8,8 +8,6 @@ this module is just a **cli** for the following npm modules.
 
 - api handlers, body parsing, etc see [@miqro/handlers](https://www.npmjs.com/package/@miqro/handlers)
 
-- sequelize integration see [@miqro/database](https://www.npmjs.com/package/@miqro/database)
-
 - some helpers for doing pagination, searching, etc [@miqro/modelhandlers](https://www.npmjs.com/package/@miqro/modelhandlers)
 
 - some helpers for starting a cluster with auto restart if crash [@miqro/runner](https://www.npmjs.com/package/@miqro/runner)
