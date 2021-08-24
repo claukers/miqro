@@ -1,7 +1,7 @@
 import { checkEnvVariables, loadConfig, SimpleMap } from "@miqro/core";
 import { resolve } from "path";
 import { writeFileSync } from "fs";
-import { loadSequelize } from "@miqro/database";
+import { loadSequelize } from "../db";
 
 export const main = async (): Promise<void> => {
   const logger = console;

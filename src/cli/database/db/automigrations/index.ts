@@ -1,7 +1,7 @@
 import { getLogger } from "@miqro/core";
 import fs from "fs";
 import path from "path";
-import { loadSequelize, loadSequelizeRC } from "@miqro/database";
+import { loadSequelize, loadSequelizeRC } from "..";
 import { executeMigration, getMigration, parseDifference, reverseModels, sortActions, writeMigration } from "./migrate";
 
 // noinspection JSUnusedGlobalSymbols

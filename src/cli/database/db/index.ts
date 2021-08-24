@@ -2,10 +2,51 @@ import { makemigrationsImpl } from "./automigrations";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { dirname, resolve } from "path";
 import { templates } from "./../template";
-import { ConfigPathResolver } from "@miqro/core";
+import { ConfigFileNotFoundError, ConfigPathResolver, getLogger, Logger, parse } from "@miqro/core";
 import { execSync } from "../../utils";
+import { Sequelize } from "sequelize/types";
 
 const logger = console;
+
+export interface SequelizeRC {
+  // noinspection SpellCheckingInspection
+  config: string;
+  "migrations-path": string;
+  "seeders-path": string;
+  "models-path": string;
+}
+
+export const loadSequelizeRC = (sequelizercPath: string = ConfigPathResolver.getSequelizeRCFilePath(), logger?: Logger): SequelizeRC => {
+  // noinspection SpellCheckingInspection
+  if (!existsSync(sequelizercPath)) {
+    // noinspection SpellCheckingInspection
+    throw new ConfigFileNotFoundError(`missing .sequelizerc file. maybe you didnt init your db config.`);
+  } else {
+    if (logger) {
+      logger.debug(`loading sequelize config from [${sequelizercPath}]`);
+    }
+    // noinspection SpellCheckingInspection
+    /* eslint-disable  @typescript-eslint/no-var-requires */
+    const sequelizerc: SequelizeRC = require(sequelizercPath);
+    return parse(sequelizercPath, sequelizerc, [
+      { name: "config", type: "string", required: true },
+      { name: "migrations-path", type: "string", required: true },
+      { name: "seeders-path", type: "string", required: true },
+      { name: "models-path", type: "string", required: true }
+    ], "no_extra") as SequelizeRC;
+  }
+};
+
+export const loadSequelize = (args?: { "models-path": string }, l?: Logger): Sequelize => {
+  const logger = l ? l : getLogger("Database");
+  const sequelizerc = args ? args : loadSequelizeRC();
+  const { sequelize } = require(sequelizerc["models-path"]);
+  sequelize.log = (text: string): void => {
+    logger.info(text);
+  };
+  return sequelize as Sequelize;
+}
+
 
 // noinspection SpellCheckingInspection
 export const initDBConfig = (): boolean => {

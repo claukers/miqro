@@ -1,6 +1,6 @@
 import { getLogger, loadConfig } from "@miqro/core";
 import { createInterface } from "readline";
-import { loadSequelize } from "@miqro/database";
+import { loadSequelize } from "../db";
 
 export const main = (): void => {
   if (process.argv.length !== 3) {
