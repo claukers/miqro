@@ -4,7 +4,6 @@ import { dirname, resolve } from "path";
 import { templates } from "./../template";
 import { ConfigFileNotFoundError, ConfigPathResolver, getLogger, Logger, parse } from "@miqro/core";
 import { execSync } from "../../utils";
-import { Sequelize } from "sequelize/types";
 
 const logger = console;
 
@@ -37,14 +36,17 @@ export const loadSequelizeRC = (sequelizercPath: string = ConfigPathResolver.get
   }
 };
 
-export const loadSequelize = (args?: { "models-path": string }, l?: Logger): Sequelize => {
+export const loadSequelize = (args?: { "models-path": string }, l?: Logger): any => {
   const logger = l ? l : getLogger("Database");
   const sequelizerc = args ? args : loadSequelizeRC();
   const { sequelize } = require(sequelizerc["models-path"]);
+  if (!sequelize || typeof sequelize !== "object" || typeof sequelize.models !== "object") {
+    throw new Error(`${sequelizerc["models-path"]} doesnt export sequelize`);
+  }
   sequelize.log = (text: string): void => {
     logger.info(text);
   };
-  return sequelize as Sequelize;
+  return sequelize;
 }
 
 

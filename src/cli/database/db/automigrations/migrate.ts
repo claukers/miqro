@@ -1,9 +1,41 @@
 import fs from "fs";
 
 import path from "path";
-import { diff } from "deep-diff";
-import hash from "object-hash";
-import { ARRAY, DataTypes, Sequelize } from "sequelize";
+//import { diff } from "deep-diff";
+//import hash from "object-hash";
+//import { ARRAY, DataTypes, Sequelize } from "sequelize";
+
+const getDiff = () => {
+  try {
+    /* eslint-disable  @typescript-eslint/no-var-requires */
+    const { diff } = require(path.resolve(process.cwd(), "node_modules", "deep-diff"));
+    return diff;
+  } catch (e) {
+    throw e;
+  }
+}
+
+const getHash = () => {
+  try {
+    /* eslint-disable  @typescript-eslint/no-var-requires */
+    const hash = require(path.resolve(process.cwd(), "node_modules", "object-hash"));
+    return hash;
+  } catch (e) {
+    throw e;
+  }
+}
+
+const getSequelize = () => {
+  try {
+    /* eslint-disable  @typescript-eslint/no-var-requires */
+    const { ARRAY, DataTypes, Sequelize } = require(path.resolve(process.cwd(), "node_modules", "sequelize"));
+    return {
+      ARRAY, DataTypes, Sequelize
+    }
+  } catch (e) {
+    throw e;
+  }
+}
 
 /* tslint:disable */
 
@@ -11,6 +43,7 @@ const reverseSequelizeColType = (col: any, prefix = "Sequelize."): string => {
   const attrName = col.type.key;
   const attrObj = col.type;
   const options = (col.type.options) ? col.type.options : {};
+  const DataTypes = getSequelize().DataTypes;
 
   // noinspection SpellCheckingInspection,DuplicateCaseLabelJS
   switch (attrName) {
@@ -178,6 +211,9 @@ const parseIndex = (idx: any, hash: any): any => {
 export const reverseModels = (sequelize: any, models: any, logger: any): any => {
   const tables = {};
 
+  const ARRAY = getSequelize().ARRAY;
+  const hash = getHash();
+
   delete models.default;
 
   for (const model in models) {
@@ -322,6 +358,7 @@ export interface DiffAction {
 export const parseDifference = (previousState: any, currentState: any, logger: any): DiffAction[] => {
   //    log(JSON.stringify(currentState, null, 4));
   const actions: DiffAction[] = [];
+  const diff = getDiff();
   const difference = diff(previousState, currentState);
   if (difference) {
     for (const df of difference) {
@@ -834,6 +871,8 @@ module.exports = {
 export const executeMigration = (queryInterface: any, filename: any, pos: any, cb: any, logger: any): any => {
   /* eslint-disable  @typescript-eslint/no-var-requires */
   const mig = require(filename);
+
+  const Sequelize = getSequelize().Sequelize;
 
   if (!mig) {
     return cb("Can't require file " + filename);

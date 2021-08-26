@@ -10,7 +10,12 @@ export const main = (): void => {
     execSync(
       `npm install sequelize --save`
     );
-
+    execSync(
+      `npm install object-hash --save-dev`
+    );
+    execSync(
+      `npm install deep-diff --save-dev`
+    );
     execSync(
       `npm install sequelize-cli --save-dev`
     );
