@@ -33,15 +33,16 @@ import { main as dumpData } from "./database/cli/dump-data";
 
 // noinspection SpellCheckingInspection
 CLIUtil.cliFlow({
+  ["new:main"]: { section: "http scafolding", cb: newMain, description: "\t\tcreates a new main file" },
+  ["new:main:minimal"]: { cb: newMainMinimal, description: "\tcreates a new minimal main file" },
   ["new"]: { cb: newJS, description: "\t\t\tcreate a new project" },
   ["new:minimal"]: { cb: newMinimalJS, description: "\t\tcreate a new minimal project" },
 
   ["new:typescript"]: { cb: newTS, description: "\t\tcreate a new typescript project" },
   ["new:typescript:minimal"]: { cb: newMinimalTS, description: "\tcreate a new typescript minimal project" },
+  ["new:route"]: { cb: newRoute, description: "\t\tcreates a new route" },
 
-  ["doc"]: { cb: apiDocJSON, description: "\t\t\toutputs to stdout an api folder auto doc as a json" },
-  ["doc:md"]: { cb: apiDocMD, description: "\t\t\toutputs to a file an api folder auto doc as a markdown" },
-  ["config"]: { cb: config, description: "\t\t\toutputs to stdout the config as a json" },
+  ["config"]: { section: "config managment", cb: config, description: "\t\t\toutputs to stdout the config as a json" },
   ["config:bash"]: {
     cb: configBash,
     description: "\t\toutputs to stdout the config as a bash script"
@@ -49,12 +50,10 @@ CLIUtil.cliFlow({
   ["config:env"]: { cb: configEnv, description: "\t\toutputs to stdout the config as a env file" },
   ["config:init"]: { cb: configInit, description: "\t\tinits your config folder" },
 
-  ["new:main"]: { cb: newMain, description: "\t\tcreates a new main file" },
-  ["new:main:minimal"]: { cb: newMainMinimal, description: "\tcreates a new minimal main file" },
+  ["start"]: { section: "cluster start", cb: start, description: "\t\t\tstart a nodejs script in cluster mode and restart if crash." },
 
-  ["new:route"]: { cb: newRoute, description: "\t\tcreates a new route" },
-
-  ["start"]: { cb: start, description: "\t\t\tstart a nodejs script in cluster mode and restart if crash." },
+  ["doc"]: { section: "api documentation", cb: apiDocJSON, description: "\t\t\toutputs to stdout an api folder auto doc as a json" },
+  ["doc:md"]: { cb: apiDocMD, description: "\t\t\toutputs to a file an api folder auto doc as a markdown" },
 
   ["db:console"]: { section: "sequelize helpers", cb: consoleCMD, description: "\t\truns a readline interface that send the input as a query" },
   ["db:dump:data"]: { cb: dumpData, description: "\t\tdump the data of the database (only defined models)" },
@@ -71,5 +70,5 @@ CLIUtil.cliFlow({
   ["db:seed:all"]: { cb: seedAll, description: "\t\talias for npx sequelize-cli db:seed:all" },
   ["db:seed"]: { cb: seed, description: "\t\t\talias for npx sequelize-cli db:seed" },
   ["db:seed:undo:all"]: { cb: undoSeedAll, description: "\talias for npx sequelize-cli db:seed:undo:all" },
-  ["db:seed:undo"]: { cb: undoSeed, description: "\t\talias for npx sequelize-cli db:seed:undo" }
+  ["db:seed:undo"]: { cb: undoSeed, description: "\t\talias for npx sequelize-cli db:seed:undo\n" }
 }, "npx miqro <command> [args]", console);
