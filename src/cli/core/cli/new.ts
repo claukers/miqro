@@ -128,7 +128,7 @@ export const mainJS = (minimal = false, typescript = false): void => {
 
   if (!minimal) {
     execSync(
-      `npx miqro new:route src_api_health_get`,
+      `npx miqro new:route src_api_health`,
       {
         cwd: appFolder
       }
