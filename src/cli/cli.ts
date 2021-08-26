@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 //@miqro/core
 import { CLIUtil } from "@miqro/core";
+import { main as start } from "./core/cli/start";
 import { mainJS as newJS } from "./core/cli/new";
 import { mainTS as newTS } from "./core/cli/new";
 import { mainMinimalTS as newMinimalTS } from "./core/cli/new";
@@ -52,6 +53,8 @@ CLIUtil.cliFlow({
   ["new:main:minimal"]: { cb: newMainMinimal, description: "\tcreates a new minimal main file" },
 
   ["new:route"]: { cb: newRoute, description: "\t\tcreates a new route" },
+
+  ["start"]: { cb: start, description: "\t\t\tstart a nodejs script in cluster mode and restart if crash." },
 
   ["db:console"]: { section: "sequelize helpers", cb: consoleCMD, description: "\t\truns a readline interface that send the input as a query" },
   ["db:dump:data"]: { cb: dumpData, description: "\t\tdump the data of the database (only defined models)" },

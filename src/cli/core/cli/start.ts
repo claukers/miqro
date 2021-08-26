@@ -1,5 +1,6 @@
 import { loadConfig } from "@miqro/core";
 import { execSync } from "../../utils";
+import { mainPath } from "@miqro/runner";
 
 export const main = (): void => {
 
@@ -9,6 +10,7 @@ export const main = (): void => {
 
   loadConfig();
 
-  execSync(`npx @miqro/runner ${process.argv.slice(3).join(" ")}`);
+  //execSync(`npx @miqro/runner ${process.argv.slice(3).join(" ")}`);
+  execSync(`${process.argv[0]} ${mainPath()} ${process.argv.slice(3).join(" ")}`)
 }
 
