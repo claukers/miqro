@@ -4,7 +4,7 @@ import { resolve } from "path";
 
 const mainTemplates = {
   ts: (minimal = false) =>
-    `${minimal ? `import { APIRouter, App, checkEnvVariables, getLogger, ReadBuffer, JSONParser } from "@miqro/core";`: `import { APIRouter, App, checkEnvVariables, getLogger } from "@miqro/core";`}
+    `${minimal ? `import { Context, APIRouter, App, checkEnvVariables, getLogger, ReadBuffer, JSONParser } from "@miqro/core";`: `import { APIRouter, App, checkEnvVariables, getLogger } from "@miqro/core";`}
 ${!minimal ? `import { middleware } from "@miqro/handlers";\nimport { resolve } from "path";` : ""}
 
 /*
