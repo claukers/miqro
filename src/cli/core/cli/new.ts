@@ -105,6 +105,9 @@ export const mainJS = (minimal = false, typescript = false): void => {
     execSync(`npm install typescript --save-dev`, {
       cwd: appFolder
     });
+    execSync(`npm install @types/node --save-dev`, {
+      cwd: appFolder
+    });
   }
 
   if (!minimal) {
