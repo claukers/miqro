@@ -1,7 +1,7 @@
-import { checkEnvVariables, loadConfig, SimpleMap } from "@miqro/core";
+import { checkEnvVariables, SimpleMap } from "@miqro/core";
 import { resolve } from "path";
 import { readFileSync } from "fs";
-import { loadSequelize } from "../db";
+import { loadSequelize } from "../utils/db";
 
 export const main = async (): Promise<void> => {
   const outfile = process.argv[3];
@@ -27,7 +27,6 @@ export const main = async (): Promise<void> => {
 
   const modelList = models.split(",").map(o => o.trim());
 
-  loadConfig();
   const db = loadSequelize();
   const out: SimpleMap<any[]> = JSON.parse(readFileSync(resolve(process.cwd(), outfile)).toString());
   for (const modelName of modelList) {

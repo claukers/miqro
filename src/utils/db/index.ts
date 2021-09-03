@@ -1,9 +1,8 @@
 import { makemigrationsImpl } from "./automigrations";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
-import { dirname, resolve } from "path";
-import { templates } from "./../template";
+import { resolve } from "path";
+import { templates } from "../../utils/templates";
 import { ConfigFileNotFoundError, ConfigPathResolver, getLogger, Logger, parse } from "@miqro/core";
-import { execSync } from "../../utils";
 
 const logger = console;
 
@@ -19,7 +18,7 @@ export const loadSequelizeRC = (sequelizercPath: string = ConfigPathResolver.get
   // noinspection SpellCheckingInspection
   if (!existsSync(sequelizercPath)) {
     // noinspection SpellCheckingInspection
-    throw new ConfigFileNotFoundError(`missing .sequelizerc file. maybe you didnt init your db config.`);
+    throw new ConfigFileNotFoundError(`missing ${sequelizercPath} file. maybe you didnt init your db config.`);
   } else {
     if (logger) {
       logger.debug(`loading sequelize config from [${sequelizercPath}]`);
@@ -36,17 +35,25 @@ export const loadSequelizeRC = (sequelizercPath: string = ConfigPathResolver.get
   }
 };
 
+export const loadModels = (args?: { "models-path": string }): { path: string; modelsModule: any } => {
+  const sequelizerc = args ? args : loadSequelizeRC();
+  const modelsModule = require(sequelizerc["models-path"]);
+  return {
+    path: sequelizerc["models-path"],
+    modelsModule
+  };
+}
+
 export const loadSequelize = (args?: { "models-path": string }, l?: Logger): any => {
   const logger = l ? l : getLogger("Database");
-  const sequelizerc = args ? args : loadSequelizeRC();
-  const { sequelize } = require(sequelizerc["models-path"]);
-  if (!sequelize || typeof sequelize !== "object" || typeof sequelize.models !== "object") {
-    throw new Error(`${sequelizerc["models-path"]} doesnt export sequelize`);
+  const { modelsModule, path } = loadModels();
+  if (!modelsModule.sequelize || typeof modelsModule.sequelize !== "object" || typeof modelsModule.sequelize.models !== "object") {
+    throw new Error(`${path} doesnt export sequelize`);
   }
-  sequelize.log = (text: string): void => {
+  modelsModule.sequelize.log = (text: string): void => {
     logger.info(text);
   };
-  return sequelize;
+  return modelsModule.sequelize;
 }
 
 
@@ -77,7 +84,8 @@ export const initDBConfig = (): boolean => {
       logger.warn(`.sequelizerc already exists!. init will do nothing.`);
       return false;
     } else {
-      const typescript = existsSync(resolve(ConfigPathResolver.getBaseDirname(), "tsconfig.json")) ? true : false;
+      // disable experimental typescript support
+      const typescript = false; //existsSync(resolve(ConfigPathResolver.getBaseDirname(), "tsconfig.json")) ? true : false;
       const dbFolder = resolve(ConfigPathResolver.getBaseDirname(), "db");
       const migrationsFolder = resolve(dbFolder, "migrations");
       const modelsFolder = typescript ? resolve("src", "models") : resolve(dbFolder, "models");
@@ -104,81 +112,6 @@ export const initDBConfig = (): boolean => {
 export const makemigrations = (): void => {
   try {
     makemigrationsImpl();
-  } catch (e) {
-    logger.error(e.message);
-    throw e;
-  }
-};
-
-export const migrate = (): void => {
-  try {
-    // noinspection SpellCheckingInspection
-    execSync(
-      "npx sequelize-cli db:migrate",
-      {
-        cwd: dirname(ConfigPathResolver.getSequelizeRCFilePath())
-      }
-    );
-  } catch (e) {
-    logger.error(e.message);
-    throw e;
-  }
-};
-
-export const undoMigrate = (): void => {
-  try {
-    // noinspection SpellCheckingInspection
-    execSync(
-      "npx sequelize-cli db:migrate:undo:all",
-      {
-        cwd: dirname(ConfigPathResolver.getSequelizeRCFilePath())
-      }
-    );
-  } catch (e) {
-    logger.error(e.message);
-    throw e;
-  }
-};
-
-export const migrateStatus = (): void => {
-  try {
-    // noinspection SpellCheckingInspection
-    execSync(
-      "npx sequelize-cli db:migrate:status",
-      {
-        cwd: dirname(ConfigPathResolver.getSequelizeRCFilePath())
-      }
-    );
-  } catch (e) {
-    logger.error(e.message);
-    throw e;
-  }
-};
-
-export const seed = (seedPath?: string): void => {
-  try {
-    // noinspection SpellCheckingInspection
-    execSync(
-      seedPath ? `npx sequelize-cli db:seed --seed ${seedPath}` : "npx sequelize-cli db:seed:all",
-      {
-        cwd: dirname(ConfigPathResolver.getSequelizeRCFilePath())
-      }
-    );
-  } catch (e) {
-    logger.error(e.message);
-    throw e;
-  }
-};
-
-export const undoSeed = (seedPath?: string): void => {
-  try {
-    // noinspection SpellCheckingInspection
-    execSync(
-      seedPath ? `npx sequelize-cli db:seed:undo --seed ${seedPath}` : "npx sequelize-cli db:seed:undo:all",
-      {
-        cwd: dirname(ConfigPathResolver.getSequelizeRCFilePath())
-      }
-    );
   } catch (e) {
     logger.error(e.message);
     throw e;

@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync, existsSync } from "fs";
 import { resolve } from "path";
-import { execSync } from "../../utils";
+import { execSync } from "../utils";
 
 const packageTemplate = {
   ts: (name: string) =>

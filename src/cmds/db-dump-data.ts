@@ -1,7 +1,7 @@
-import { checkEnvVariables, loadConfig, SimpleMap } from "@miqro/core";
+import { checkEnvVariables, SimpleMap } from "@miqro/core";
 import { resolve } from "path";
 import { writeFileSync } from "fs";
-import { loadSequelize } from "../db";
+import { loadSequelize } from "../utils/db";
 
 export const main = async (): Promise<void> => {
   const logger = console;
@@ -21,7 +21,6 @@ export const main = async (): Promise<void> => {
     throw new Error(`LIMIT must be a number grater than 0!`);
   }
 
-  loadConfig();
   const db = loadSequelize();
   const out: SimpleMap<any[]> = {};
   logger.info(`beware that if the model is not implicitly defined in db.models it will be dumped.`);

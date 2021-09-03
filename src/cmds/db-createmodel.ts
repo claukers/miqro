@@ -1,8 +1,8 @@
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
-import { templates } from "../template";
+import { templates } from "../utils/templates";
 import { ConfigPathResolver } from "@miqro/core";
-import { loadSequelizeRC } from "../db";
+import { loadSequelizeRC } from "../utils/db";
 
 export const main = (): void => {
   const logger = console;
@@ -20,7 +20,8 @@ export const main = (): void => {
 
   const config = loadSequelizeRC();
 
-  const typescript = existsSync(resolve(ConfigPathResolver.getBaseDirname(), "tsconfig.json")) ? true : false;
+  // disable experimental typescript support
+  const typescript = false; //existsSync(resolve(ConfigPathResolver.getBaseDirname(), "tsconfig.json")) ? true : false;
   const modelsFolder = typescript ? resolve(ConfigPathResolver.getBaseDirname(), "src", "models") : config["models-path"];
 
   if (!existsSync(modelsFolder)) {

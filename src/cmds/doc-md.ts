@@ -2,7 +2,7 @@ import { ConfigPathResolver, getLogger, loadConfig, Method, ParseOption, ParseOp
 import { resolve } from "path";
 import { writeFileSync } from "fs";
 
-import { getDOCJSON } from "../util";
+import { getDOCJSON } from "../utils/doc";
 
 export const main = (): void => {
 

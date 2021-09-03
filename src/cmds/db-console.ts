@@ -1,13 +1,12 @@
-import { getLogger, loadConfig } from "@miqro/core";
+import { getLogger } from "@miqro/core";
 import { createInterface } from "readline";
-import { loadSequelize } from "../db";
+import { loadSequelize } from "../utils/db";
 
 export const main = (): void => {
   if (process.argv.length !== 3) {
     throw new Error(`invalid number of args`);
   }
 
-  loadConfig();
   const logger = getLogger("db:console");
   const rl = createInterface({
     input: process.stdin,

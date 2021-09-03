@@ -1,49 +1,17 @@
 import fs from "fs";
 
 import path from "path";
-//import { diff } from "deep-diff";
-//import hash from "object-hash";
+import { diff } from "deep-diff";
+import hash from "object-hash";
 //import { ARRAY, DataTypes, Sequelize } from "sequelize";
-
-const getDiff = () => {
-  try {
-    /* eslint-disable  @typescript-eslint/no-var-requires */
-    const { diff } = require(path.resolve(process.cwd(), "node_modules", "deep-diff"));
-    return diff;
-  } catch (e) {
-    throw e;
-  }
-}
-
-const getHash = () => {
-  try {
-    /* eslint-disable  @typescript-eslint/no-var-requires */
-    const hash = require(path.resolve(process.cwd(), "node_modules", "object-hash"));
-    return hash;
-  } catch (e) {
-    throw e;
-  }
-}
-
-const getSequelize = () => {
-  try {
-    /* eslint-disable  @typescript-eslint/no-var-requires */
-    const { ARRAY, DataTypes, Sequelize } = require(path.resolve(process.cwd(), "node_modules", "sequelize"));
-    return {
-      ARRAY, DataTypes, Sequelize
-    }
-  } catch (e) {
-    throw e;
-  }
-}
 
 /* tslint:disable */
 
-const reverseSequelizeColType = (col: any, prefix = "Sequelize."): string => {
+const reverseSequelizeColType = (sequelizeModule: any, col: any, prefix = "Sequelize."): string => {
   const attrName = col.type.key;
   const attrObj = col.type;
   const options = (col.type.options) ? col.type.options : {};
-  const DataTypes = getSequelize().DataTypes;
+  const DataTypes = sequelizeModule.DataTypes;
 
   // noinspection SpellCheckingInspection,DuplicateCaseLabelJS
   switch (attrName) {
@@ -208,11 +176,10 @@ const parseIndex = (idx: any, hash: any): any => {
 };
 
 /* eslint-disable  @typescript-eslint/explicit-module-boundary-types */
-export const reverseModels = (sequelize: any, models: any, logger: any): any => {
+export const reverseModels = (sequelizeModule: any, sequelize: any, models: any, logger: any): any => {
   const tables = {};
 
-  const ARRAY = getSequelize().ARRAY;
-  const hash = getHash();
+  const ARRAY = sequelizeModule.ARRAY;
 
   delete models.default;
 
@@ -280,7 +247,7 @@ export const reverseModels = (sequelize: any, models: any, logger: any): any => 
         }
       }
       // noinspection JSUnfilteredForInLoop
-      let seqType = reverseSequelizeColType(attributes[column]);
+      let seqType = reverseSequelizeColType(sequelizeModule, attributes[column]);
 
       // NO virtual types in migration
       if (seqType === "Sequelize.VIRTUAL") {
@@ -358,7 +325,6 @@ export interface DiffAction {
 export const parseDifference = (previousState: any, currentState: any, logger: any): DiffAction[] => {
   //    log(JSON.stringify(currentState, null, 4));
   const actions: DiffAction[] = [];
-  const diff = getDiff();
   const difference = diff(previousState, currentState);
   if (difference) {
     for (const df of difference) {
@@ -866,29 +832,4 @@ module.exports = {
   fs.writeFileSync(filename, template);
 
   return { filename, info };
-};
-
-export const executeMigration = (queryInterface: any, filename: any, pos: any, cb: any, logger: any): any => {
-  /* eslint-disable  @typescript-eslint/no-var-requires */
-  const mig = require(filename);
-
-  const Sequelize = getSequelize().Sequelize;
-
-  if (!mig) {
-    return cb("Can't require file " + filename);
-  }
-
-  if (pos > 0) {
-    logger.info("Set position to " + pos);
-    mig.pos = pos;
-  }
-
-  mig.up(queryInterface, Sequelize).then(
-    () => {
-      cb();
-    },
-    (err: any) => {
-      cb(err);
-    }
-  );
 };

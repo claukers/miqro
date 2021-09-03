@@ -1,4 +1,4 @@
-import { execSync } from "../../utils";
+import { execSync } from "../utils";
 import { mainPath } from "@miqro/runner";
 
 export const main = (): void => {

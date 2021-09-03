@@ -1,5 +1,5 @@
 import { getLogger, loadConfig } from "@miqro/core";
-import { getDOCJSON } from "../util";
+import { getDOCJSON } from "../utils/doc";
 
 export const main = (): void => {
 
