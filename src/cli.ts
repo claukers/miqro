@@ -27,39 +27,39 @@ import { main as dumpData } from "./cmds/db-dump-data";
 
 // noinspection SpellCheckingInspection
 CLIUtil.cliFlow({
-  ["new:main"]: { section: "http scafolding", cb: newMain, description: "\t\tcreates a new main file" },
-  ["new:main:minimal"]: { cb: newMainMinimal, description: "\tcreates a new minimal main file" },
-  ["new"]: { cb: newJS, description: "\t\t\tcreate a new project" },
-  ["new:minimal"]: { cb: newMinimalJS, description: "\t\tcreate a new minimal project" },
+  ["new:main"]: { section: "http scafolding", cb: newMain, description: "\t\t\tcreates a new main file" },
+  ["new:main:minimal"]: { cb: newMainMinimal, description: "\t\tcreates a new minimal main file" },
+  ["new"]: { cb: newJS, description: "\t\t\t\tcreate a new project" },
+  ["new:minimal"]: { cb: newMinimalJS, description: "\t\t\tcreate a new minimal project" },
 
-  ["new:typescript"]: { cb: newTS, description: "\t\tcreate a new typescript project" },
-  ["new:typescript:minimal"]: { cb: newMinimalTS, description: "\tcreate a new typescript minimal project" },
-  ["new:route"]: { cb: newRoute, description: "\t\tcreates a new route" },
+  ["new:typescript"]: { cb: newTS, description: "\t\t\tcreate a new typescript project" },
+  ["new:typescript:minimal"]: { cb: newMinimalTS, description: "\t\tcreate a new typescript minimal project" },
+  ["new:route"]: { cb: newRoute, description: "\t\t\tcreates a new route" },
 
-  ["config"]: { section: "config managment", cb: config, description: "\t\t\toutputs to stdout the config as a json" },
+  ["config"]: { section: "config managment", cb: config, description: "\t\t\t\toutputs to stdout the config as a json" },
   ["config:bash"]: {
     cb: configBash,
-    description: "\t\toutputs to stdout the config as a bash script"
+    description: "\t\t\toutputs to stdout the config as a bash script"
   },
-  ["config:env"]: { cb: configEnv, description: "\t\toutputs to stdout the config as a env file" },
-  ["config:init"]: { cb: configInit, description: "\t\tinits your config folder" },
+  ["config:env"]: { cb: configEnv, description: "\t\t\toutputs to stdout the config as a env file" },
+  ["config:init"]: { cb: configInit, description: "\t\t\tinits your config folder" },
 
-  ["start"]: { section: "cluster start", cb: start, description: "\t\t\tstart a nodejs script in cluster mode and restart if crash." },
+  ["start"]: { section: "cluster start", cb: start, description: "\t\t\t\tstart a nodejs script in cluster mode and restart if crash." },
 
-  ["doc"]: { section: "api documentation", cb: apiDocJSON, description: "\t\t\toutputs to stdout an api folder auto doc as a json" },
-  ["doc:md"]: { cb: apiDocMD, description: "\t\t\toutputs to a file an api folder auto doc as a markdown" },
+  ["doc"]: { section: "api documentation", cb: apiDocJSON, description: "\t\t\t\toutputs to stdout an api folder auto doc as a json" },
+  ["doc:md"]: { cb: apiDocMD, description: "\t\t\t\toutputs to a file an api folder auto doc as a markdown" },
 
-  ["db:console"]: { section: "sequelize helpers", cb: consoleCMD, description: "\t\truns a readline interface that send the input as a query" },
-  ["db:dump:data"]: { cb: dumpData, description: "\t\tdump the data of the database (only defined models)" },
-  ["db:push:data"]: { cb: pushData, description: "\t\tpush a dump to the database" },
+  ["db:console"]: { section: "sequelize helpers", cb: consoleCMD, description: "\t\t\truns a readline interface that send the input as a query" },
+  ["db:dump:data"]: { cb: dumpData, description: "\t\t\tdump the data of the database (only defined models)" },
+  ["db:push:data"]: { cb: pushData, description: "\t\t\tpush a dump to the database" },
   ["db:make:migration"]: {
     cb: makeMigrations,
-    description: "\tseeks changes in your models and creates migrations"
+    description: "\t\tseeks changes in your models and creates migrations"
   },
   ["db:make:migration:generate:state"]: {
     cb: syncMakeMigrations,
-    description: "\tgenerates _current.json in the migrations folder"
+    description: "regenerate _current.json in the migrations folder"
   },
-  ["db:init"]: { cb: dbInit, description: "\t\t\tinit sequelize configuration." },
-  ["db:create:model"]: { cb: createModel, description: "\t\tcreates an example model" }
+  ["db:init"]: { cb: dbInit, description: "\t\t\t\tinit sequelize configuration." },
+  ["db:create:model"]: { cb: createModel, description: "\t\t\tcreates an example model" }
 }, "npx miqro <command> [args]", console);
