@@ -1,1 +1,1 @@
-export * from "@miqro/core";
+//export * from "@miqro/core";
