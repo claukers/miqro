@@ -19,6 +19,7 @@ import { mainMinimal as newMainMinimal } from "./cmds/handler-main-new";
 //@miqro/database
 import { main as dbInit } from "./cmds/db-init";
 import { main as makeMigrations } from "./cmds/db-makemigrations";
+import { main as syncMakeMigrations } from "./cmds/db-sync-makemigrations";
 import { main as consoleCMD } from "./cmds/db-console";
 import { main as createModel } from "./cmds/db-createmodel";
 import { main as pushData } from "./cmds/db-push-data";
@@ -54,6 +55,10 @@ CLIUtil.cliFlow({
   ["db:make:migration"]: {
     cb: makeMigrations,
     description: "\tseeks changes in your models and creates migrations"
+  },
+  ["db:make:migration:generate:state"]: {
+    cb: syncMakeMigrations,
+    description: "\tgenerates _current.json in the migrations folder"
   },
   ["db:init"]: { cb: dbInit, description: "\t\t\tinit sequelize configuration." },
   ["db:create:model"]: { cb: createModel, description: "\t\tcreates an example model" }

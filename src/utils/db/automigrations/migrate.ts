@@ -2,16 +2,28 @@ import fs from "fs";
 
 import path from "path";
 import { diff } from "deep-diff";
-import hash from "object-hash";
-//import { ARRAY, DataTypes, Sequelize } from "sequelize";
+
+interface TableMap {
+  [tableName: string]: {
+    tableName: string;
+    schema: any;
+    indexes: any;
+    model?: any;
+    options?: any;
+    fields?: any[];
+  }
+}
+
+export interface MigrationState {
+  tables: TableMap;
+  revision: number;
+}
 
 /* tslint:disable */
-
-const reverseSequelizeColType = (sequelizeModule: any, col: any, prefix = "Sequelize."): string => {
+const reverseSequelizeColType = (DataTypes: any, col: any, prefix = "Sequelize."): string => {
   const attrName = col.type.key;
   const attrObj = col.type;
   const options = (col.type.options) ? col.type.options : {};
-  const DataTypes = sequelizeModule.DataTypes;
 
   // noinspection SpellCheckingInspection,DuplicateCaseLabelJS
   switch (attrName) {
@@ -142,7 +154,7 @@ const reverseSequelizeDefValueType = (defaultValue: any, prefix = "Sequelize."):
   return { value: defaultValue };
 };
 
-const parseIndex = (idx: any, hash: any): any => {
+const parseIndex = (idx: any): any => {
   delete idx.parser;
   if (idx.type == "") {
     delete idx.type;
@@ -169,29 +181,48 @@ const parseIndex = (idx: any, hash: any): any => {
 
   idx.options = options;
 
-  idx.hash = hash(idx);
+  idx.hash = JSON.stringify(idx);
 
   //    log ('PI:', JSON.stringify(idx, null, 4));
   return idx;
 };
 
 /* eslint-disable  @typescript-eslint/explicit-module-boundary-types */
-export const reverseModels = (sequelizeModule: any, sequelize: any, models: any, logger: any): any => {
-  const tables = {};
+export const reverseModels = (sequelizeModule: any, sequelize: any, realModels: { [model: string]: any }, logger: any): TableMap => {
 
-  const ARRAY = sequelizeModule.ARRAY;
+  const models: {
+    [key: string]: {
+      tableName: string;
+      options: any;
+      rawAttributes: { [attribute: string]: any };
+    };
+  } = {};
+  for (const model in realModels) {
+    if (model !== "default") {
+      models[model] = {
+        tableName: realModels[model].tableName,
+        options: {
+          ...realModels[model].options
+        },
+        rawAttributes: {
+          ...realModels[model].rawAttributes
+        }
+      }
+    }
+  }
+  const tables: TableMap = {};
 
   delete models.default;
 
   for (const model in models) {
     // noinspection JSUnfilteredForInLoop
-    const attributes = models[model].attributes || models[model].rawAttributes;
+    const attributes = models[model].rawAttributes;
 
     for (const column in attributes) {
       // noinspection JSUnfilteredForInLoop
-      delete attributes[column].Model;
+      delete (attributes[column] as any).Model;
       // noinspection JSUnfilteredForInLoop
-      delete attributes[column].fieldName;
+      delete (attributes[column] as any).fieldName;
       // delete attributes[column].field;
 
       // noinspection JSUnfilteredForInLoop
@@ -227,7 +258,7 @@ export const reverseModels = (sequelizeModule: any, sequelize: any, models: any,
       // noinspection JSUnfilteredForInLoop
       if (typeof attributes[column].type === "undefined") {
         // noinspection JSUnfilteredForInLoop
-        if (!attributes[column].seqType) {
+        if (!(attributes[column] as any).seqType) {
           // noinspection JSUnfilteredForInLoop
           logger.info(`[Not supported] Skip column with undefined type ${model}:${column}`);
           // noinspection JSUnfilteredForInLoop
@@ -235,19 +266,19 @@ export const reverseModels = (sequelizeModule: any, sequelize: any, models: any,
           continue;
         } else {
           // noinspection JSUnfilteredForInLoop
-          if (!["Sequelize.ARRAY(Sequelize.INTEGER)", "Sequelize.ARRAY(Sequelize.STRING)"].includes(attributes[column].seqType)) {
+          if (!["Sequelize.ARRAY(Sequelize.INTEGER)", "Sequelize.ARRAY(Sequelize.STRING)"].includes((attributes[column] as any).seqType)) {
             // noinspection JSUnfilteredForInLoop
             delete attributes[column];
             continue;
           }
           // noinspection JSUnfilteredForInLoop
-          attributes[column].type = {
-            key: ARRAY.key
+          (attributes[column] as any).type = {
+            key: sequelizeModule.ARRAY.key
           };
         }
       }
       // noinspection JSUnfilteredForInLoop
-      let seqType = reverseSequelizeColType(sequelizeModule, attributes[column]);
+      let seqType = reverseSequelizeColType(sequelizeModule.DataTypes, attributes[column]);
 
       // NO virtual types in migration
       if (seqType === "Sequelize.VIRTUAL") {
@@ -260,9 +291,9 @@ export const reverseModels = (sequelizeModule: any, sequelize: any, models: any,
 
       if (!seqType) {
         // noinspection JSUnfilteredForInLoop
-        if (typeof attributes[column].type.options !== "undefined" && typeof attributes[column].type.options.toString === "function") {
+        if (typeof (attributes[column] as any).type.options !== "undefined" && typeof (attributes[column] as any).type.options.toString === "function") {
           // noinspection JSUnfilteredForInLoop
-          seqType = attributes[column].type.options.toString(sequelize);
+          seqType = (attributes[column] as any).type.options.toString(sequelize);
         }
         // noinspection JSUnfilteredForInLoop
         if (typeof attributes[column].type.toString === "function") {
@@ -271,7 +302,7 @@ export const reverseModels = (sequelizeModule: any, sequelize: any, models: any,
         }
       }
       // noinspection JSUnfilteredForInLoop
-      attributes[column].seqType = seqType;
+      (attributes[column] as any).seqType = seqType;
       // noinspection JSUnfilteredForInLoop
       delete attributes[column].type;
       // noinspection JSUnfilteredForInLoop
@@ -289,7 +320,7 @@ export const reverseModels = (sequelizeModule: any, sequelize: any, models: any,
       // noinspection JSUnfilteredForInLoop
       for (const _i in models[model].options.indexes) {
         // noinspection JSUnfilteredForInLoop
-        const index = parseIndex(models[model].options.indexes[_i], hash);
+        const index = parseIndex(models[model].options.indexes[_i]);
         (idxOut as any)[index.hash + ""] = index;
         delete index.hash;
 
@@ -297,7 +328,8 @@ export const reverseModels = (sequelizeModule: any, sequelize: any, models: any,
         Object.freeze(index);
       }
       // noinspection JSUnfilteredForInLoop
-      models[model].options.indexes = idxOut;
+      // models[model].options.indexes = idxOut;
+      tables[models[model].tableName].indexes = idxOut;
     }
     // noinspection JSUnfilteredForInLoop
     if (typeof models[model].options.charset !== "undefined") {
@@ -311,7 +343,7 @@ export const reverseModels = (sequelizeModule: any, sequelize: any, models: any,
   return tables;
 };
 
-export interface DiffAction {
+interface DiffAction {
   actionType: string;
   columnName?: string;
   attributeName?: any;
@@ -322,7 +354,7 @@ export interface DiffAction {
   depends?: any;
 }
 
-export const parseDifference = (previousState: any, currentState: any, logger: any): DiffAction[] => {
+export const parseDifference = (previousState: TableMap, currentState: TableMap, logger: any): DiffAction[] => {
   //    log(JSON.stringify(currentState, null, 4));
   const actions: DiffAction[] = [];
   const difference = diff(previousState, currentState);
@@ -418,9 +450,13 @@ export const parseDifference = (previousState: any, currentState: any, logger: a
           // new index
           if (df.path && df.path[1] === "indexes") {
             const tableName = df.path[0];
-            const index = { ...df.rhs };
-            index.actionType = "addIndex";
-            index.tableName = tableName;
+            const index: DiffAction = {
+              ...df.rhs,
+              actionType: "addIndex",
+              tableName: tableName,
+              depends: "addIndex",
+            };
+
             index.depends = [tableName];
             actions.push(index);
             break;
@@ -480,7 +516,7 @@ export const parseDifference = (previousState: any, currentState: any, logger: a
             actions.push({
               actionType: "removeIndex",
               tableName,
-              fields: df.lhs.fields,
+              fields: df.lhs.fields as any,
               options: df.lhs.options,
               depends: [tableName]
             });
@@ -562,7 +598,7 @@ export const parseDifference = (previousState: any, currentState: any, logger: a
   return actions;
 };
 
-export const sortActions = (actions: any[]): any => {
+export const sortActions = (actions: DiffAction[]): void => {
   const orderedActionTypes = [
     "removeIndex",
     "removeColumn",
@@ -629,8 +665,14 @@ export const sortActions = (actions: any[]): any => {
     }
   }
 };
+
+interface Migration {
+  commandsUp: string[];
+  consoleOut: string[];
+}
+
 // noinspection SpellCheckingInspection
-export const getMigration = (actions: any): any => {
+export const getMigration = (actions: DiffAction[]): Migration => {
   const propertyToStr = (obj: any): any => {
     // noinspection SpellCheckingInspection
     const vals = [];
@@ -773,7 +815,17 @@ export const getMigration = (actions: any): any => {
   return { commandsUp, consoleOut };
 };
 
-export const writeMigration = (revision: any, migration: any, migrationsDir: any, name = "", comment = ""): any => {
+interface WritenMigration {
+  filename: string;
+  info: {
+    revision: number;
+    name: string;
+    created: Date;
+    comment: string;
+  }
+};
+
+export const writeMigration = (revision: number, migration: Migration, migrationsDir: string, name = "", comment = ""): WritenMigration => {
   const _commands = "var migrationCommands = [ \n" + migration.commandsUp.join(", \n") + " \n];\n";
   const _actions = " * " + migration.consoleOut.join("\n * ");
 
@@ -787,7 +839,7 @@ export const writeMigration = (revision: any, migration: any, migrationsDir: any
 
   const template = `'use strict';
 
-var Sequelize = require('sequelize');
+const Sequelize = require('sequelize');
 
 /**
  * Actions summary:
@@ -796,7 +848,7 @@ ${_actions}
  *
  **/
 
-var info = ${JSON.stringify(info, null, 4)};
+const info = ${JSON.stringify(info, null, 4)};
 
 ${_commands}
 

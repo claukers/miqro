@@ -24,10 +24,10 @@
   "dependencies": {
     "@miqro/core": "^1.2.3",
     "@miqro/runner": "^1.1.5",
-    "deep-diff": "^1.0.2",
-    "object-hash": "^2.2.0"
+    "deep-diff": "^1.0.2"
   },
   "devDependencies": {
+    "@types/deep-diff": "^1.0.1",
     "@types/node": "^16.7.10",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",

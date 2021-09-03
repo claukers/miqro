@@ -1,4 +1,4 @@
-import { makemigrationsImpl } from "./automigrations";
+import { makemigrationsImpl, syncMakeMigrationsImpl } from "./automigrations";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { templates } from "../../utils/templates";
@@ -112,6 +112,15 @@ export const initDBConfig = (): boolean => {
 export const makemigrations = (): void => {
   try {
     makemigrationsImpl();
+  } catch (e) {
+    logger.error(e.message);
+    throw e;
+  }
+};
+
+export const syncMakeMigrations = (): void => {
+  try {
+    syncMakeMigrationsImpl();
   } catch (e) {
     logger.error(e.message);
     throw e;
