@@ -14,14 +14,7 @@ export const featuresEnvFile = `####################
 
 export const dbEnvFile = `####################
 ## db
-DB_NAME=devdb
-DB_HOST=localhost
-DB_PORT=3306
-# should be loadad from a secret manager into process.env.DB_USER
-DB_USER=
-# should be loadad from a secret manager into process.env.DB_PASS
-DB_PASS=
-DB_DIALECT=sqlite
+DB_URI=sqlite://user:password@localhost:3306/devdb
 DB_DIALECT_SSL=true
 DB_POOL_MAX=5
 DB_POOL_MIN=0
@@ -87,33 +80,35 @@ module.exports.Sequelize = Sequelize;
 `;
 // noinspection SpellCheckingInspection
 const dbConfig =
-  `const { loadConfig } = require("@miqro/core");
+  `const { loadConfig, checkEnvVariables } = require("@miqro/core");
 
 loadConfig();
 
-["DB_DIALECT_SSL", "DB_PORT", "DB_NAME", "DB_USER", "DB_PASS", "DB_HOST", ` +
-  `"DB_DIALECT", "DB_POOL_MAX", "DB_POOL_MIN", "DB_POOL_ACQUIRE", "DB_POOL_IDDLE", "DB_STORAGE"].forEach((envName) => {
-if (process.env[envName] === undefined) {
-  throw new Error(\`Env variable [\${envName}!] not defined\`);
-}
-});
+const { URL } = require("url");
+
+const [DB_URI] = checkEnvVariables(["DB_URI"]);
+const [DB_POOL, DB_POOL_ACQUIRE, DB_POOL_IDDLE, DB_POOL_MAX, DB_POOL_MIN] = checkEnvVariables(["DB_POOL", "DB_POOL_ACQUIRE", "DB_POOL_IDDLE", "DB_POOL_MAX", "DB_POOL_MIN"], ["false", "30000", "10000", "5", "0"]);
+
+const pool = DB_POOL === "true" ? {
+  acquire: parseInt(DB_POOL_ACQUIRE, 10),
+  idle: parseInt(DB_POOL_IDDLE, 10),
+  max: parseInt(DB_POOL_MAX, 10),
+  min: parseInt(DB_POOL_MIN, 10)
+} : undefined;
+
+const parsed = new URL(process.env.DB_URI);
 
 module.exports = {
-  username: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  host: process.env.DB_HOST,
-  dialect: process.env.DB_DIALECT,
-  port: process.env.DB_PORT,
+  database: parsed.pathname.substr(1),
+  host: parsed.hostname,
+  port: parsed.port,
+  username: parsed.username,
+  password: parsed.password,
+  dialect: parsed.protocol.substring(0, parsed.protocol.length - 1),
   dialectOptions: {
-    ssl: process.env.DB_DIALECT_SSL === "true"
+    ssl: process.env.DB_DIALECT_SSL === "true" || process.env.DB_DIALECT_SSL === undefined ? true : false
   },
-  pool: {
-    acquire: parseInt(process.env.DB_POOL_ACQUIRE, 10),
-    idle: parseInt(process.env.DB_POOL_IDDLE, 10),
-    max: parseInt(process.env.DB_POOL_MAX, 10),
-    min: parseInt(process.env.DB_POOL_MIN, 10)
-  },
+  pool,
   storage: process.env.DB_STORAGE
 };
 `;
