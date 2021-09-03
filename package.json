@@ -22,7 +22,7 @@
   "author": "claukers",
   "license": "ISC",
   "dependencies": {
-    "@miqro/core": "^1.2.2",
+    "@miqro/core": "^1.2.3",
     "@miqro/runner": "^1.1.5",
     "deep-diff": "^1.0.2",
     "object-hash": "^2.2.0"
