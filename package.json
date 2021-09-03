@@ -9,7 +9,7 @@
     "url": "https://github.com/claukers/miqro.git"
   },
   "bin": {
-    "miqro": "dist/cli/cli.js"
+    "miqro": "dist/cli.js"
   },
   "scripts": {
     "prepare": "npm run build",
