@@ -823,7 +823,7 @@ interface WritenMigration {
     created: Date;
     comment: string;
   }
-};
+}
 
 export const writeMigration = (revision: number, migration: Migration, migrationsDir: string, name = "", comment = ""): WritenMigration => {
   const _commands = "var migrationCommands = [ \n" + migration.commandsUp.join(", \n") + " \n];\n";
