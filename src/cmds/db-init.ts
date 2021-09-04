@@ -1,4 +1,4 @@
-import { ConfigPathResolver } from "@miqro/core";
+import { ConfigPathResolver, loadConfig } from "@miqro/core";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { execSync } from "../utils";
@@ -20,6 +20,8 @@ export const main = (): void => {
       logger.warn(`${path} already exists!. init will not create it.`);
     }
   };
+
+  loadConfig();
 
   if (initDBConfig()) {
     const configPath = ConfigPathResolver.getConfigDirname();

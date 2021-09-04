@@ -1,4 +1,4 @@
-import { ConfigPathResolver } from "@miqro/core";
+import { ConfigPathResolver, loadConfig } from "@miqro/core";
 import { mkdirSync, writeFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
@@ -70,6 +70,8 @@ export const main = (minimal = false): void => {
   if (dots.length > 0) {
     throw new Error(`identifier cannot contain dots\narguments: <identifier ex: SRC_MAIN>`);
   }
+
+  loadConfig();
 
   const path = resolve(ConfigPathResolver.getBaseDirname(), ...split.splice(0, split.length - 1));
 

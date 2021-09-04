@@ -1,4 +1,4 @@
-import { checkEnvVariables, SimpleMap } from "@miqro/core";
+import { checkEnvVariables, SimpleMap, loadConfig } from "@miqro/core";
 import { resolve } from "path";
 import { writeFileSync } from "fs";
 import { loadSequelize } from "../utils/db";
@@ -20,6 +20,8 @@ export const main = async (): Promise<void> => {
   if (isNaN(limit) || limit <= 0) {
     throw new Error(`LIMIT must be a number grater than 0!`);
   }
+
+  loadConfig();
 
   const db = loadSequelize();
   const out: SimpleMap<any[]> = {};

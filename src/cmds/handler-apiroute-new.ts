@@ -1,4 +1,4 @@
-import { ConfigPathResolver } from "@miqro/core";
+import { ConfigPathResolver, loadConfig } from "@miqro/core";
 import { mkdirSync, writeFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
@@ -81,6 +81,8 @@ export const main = (): void => {
   if (dots.length > 0) {
     throw new Error(`identifier cannot contain dots\narguments: <identifier ex: SRC_API_V1_HEALTH>`);
   }
+
+  loadConfig();
 
   const path = resolve(ConfigPathResolver.getBaseDirname(), ...split.splice(0, split.length - 1));
 

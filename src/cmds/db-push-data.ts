@@ -1,4 +1,4 @@
-import { checkEnvVariables, SimpleMap } from "@miqro/core";
+import { checkEnvVariables, SimpleMap, loadConfig } from "@miqro/core";
 import { resolve } from "path";
 import { readFileSync } from "fs";
 import { loadSequelize } from "../utils/db";
@@ -17,6 +17,8 @@ export const main = async (): Promise<void> => {
   if (typeof models !== "string") {
     throw new Error(`<modelA,..> must be a list of model names!`);
   }
+
+  loadConfig();
 
   const [BULK_CREATE_COUNT] = checkEnvVariables(["BULK_CREATE_COUNT"], ["100"]);
   const bulkCount = parseInt(BULK_CREATE_COUNT, 10);

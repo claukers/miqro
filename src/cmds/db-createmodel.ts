@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { templates } from "../utils/templates";
-import { ConfigPathResolver } from "@miqro/core";
+import { ConfigPathResolver, loadConfig } from "@miqro/core";
 import { loadSequelizeRC } from "../utils/db";
 
 export const main = (): void => {
@@ -16,7 +16,7 @@ export const main = (): void => {
     throw new Error(`<modelname> must be a string!`);
   }
 
-
+  loadConfig();
 
   const config = loadSequelizeRC();
 

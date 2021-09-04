@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
-import { ConfigPathResolver } from "@miqro/core";
+import { ConfigPathResolver, loadConfig } from "@miqro/core";
 import { templates } from "../utils/templates";
 
 export const main = (): void => {
@@ -9,6 +9,8 @@ export const main = (): void => {
   if (process.argv.length !== 3) {
     throw new Error(`invalid number of args`);
   }
+
+  loadConfig();
 
   const configPath = ConfigPathResolver.getConfigDirname();
 
