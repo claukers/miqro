@@ -56,9 +56,9 @@ CLIUtil.cliFlow({
     cb: makeMigrations,
     description: "\t\tseeks changes in your models and creates migrations"
   },
-  ["db:make:migration:generate:state"]: {
+  ["db:make:migration:force:clean:state"]: {
     cb: syncMakeMigrations,
-    description: "regenerate _current.json in the migrations folder"
+    description: "regenerate _current.json in the migrations folder to force the 'local' migration state to be the same as the current models."
   },
   ["db:init"]: { cb: dbInit, description: "\t\t\t\tinit sequelize configuration." },
   ["db:create:model"]: { cb: createModel, description: "\t\t\tcreates an example model" }
