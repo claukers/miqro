@@ -19,7 +19,7 @@ const route: APIRoute = {
     }
   ],
   params: false,
-  results: [
+  result: [
     {
       options: {
         text: "string"
@@ -50,7 +50,7 @@ export default route;
     }
   ],
   params: false,
-  results: [
+  result: [
     {
       options: {
         text: "string"
