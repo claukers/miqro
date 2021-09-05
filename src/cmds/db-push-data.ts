@@ -7,7 +7,7 @@ export const main = async (): Promise<void> => {
   const outfile = process.argv[3];
   const models = process.argv[4];
   if (process.argv.length !== 5) {
-    throw new Error(`[BULK_CREATE_COUNT=100] arguments: <outfile> <modelA,..>`);
+    throw new Error(`[BULK_CREATE_COUNT=10] [BULK_CREATE_IGNORE_ERROR=true] arguments: <outfile> <modelA,..>`);
   }
 
   if (typeof outfile !== "string") {
@@ -20,7 +20,7 @@ export const main = async (): Promise<void> => {
 
   loadConfig();
 
-  const [BULK_CREATE_COUNT] = checkEnvVariables(["BULK_CREATE_COUNT"], ["100"]);
+  const [BULK_CREATE_COUNT, BULK_CREATE_IGNORE_ERROR] = checkEnvVariables(["BULK_CREATE_COUNT", "BULK_CREATE_IGNORE_ERROR"], ["10", "true"]);
   const bulkCount = parseInt(BULK_CREATE_COUNT, 10);
 
   if (isNaN(bulkCount) || bulkCount < 0) {
@@ -43,12 +43,32 @@ export const main = async (): Promise<void> => {
       });
       if (bulkCount === 0) {
         for (const m of list) {
-          await db.models[modelName].create(m);
+          try {
+            await db.models[modelName].create(m);
+          } catch(e) {
+            if(BULK_CREATE_IGNORE_ERROR === "true") {
+              console.error("error pushing");
+              console.error(e.message);
+              console.error("");
+            } else {
+              throw e;
+            }
+          }
         }
       } else {
         let current;
         while ((current = list.splice(0, bulkCount)).length > 0) {
-          await db.models[modelName].bulkCreate(current);
+          try {
+            await db.models[modelName].bulkCreate(current);
+          } catch(e) {
+            if(BULK_CREATE_IGNORE_ERROR === "true") {
+              console.error("error pushing");
+              console.error(e.message);
+              console.error("");
+            } else {
+              throw e;
+            }
+          }
         }
       }
     }
