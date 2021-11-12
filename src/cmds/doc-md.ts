@@ -60,7 +60,7 @@ export const main = (): void => {
       }
       return `|method|path|\n|----|----|\n${rows.join("\n")}`;
     } else {
-      throw new Error("bad definition");
+      return "";
     }
   };
 
@@ -204,10 +204,10 @@ export const main = (): void => {
     const results = doc.result instanceof Array ? doc.result : [doc.result];
     const resultTables = [];
     for (const r of results) {
-      let resultsTable = doc.result ? parseOptionTable(r) : "";
       if (!r) {
-        throw new Error("bad doc definition");
+        continue;
       }
+      let resultsTable = doc.result ? parseOptionTable(r) : "";
       if (resultsTable.split("\n").length > 1) {
         resultsTable = `#### response.data${r.description ? ` (${r.description})` : ""}\n\n${resultsTable}`;
       } else {
