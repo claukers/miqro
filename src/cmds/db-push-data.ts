@@ -34,7 +34,7 @@ export const main = async (): Promise<void> => {
   for (const modelName of modelList) {
     if (out[modelName] && db.models[modelName]) {
       const list = out[modelName].map(i => {
-        const ret = {};
+        const ret: any = {};
         const attrs = Object.keys(i);
         for (const a of attrs) {
           ret[a] = i[a] && i[a].type === "Buffer" ? Buffer.from(i[a]) : i[a];
@@ -45,7 +45,7 @@ export const main = async (): Promise<void> => {
         for (const m of list) {
           try {
             await db.models[modelName].create(m);
-          } catch(e) {
+          } catch(e: any) {
             if(BULK_CREATE_IGNORE_ERROR === "true") {
               console.error("error pushing");
               console.error(e.message);
@@ -60,7 +60,7 @@ export const main = async (): Promise<void> => {
         while ((current = list.splice(0, bulkCount)).length > 0) {
           try {
             await db.models[modelName].bulkCreate(current);
-          } catch(e) {
+          } catch(e: any) {
             if(BULK_CREATE_IGNORE_ERROR === "true") {
               console.error("error pushing");
               console.error(e.message);

@@ -102,7 +102,7 @@ export const initDBConfig = (): boolean => {
       initDir(seedersFolder);
     }
     return true;
-  } catch (e) {
+  } catch (e: any) {
     logger.error(e.message);
     throw e;
   }
@@ -112,7 +112,7 @@ export const initDBConfig = (): boolean => {
 export const makemigrations = (): void => {
   try {
     makemigrationsImpl();
-  } catch (e) {
+  } catch (e: any) {
     logger.error(e.message);
     throw e;
   }
@@ -121,7 +121,7 @@ export const makemigrations = (): void => {
 export const syncMakeMigrations = (): void => {
   try {
     syncMakeMigrationsImpl();
-  } catch (e) {
+  } catch (e: any) {
     logger.error(e.message);
     throw e;
   }

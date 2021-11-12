@@ -45,19 +45,23 @@ export const main = (): void => {
 
   };
 
-  const methodUrlTable = (options: { path: string | string[]; method: Method | Method[] }): string => {
-    const rows: string[] = [];
-    const paths = (options.path as any) instanceof Array ? options.path : [options.path];
-    for (const p of paths) {
-      if (options.method instanceof Array) {
-        for (const m of options.method) {
-          rows.push(`|${m}|${p}|`);
+  const methodUrlTable = (options?: { path?: string | string[]; method?: Method | Method[] }): string => {
+    if (options && options.path) {
+      const rows: string[] = [];
+      const paths = (options.path as any) instanceof Array ? options.path : [options.path];
+      for (const p of paths) {
+        if (options.method instanceof Array) {
+          for (const m of options.method) {
+            rows.push(`|${m}|${p}|`);
+          }
+        } else {
+          rows.push(`|${options.method}|${p}|`);
         }
-      } else {
-        rows.push(`|${options.method}|${p}|`);
       }
+      return `|method|path|\n|----|----|\n${rows.join("\n")}`;
+    } else {
+      throw new Error("bad definition");
     }
-    return `|method|path|\n|----|----|\n${rows.join("\n")}`;
   };
 
   const getRange = (o: ParseOption, t: string): string => {
@@ -106,23 +110,23 @@ export const main = (): void => {
     return range;
   };
 
-  const parseOptionTable = (options: { options: ParseOption[] | ParseOptionMap; } | false | undefined, subName = "", tableHeaders: number | null = 0): string => {
+  const parseOptionTable = (options: { options: ParseOption[] | ParseOptionMap; } | false | undefined, subName = "", tableHeaders = 0): string => {
     if (options) {
       let padding = "";
       for (let i = 0; i < tableHeaders; i++) {
         padding += "| ";
       }
       const hl = "|----|----|----|----|----|----|----|----|----|----|";
-      options.options = options.options instanceof Array ? options.options : parseOptionMap2ParseOptionList(options.options);
+      const list: ParseOption[] = options.options instanceof Array ? options.options : parseOptionMap2ParseOptionList(options.options);
       const headers = `|**name**|**description**|**type**|**arrayRange**|**arrayType**|**range**|**values**|**defaultValue**|**required**|**allowNull**|`;
-      return `${tableHeaders >= 0 ? `${padding}${headers}\n${tableHeaders === 0 ? `${padding}${hl}\n` : ""}` : ""}${options.options.map(o => {
+      return `${tableHeaders >= 0 ? `${padding}${headers}\n${tableHeaders === 0 ? `${padding}${hl}\n` : ""}` : ""}${list.map(o => {
         const arrayRange = o.type === "array" ? getRange(o, o.type) : " ";
         const range = o.type === "array" ? (o.arrayType ? getRange(o, o.arrayType) : " ") : getRange(o, o.type);
         let out = `${padding}|${subName}${o.name}|${o.description ? o.description : " "}|${o.type}|${arrayRange}|${o.arrayType ? o.arrayType : " "}|` +
           `${range}|` +
           `${o.enumValues ? o.enumValues.join(", ") : " "}|${o.defaultValue !== undefined ? o.defaultValue : " "}|${o.required === undefined ? true : o.required}|${o.allowNull ? "true" : "false"}|`;
         if (o.type === "multiple" || o.arrayType === "multiple") {
-          out += `\n${o.multipleOptions.map(oM => {
+          out += `\n${(o.multipleOptions ? o.multipleOptions : []).map(oM => {
             return parseOptionTable({
               options: [{
                 name: o.name,
@@ -132,7 +136,7 @@ export const main = (): void => {
           })}`;
           return out;
         } else if (o.type === "nested" || o.arrayType === "nested") {
-          out += `\n${parseOptionTable({ options: o.nestedOptions.options }, `${subName}${o.name}${o.type === "array" ? "[..]" : ""}.`, tableHeaders ? tableHeaders + 1 : 1)}`;
+          out += `\n${parseOptionTable({ options: o.nestedOptions ? o.nestedOptions.options : [] }, `${subName}${o.name}${o.type === "array" ? "[..]" : ""}.`, tableHeaders ? tableHeaders + 1 : 1)}`;
           return out;
         } else {
           return out;
@@ -201,6 +205,9 @@ export const main = (): void => {
     const resultTables = [];
     for (const r of results) {
       let resultsTable = doc.result ? parseOptionTable(r) : "";
+      if (!r) {
+        throw new Error("bad doc definition");
+      }
       if (resultsTable.split("\n").length > 1) {
         resultsTable = `#### response.data${r.description ? ` (${r.description})` : ""}\n\n${resultsTable}`;
       } else {

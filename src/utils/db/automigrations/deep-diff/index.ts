@@ -216,7 +216,7 @@ const deepDiff = (lhs: any, rhs: any, changes: any[], prefilter?: PreFilter<any,
 }
 
 /* eslint-disable  @typescript-eslint/explicit-module-boundary-types */
-const observableDiff = (lhs: any, rhs: any, observer: (difference: any) => void, prefilter?: PreFilter<any, any>, orderIndependent?: boolean): Diff<any, any>[] => {
+const observableDiff = (lhs: any, rhs: any, observer?: (difference: any) => void, prefilter?: PreFilter<any, any>, orderIndependent?: boolean): Diff<any, any>[] => {
     const changes: Diff<any, any>[] = [];
     deepDiff(lhs, rhs, changes, prefilter, null, null, null, orderIndependent);
     if (observer) {

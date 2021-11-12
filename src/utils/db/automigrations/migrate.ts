@@ -431,7 +431,7 @@ export const parseDifference = (previousState: TableMap, currentState: TableMap,
             if (df.path && df.path.length > 3) {
               if (df.path[1] === "schema") {
                 // new field attributes
-                const options = currentState[tableName].schema[df.path[2]];
+                const options = currentState[tableName as string].schema[df.path[2]];
                 if (options.references) {
                   depends.push(options.references.nodel);
                 }
@@ -496,7 +496,7 @@ export const parseDifference = (previousState: TableMap, currentState: TableMap,
             // if (df.path.length > 3) - drop attribute from column (change col)
             if (df.path.length > 3) {
               // new field attributes
-              const options = currentState[tableName].schema[df.path[2]];
+              const options = currentState[tableName as string].schema[df.path[2]];
               if (options.references) {
                 depends.push(options.references.nodel);
               }
@@ -532,7 +532,7 @@ export const parseDifference = (previousState: TableMap, currentState: TableMap,
 
           if (df.path && df.path[1] === "schema") {
             // new field attributes
-            const options = currentState[tableName].schema[df.path[2]];
+            const options = currentState[tableName as string].schema[df.path[2]];
             if (options.references) {
               depends.push(options.references.nodel);
             }
