@@ -1,7 +1,8 @@
 import fs from "fs";
 
 import path from "path";
-import { diff } from "deep-diff";
+
+import { diff } from "../../deep-diff";
 
 interface TableMap {
   [tableName: string]: {

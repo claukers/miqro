@@ -1,4 +1,4 @@
-import { ConfigPathResolver, getLogger, loadConfig, Method, ParseOption, ParseOptionMap } from "@miqro/core";
+import { ConfigPathResolver, getLogger, GroupPolicy, loadConfig, Method, ParseOption, ParseOptionMap } from "@miqro/core";
 import { resolve } from "path";
 import { writeFileSync } from "fs";
 
@@ -35,6 +35,15 @@ export const main = (): void => {
   }
 
   const docJSON = getDOCJSON({ dirname, subPath }, getLogger("miqro"));
+
+  const policyTable = (policy: GroupPolicy | undefined | false): string => {
+    if (policy) {
+      return `|policy|groups|\n|----|----|\n|${policy.groupPolicy}|${policy.groups.join(", ")}|`;
+    } else {
+      return "```no policy provided!!```";
+    }
+
+  };
 
   const methodUrlTable = (options: { path: string | string[]; method: Method | Method[] }): string => {
     const rows: string[] = [];
@@ -144,7 +153,6 @@ export const main = (): void => {
   }).join("\n\n")}`;
 
   writeFileSync(resolve(ConfigPathResolver.getBaseDirname(), outPath), `${featureIndex}\n\n` + docJSON.map(doc => {
-
     const param = doc.params instanceof Array ? doc.params : [doc.params];
     const paramsTable = [];
     for (const q of param) {
@@ -201,8 +209,11 @@ export const main = (): void => {
       resultTables.push(resultsTable);
     }
 
+    const pTable = policyTable(doc.policy);
+
     return `### ${doc.featureName}\n\n` +
       `${doc.description ? `${doc.description}\n\n` : ""}` +
+      `${pTable ? `${pTable}\n\n` : ""}` +
       `#### endpoint\n\n` +
       `${methodUrlTable(doc)}\n\n` +
       // `${paramsTable ? `${paramsTable}\n\n` : ""}` +
