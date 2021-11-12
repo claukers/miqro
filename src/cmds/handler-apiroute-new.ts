@@ -9,24 +9,6 @@ const templates = {
 const route: APIRoute = {
   path: "${path}",
   method: "POST",
-  query: false,
-  body: [
-    {
-      options: {
-        name: "string"
-      },
-      mode: "no_extra"
-    }
-  ],
-  params: false,
-  result: [
-    {
-      options: {
-        text: "string"
-      },
-      mode: "remove_extra"
-    }
-  ],
   handler: async (ctx: Context) => {
     return {
       text: \`Hello \${ctx.body.name}!\`
@@ -40,24 +22,6 @@ export default route;
     `module.exports = {
   path: "${path}",
   method: "POST",
-  query: false,
-  body: [
-    {
-      options: {
-        name: "string"
-      },
-      mode: "no_extra"
-    }
-  ],
-  params: false,
-  result: [
-    {
-      options: {
-        text: "string"
-      },
-      mode: "remove_extra"
-    }
-  ],
   handler: async (ctx) => {
     return {
       text: \`Hello \${ctx.body.name}!\`

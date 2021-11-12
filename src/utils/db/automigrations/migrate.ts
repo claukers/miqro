@@ -2,7 +2,7 @@ import fs from "fs";
 
 import path from "path";
 
-import { diff } from "../../deep-diff";
+import { DEEPDIFF } from "./deep-diff";
 
 interface TableMap {
   [tableName: string]: {
@@ -358,7 +358,7 @@ interface DiffAction {
 export const parseDifference = (previousState: TableMap, currentState: TableMap, logger: any): DiffAction[] => {
   //    log(JSON.stringify(currentState, null, 4));
   const actions: DiffAction[] = [];
-  const difference = diff(previousState, currentState);
+  const difference = DEEPDIFF.diff(previousState, currentState);
   if (difference) {
     for (const df of difference) {
       //    log (JSON.stringify(df, null, 4));

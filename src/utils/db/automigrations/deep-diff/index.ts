@@ -1,80 +1,43 @@
 // https://github.com/flitbit/diff/blob/master/index.js
 
-// nodejs compatible on server side and in the browser.
-function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor;
-    ctor.prototype = Object.create(superCtor.prototype, {
-        constructor: {
-            value: ctor,
-            enumerable: false,
-            writable: true,
-            configurable: true
-        }
-    });
-}
-
-function Diff(kind, path) {
-    Object.defineProperty(this, 'kind', {
-        value: kind,
-        enumerable: true
-    });
-    if (path && path.length) {
-        Object.defineProperty(this, 'path', {
-            value: path,
-            enumerable: true
-        });
+class Diff<LHS = any, RHS = any> {
+    public rhs: RHS | undefined;
+    public lhs: LHS | undefined;
+    constructor(public kind: "A" | "E" | "N" | "D", public path: string[] | undefined) {
     }
 }
 
-function DiffEdit(path, origin, value) {
-    // @ts-ignore
-    DiffEdit.super_.call(this, 'E', path);
-    Object.defineProperty(this, 'lhs', {
-        value: origin,
-        enumerable: true
-    });
-    Object.defineProperty(this, 'rhs', {
-        value: value,
-        enumerable: true
-    });
+class DiffEdit<L, R> extends Diff<L, R> {
+    constructor(path: string[], lhs: L, rhs: R) {
+        super("E", path);
+        this.lhs = lhs;
+        this.rhs = rhs;
+    }
 }
-inherits(DiffEdit, Diff);
 
-function DiffNew(path, value) {
-    // @ts-ignore
-    DiffNew.super_.call(this, 'N', path);
-    Object.defineProperty(this, 'rhs', {
-        value: value,
-        enumerable: true
-    });
+class DiffNew<L, R> extends Diff<L, R> {
+    constructor(path: string[] | undefined, rhs: R) {
+        super("N", path);
+        this.rhs = rhs;
+    }
 }
-inherits(DiffNew, Diff);
 
-function DiffDeleted(path, value) {
-    // @ts-ignore
-    DiffDeleted.super_.call(this, 'D', path);
-    Object.defineProperty(this, 'lhs', {
-        value: value,
-        enumerable: true
-    });
+class DiffDeleted<L, R> extends Diff<L, R>{
+    constructor(path: string[] | undefined, public lhs: L) {
+        super("D", path);
+        this.lhs = lhs;
+    }
 }
-inherits(DiffDeleted, Diff);
 
-function DiffArray(path, index, item) {
-    // @ts-ignore
-    DiffArray.super_.call(this, 'A', path);
-    Object.defineProperty(this, 'index', {
-        value: index,
-        enumerable: true
-    });
-    Object.defineProperty(this, 'item', {
-        value: item,
-        enumerable: true
-    });
+class DiffArray extends Diff {
+    public item: any;
+    constructor(path: string[], public index: number, item: any) {
+        super("A", path);
+        this.item = item;
+    }
 }
-inherits(DiffArray, Diff);
 
-function realTypeOf(subject) {
+function realTypeOf(subject: any) {
     var type = typeof subject;
     if (type !== 'object') {
         return type;
@@ -113,7 +76,7 @@ const getOrderIndependentHash = (object: any): number => {
     var type = realTypeOf(object);
 
     if (type === 'array') {
-        object.forEach(function (item) {
+        object.forEach(function (item: any) {
             // Addition is commutative so this is order indep
             accum += getOrderIndependentHash(item);
         });
@@ -138,7 +101,7 @@ const getOrderIndependentHash = (object: any): number => {
     return accum + hashThisString(stringToHash);
 }
 
-const deepDiff = (lhs: any, rhs: any, changes: any[], prefilter?: PreFilter<any, any>, path?: string[] | null, key?: string | null, stack?: { lhs?: any; rhs?: any; }[] | null, orderIndependent?) => {
+const deepDiff = (lhs: any, rhs: any, changes: any[], prefilter?: PreFilter<any, any>, path?: string[] | null, key?: string | null | number, stack?: { lhs?: any; rhs?: any; }[] | null, orderIndependent?: boolean) => {
     changes = changes || [];
     path = path || [];
     stack = stack || [];
@@ -160,7 +123,7 @@ const deepDiff = (lhs: any, rhs: any, changes: any[], prefilter?: PreFilter<any,
                 }
             }
         }
-        currentPath.push(key);
+        currentPath.push(key as string);
     }
 
     // Use string comparison for regexes
@@ -175,10 +138,10 @@ const deepDiff = (lhs: any, rhs: any, changes: any[], prefilter?: PreFilter<any,
 
     var ldefined = ltype !== 'undefined' ||
         (stack && (stack.length > 0) && stack[stack.length - 1].lhs &&
-            Object.getOwnPropertyDescriptor(stack[stack.length - 1].lhs, key));
+            Object.getOwnPropertyDescriptor(stack[stack.length - 1].lhs, key as string));
     var rdefined = rtype !== 'undefined' ||
         (stack && (stack.length > 0) && stack[stack.length - 1].rhs &&
-            Object.getOwnPropertyDescriptor(stack[stack.length - 1].rhs, key));
+            Object.getOwnPropertyDescriptor(stack[stack.length - 1].rhs, key as string));
 
     if (!ldefined && rdefined) {
         changes.push(new DiffNew(currentPath, rhs));
@@ -204,7 +167,7 @@ const deepDiff = (lhs: any, rhs: any, changes: any[], prefilter?: PreFilter<any,
                         return getOrderIndependentHash(a) - getOrderIndependentHash(b);
                     });
 
-                    rhs.sort(function (a, b) {
+                    rhs.sort(function (a: any, b: any) {
                         return getOrderIndependentHash(a) - getOrderIndependentHash(b);
                     });
                 }
@@ -229,7 +192,7 @@ const deepDiff = (lhs: any, rhs: any, changes: any[], prefilter?: PreFilter<any,
                     other = pkeys.indexOf(k);
                     if (other >= 0) {
                         deepDiff(lhs[k], rhs[k], changes, prefilter, currentPath, k, stack, orderIndependent);
-                        pkeys[other] = null;
+                        pkeys[other] = null as any;
                     } else {
                         deepDiff(lhs[k], undefined, changes, prefilter, currentPath, k, stack, orderIndependent);
                     }
@@ -253,8 +216,8 @@ const deepDiff = (lhs: any, rhs: any, changes: any[], prefilter?: PreFilter<any,
     }
 }
 
-const observableDiff = (lhs: any, rhs: any, observer: (differenca: any) => void, prefilter?: PreFilter<any, any>, orderIndependent?) => {
-    var changes = [];
+const observableDiff = (lhs: any, rhs: any, observer: (difference: any) => void, prefilter?: PreFilter<any, any>, orderIndependent?: boolean): Diff<any, any>[] => {
+    const changes: Diff<any, any>[] = [];
     deepDiff(lhs, rhs, changes, prefilter, null, null, null, orderIndependent);
     if (observer) {
         for (var i = 0; i < changes.length; ++i) {
@@ -264,9 +227,9 @@ const observableDiff = (lhs: any, rhs: any, observer: (differenca: any) => void,
     return changes;
 }
 
-const accumulateDiff = (lhs: any, rhs: any, prefilter?: PreFilter<any, any>, accum?): Array<Diff<any, any>> | undefined => {
+const accumulateDiff = (lhs: any, rhs: any, prefilter?: PreFilter<any, any>, accum?: Diff<any, any>[] | undefined): Array<Diff<any, any>> | undefined => {
     var observer = (accum) ?
-        function (difference) {
+        function (difference: any) {
             if (difference) {
                 accum.push(difference);
             }
@@ -275,34 +238,6 @@ const accumulateDiff = (lhs: any, rhs: any, prefilter?: PreFilter<any, any>, acc
     var changes = observableDiff(lhs, rhs, observer, prefilter);
     return (accum) ? accum : (changes.length) ? changes : undefined;
 }
-
-export interface DiffNew<RHS> {
-    kind: 'N';
-    path?: any[] | undefined;
-    rhs: RHS;
-}
-
-export interface DiffDeleted<LHS> {
-    kind: 'D';
-    path?: any[] | undefined;
-    lhs: LHS;
-}
-
-export interface DiffEdit<LHS, RHS = LHS> {
-    kind: 'E';
-    path?: any[] | undefined;
-    lhs: LHS;
-    rhs: RHS;
-}
-
-export interface DiffArray<LHS, RHS = LHS> {
-    kind: 'A';
-    path?: any[] | undefined;
-    index: number;
-    item: Diff<LHS, RHS>;
-}
-
-export type Diff<LHS, RHS = LHS> = DiffNew<RHS> | DiffDeleted<LHS> | DiffEdit<LHS, RHS> | DiffArray<LHS, RHS>;
 
 export type PreFilterFunction = (path: any[], key: any) => boolean;
 export interface PreFilterObject<LHS, RHS = LHS> {
@@ -322,4 +257,8 @@ export type Filter<LHS, RHS = LHS> = (target: LHS, source: RHS, change: Diff<LHS
 
 export type DeepDiff<LHS, RHS = LHS> = (lhs: LHS, rhs: RHS, prefilter?: PreFilter<LHS, RHS>) => Array<Diff<LHS, RHS>> | undefined;
 
-export const diff: DeepDiff<any> = accumulateDiff;
+export const DEEPDIFF: {
+    diff: DeepDiff<any>
+} = {
+    diff: accumulateDiff
+};
