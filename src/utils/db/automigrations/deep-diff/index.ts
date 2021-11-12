@@ -37,7 +37,7 @@ class DiffArray extends Diff {
     }
 }
 
-function realTypeOf(subject: any) {
+const realTypeOf = (subject: any) => {
     const type = typeof subject;
     if (type !== 'object') {
         return type;
