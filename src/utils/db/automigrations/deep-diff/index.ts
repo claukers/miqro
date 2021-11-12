@@ -38,7 +38,7 @@ class DiffArray extends Diff {
 }
 
 function realTypeOf(subject: any) {
-    var type = typeof subject;
+    const type = typeof subject;
     if (type !== 'object') {
         return type;
     }
@@ -59,10 +59,10 @@ function realTypeOf(subject: any) {
 
 // http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
 const hashThisString = (string: string): number => {
-    var hash = 0;
+    let hash = 0;
     if (string.length === 0) { return hash; }
-    for (var i = 0; i < string.length; i++) {
-        var char = string.charCodeAt(i);
+    for (let i = 0; i < string.length; i++) {
+        const char = string.charCodeAt(i);
         hash = ((hash << 5) - hash) + char;
         hash = hash & hash; // Convert to 32bit integer
     }
@@ -72,8 +72,8 @@ const hashThisString = (string: string): number => {
 // Gets a hash of the given object in an array order-independent fashion
 // also object key order independent (easier since they can be alphabetized)
 const getOrderIndependentHash = (object: any): number => {
-    var accum = 0;
-    var type = realTypeOf(object);
+    let accum = 0;
+    const type = realTypeOf(object);
 
     if (type === 'array') {
         object.forEach(function (item: any) {
@@ -81,14 +81,14 @@ const getOrderIndependentHash = (object: any): number => {
             accum += getOrderIndependentHash(item);
         });
 
-        var arrayString = '[type: array, hash: ' + accum + ']';
+        const arrayString = '[type: array, hash: ' + accum + ']';
         return accum + hashThisString(arrayString);
     }
 
     if (type === 'object') {
-        for (var key in object) {
+        for (const key in object) {
             if (object.hasOwnProperty(key)) {
-                var keyValueString = '[ type: object, key: ' + key + ', value hash: ' + getOrderIndependentHash(object[key]) + ']';
+                const keyValueString = '[ type: object, key: ' + key + ', value hash: ' + getOrderIndependentHash(object[key]) + ']';
                 accum += hashThisString(keyValueString);
             }
         }
@@ -97,7 +97,7 @@ const getOrderIndependentHash = (object: any): number => {
     }
 
     // Non object, non array...should be good?
-    var stringToHash = '[ type: ' + type + ' ; value: ' + object + ']';
+    const stringToHash = '[ type: ' + type + ' ; value: ' + object + ']';
     return accum + hashThisString(stringToHash);
 }
 
@@ -105,7 +105,7 @@ const deepDiff = (lhs: any, rhs: any, changes: any[], prefilter?: PreFilter<any,
     changes = changes || [];
     path = path || [];
     stack = stack || [];
-    var currentPath = path.slice(0);
+    const currentPath = path.slice(0);
     if (typeof key !== 'undefined' && key !== null) {
         if (prefilter) {
             if (typeof (prefilter) === 'function' && prefilter(currentPath, key)) {
@@ -115,7 +115,7 @@ const deepDiff = (lhs: any, rhs: any, changes: any[], prefilter?: PreFilter<any,
                     return;
                 }
                 if (prefilter.normalize) {
-                    var alt = prefilter.normalize(currentPath, key, lhs, rhs);
+                    const alt = prefilter.normalize(currentPath, key, lhs, rhs);
                     if (alt) {
                         lhs = alt[0];
                         rhs = alt[1];
@@ -132,14 +132,14 @@ const deepDiff = (lhs: any, rhs: any, changes: any[], prefilter?: PreFilter<any,
         rhs = rhs.toString();
     }
 
-    var ltype = typeof lhs;
-    var rtype = typeof rhs;
-    var i, j, k, other;
+    const ltype = typeof lhs;
+    const rtype = typeof rhs;
+    let i, j, k, other;
 
-    var ldefined = ltype !== 'undefined' ||
+    const ldefined = ltype !== 'undefined' ||
         (stack && (stack.length > 0) && stack[stack.length - 1].lhs &&
             Object.getOwnPropertyDescriptor(stack[stack.length - 1].lhs, key as string));
-    var rdefined = rtype !== 'undefined' ||
+    const rdefined = rtype !== 'undefined' ||
         (stack && (stack.length > 0) && stack[stack.length - 1].rhs &&
             Object.getOwnPropertyDescriptor(stack[stack.length - 1].rhs, key as string));
 
@@ -183,10 +183,9 @@ const deepDiff = (lhs: any, rhs: any, changes: any[], prefilter?: PreFilter<any,
                     deepDiff(lhs[i], rhs[i], changes, prefilter, currentPath, i, stack, orderIndependent);
                 }
             } else {
-                // @ts-ignore
-                var akeys = Object.keys(lhs).concat(Object.getOwnPropertySymbols(lhs));
-                // @ts-ignore
-                var pkeys = Object.keys(rhs).concat(Object.getOwnPropertySymbols(rhs));
+
+                const akeys = Object.keys(lhs).concat(Object.getOwnPropertySymbols(lhs) as any[] as string[]);
+                const pkeys = Object.keys(rhs).concat(Object.getOwnPropertySymbols(rhs) as any[] as string[]);
                 for (i = 0; i < akeys.length; ++i) {
                     k = akeys[i];
                     other = pkeys.indexOf(k);
@@ -216,26 +215,27 @@ const deepDiff = (lhs: any, rhs: any, changes: any[], prefilter?: PreFilter<any,
     }
 }
 
+/* eslint-disable  @typescript-eslint/explicit-module-boundary-types */
 const observableDiff = (lhs: any, rhs: any, observer: (difference: any) => void, prefilter?: PreFilter<any, any>, orderIndependent?: boolean): Diff<any, any>[] => {
     const changes: Diff<any, any>[] = [];
     deepDiff(lhs, rhs, changes, prefilter, null, null, null, orderIndependent);
     if (observer) {
-        for (var i = 0; i < changes.length; ++i) {
+        for (let i = 0; i < changes.length; ++i) {
             observer(changes[i]);
         }
     }
     return changes;
 }
 
+/* eslint-disable  @typescript-eslint/explicit-module-boundary-types */
 const accumulateDiff = (lhs: any, rhs: any, prefilter?: PreFilter<any, any>, accum?: Diff<any, any>[] | undefined): Array<Diff<any, any>> | undefined => {
-    var observer = (accum) ?
+    const observer = (accum) ?
         function (difference: any) {
             if (difference) {
                 accum.push(difference);
             }
         } : undefined;
-    // @ts-ignore
-    var changes = observableDiff(lhs, rhs, observer, prefilter);
+    const changes = observableDiff(lhs, rhs, observer, prefilter);
     return (accum) ? accum : (changes.length) ? changes : undefined;
 }
 

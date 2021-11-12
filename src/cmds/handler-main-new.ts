@@ -3,9 +3,9 @@ import { mkdirSync, writeFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
 const mainTemplates = {
-  ts: (minimal = false) =>
-    `${minimal ? `import { Context, APIRouter, App, checkEnvVariables, getLogger, ReadBuffer, JSONParser } from "@miqro/core";`: `import { APIRouter, App, checkEnvVariables, getLogger } from "@miqro/core";`}
-${!minimal ? `import { middleware } from "@miqro/handlers";\nimport { resolve } from "path";` : ""}
+  ts: () =>
+    `import { APIRouter, App, checkEnvVariables, getLogger, middleware } from "@miqro/core";
+import { resolve } from "path";
 
 /*
 To be start as a main file
@@ -17,21 +17,17 @@ const [PORT] = checkEnvVariables(["PORT"], ["8080"]);
 const logger = getLogger("server");
 
 const app = new App();
-${!minimal ? `app.use(middleware());\napp.use(APIRouter({
+app.use(middleware());
+app.use(APIRouter({
   dirname: resolve(__dirname, "api")
-}, logger));` : `app.get("/api/health", [ReadBuffer(), JSONParser(), async (ctx: Context) => {
-  ctx.json({
-    status: "OK"
-  });
-}]);`}
+}, logger));
 app.listen(PORT, () => {
   logger.info("listening on " + PORT);
 });
 `,
-  js: (minimal = false) =>
-    `${minimal ? `const { APIRouter, App, checkEnvVariables, getLogger, ReadBuffer, JSONParser } = require("@miqro/core");`: `const { APIRouter, App, checkEnvVariables, getLogger } = require("@miqro/core");`}
-${!minimal ? `const { middleware } = require("@miqro/handlers");
-const { resolve } = require("path");`: ""}
+  js: () =>
+    `const { APIRouter, App, checkEnvVariables, getLogger, middleware } = require("@miqro/core");
+const { resolve } = require("path");
 
 /*
 To be start as a main file
@@ -43,20 +39,17 @@ const [PORT] = checkEnvVariables(["PORT"], ["8080"]);
 const logger = getLogger("server");
 
 const app = new App();
-${!minimal ? `app.use(middleware());\napp.use(APIRouter({
+app.use(middleware());
+app.use(APIRouter({
   dirname: resolve(__dirname, "api")
-}, logger));` : `app.get("/api/health", [ReadBuffer(), JSONParser(), async (ctx) => {
-  ctx.json({
-    status: "OK"
-  });
-}]);`}
+}, logger));
 app.listen(PORT, () => {
   logger.info("listening on " + PORT);
 });
 `
 }
 
-export const main = (minimal = false): void => {
+export const main = (): void => {
 
   if (process.argv.length !== 4 || process.argv[3].length < 1) {
     throw new Error(`arguments: <identifier ex: SRC_MAIN>`);
@@ -88,7 +81,5 @@ export const main = (minimal = false): void => {
     recursive: true
   });
 
-  writeFileSync(filePath, mainTemplates[ext](minimal));
+  writeFileSync(filePath, mainTemplates[ext]());
 }
-
-export const mainMinimal = (): void => main(true);

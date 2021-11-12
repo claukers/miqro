@@ -4,8 +4,6 @@ import { CLIUtil } from "@miqro/core";
 import { main as start } from "./cmds/start";
 import { mainJS as newJS } from "./cmds/new";
 import { mainTS as newTS } from "./cmds/new";
-import { mainMinimalTS as newMinimalTS } from "./cmds/new";
-import { mainMinimalJS as newMinimalJS } from "./cmds/new";
 import { main as apiDocJSON } from "./cmds/doc-json";
 import { main as apiDocMD } from "./cmds/doc-md";
 import { main as configInit } from "./cmds/config-init";
@@ -15,7 +13,6 @@ import { main as configEnv } from "./cmds/config-env";
 //@miqro/handlers
 import { main as newRoute } from "./cmds/handler-apiroute-new";
 import { main as newMain } from "./cmds/handler-main-new";
-import { mainMinimal as newMainMinimal } from "./cmds/handler-main-new";
 //@miqro/database
 import { main as dbInit } from "./cmds/db-init";
 import { main as makeMigrations } from "./cmds/db-makemigrations";
@@ -27,13 +24,13 @@ import { main as dumpData } from "./cmds/db-dump-data";
 
 // noinspection SpellCheckingInspection
 CLIUtil.cliFlow({
+
+  ["new"]: { section: "quick start", cb: newJS, description: "\t\t\t\tcreate a new project" },
+
   ["new:main"]: { section: "http scafolding", cb: newMain, description: "\t\t\tcreates a new main file" },
-  ["new:main:minimal"]: { cb: newMainMinimal, description: "\t\tcreates a new minimal main file" },
-  ["new"]: { cb: newJS, description: "\t\t\t\tcreate a new project" },
-  ["new:minimal"]: { cb: newMinimalJS, description: "\t\t\tcreate a new minimal project" },
 
   ["new:typescript"]: { cb: newTS, description: "\t\t\tcreate a new typescript project" },
-  ["new:typescript:minimal"]: { cb: newMinimalTS, description: "\t\tcreate a new typescript minimal project" },
+
   ["new:route"]: { cb: newRoute, description: "\t\t\tcreates a new route" },
 
   ["config"]: { section: "config managment", cb: config, description: "\t\t\t\toutputs to stdout the config as a json" },

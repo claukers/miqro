@@ -40,7 +40,7 @@ const packageTemplate = {
 }`
 }
 
-export const mainJS = (minimal = false, typescript = false): void => {
+export const mainJS = (typescript = false): void => {
   if (process.argv.length !== 4 || process.argv[3].length < 1) {
     throw new Error(`arguments: <name ex: NEW_APP>`);
   }
@@ -110,34 +110,19 @@ export const mainJS = (minimal = false, typescript = false): void => {
     });
   }
 
-  if (!minimal) {
-    execSync(
-      `npm install @miqro/handlers --save`,
-      {
-        cwd: appFolder
-      }
-    );
-  }
-
   execSync(
-    `npx miqro new:main${minimal ? ":minimal" : ""} src_main`,
+    `npx miqro new:main src_main`,
     {
       cwd: appFolder
     }
   );
 
-  if (!minimal) {
-    execSync(
-      `npx miqro new:route src_api_health`,
-      {
-        cwd: appFolder
-      }
-    );
-  }
+  execSync(
+    `npx miqro new:route src_api_health`,
+    {
+      cwd: appFolder
+    }
+  );
 }
 
-export const mainTS = (): void => mainJS(false, true);
-
-export const mainMinimalJS = (): void => mainJS(true, false);
-
-export const mainMinimalTS = (): void => mainJS(true, true);
+export const mainTS = (): void => mainJS(true);
