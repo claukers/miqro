@@ -40,7 +40,7 @@ export const main = (): void => {
     if (policy) {
       return `|policy|groups|\n|----|----|\n|${policy.groupPolicy}|${policy.groups.join(", ")}|`;
     } else {
-      return "```no policy provided!!```";
+      return "";
     }
 
   };
@@ -145,7 +145,7 @@ export const main = (): void => {
     } else if (options === false) {
       return "";
     } else {
-      return "not defined";
+      return "";
     }
   };
 
