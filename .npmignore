@@ -1,10 +1,7 @@
 node_modules/
-Dockerfile
 coverage/
 .nyc_output/
 *.log
-bla.sh
-log.txt
 dist/
 test/data/*.log
 .idea
@@ -13,7 +10,7 @@ docs/
 #src/
 test/
 .eslintrc
-tsconfig.json
+#tsconfig.json
 .editorconfig
 .nycrc
 .github/
