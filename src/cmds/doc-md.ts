@@ -167,7 +167,9 @@ export const main = (): void => {
       } else {
         paramTable = paramTable === "" ? "" : `### params${q && q.description ? ` (${q.description})` : ""}: ${paramTable}`;
       }
-      paramsTable.push(paramTable);
+      if (paramTable !== "") {
+        paramsTable.push(paramTable);
+      }
     }
 
     const query = doc.query instanceof Array ? doc.query : [doc.query];
@@ -180,7 +182,9 @@ export const main = (): void => {
       } else {
         queryTable = queryTable === "" ? "" : `### query${q && q.description ? ` (${q.description})` : ""}: ${queryTable}`;
       }
-      queryTables.push(queryTable);
+      if (queryTable !== "") {
+        queryTables.push(queryTable);
+      }
     }
     /*if (paramsTable.split("\n").length > 1) {
       paramsTable = `- params\n\n${paramsTable}`;
@@ -198,7 +202,9 @@ export const main = (): void => {
       } else {
         bodyTable = bodyTable === "" ? "" : `### body${b && b.description ? ` (${b.description})` : ""}: ${bodyTable}`;
       }
-      bodyTables.push(bodyTable);
+      if (bodyTable !== "") {
+        bodyTables.push(bodyTable);
+      }
     }
 
     const results = doc.result instanceof Array ? doc.result : [doc.result];
@@ -213,7 +219,9 @@ export const main = (): void => {
       } else {
         resultsTable = resultsTable === "" ? "" : `### response${r.description ? ` (${r.description})` : ""}: ${resultsTable}`;
       }
-      resultTables.push(resultsTable);
+      if (resultsTable !== "") {
+        resultTables.push(resultsTable);
+      }
     }
 
     const pTable = policyTable(doc.policy);
