@@ -19,52 +19,8 @@ this module is just a **cli** for the following npm modules.
 npm install miqro --save-dev
 ```
 
-```
-npx miqro <command> [args]
-```
-
 to see available cmds
 
 ```
 npx miqro
-```
-
-```
-Available commands:
-
-quick start
-
-	new					    create a new project
-
-http scafolding
-
-	new:main				creates a new main file
-	new:typescript			create a new typescript project
-	new:route				creates a new route
-
-config managment
-
-	config					outputs to stdout the config as a json
-	config:bash				outputs to stdout the config as a bash script
-	config:env				outputs to stdout the config as a env file
-	config:init				inits your config folder
-
-cluster start
-
-	start					start a nodejs script in cluster mode and restart if crash.
-
-api documentation
-
-	doc					    outputs to stdout an api folder auto doc as a json
-	doc:md				    outputs to a file an api folder auto doc as a markdown
-
-sequelize helpers
-
-	db:console				runs a readline interface that send the input as a query
-	db:dump:data			dump the data of the database (only defined models)
-	db:push:data			push a dump to the database
-	db:make:migration		seeks changes in your models and creates migrations
-	db:make:migration:force:clean:state	regenerate _current.json in the migrations folder to force the 'local' migration state to be the same as the current models.
-	db:init					init sequelize configuration.
-	db:create:model			creates an example model
 ```

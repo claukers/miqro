@@ -26,11 +26,9 @@ import { main as dumpData } from "./cmds/db-dump-data";
 CLIUtil.cliFlow({
 
   ["new"]: { section: "quick start", cb: newJS, description: "\t\t\t\tcreate a new project" },
-
-  ["new:main"]: { section: "http scafolding", cb: newMain, description: "\t\t\tcreates a new main file" },
-
   ["new:typescript"]: { cb: newTS, description: "\t\t\tcreate a new typescript project" },
 
+  ["new:main"]: { section: "http scafolding", cb: newMain, description: "\t\t\tcreates a new main file" },
   ["new:route"]: { cb: newRoute, description: "\t\t\tcreates a new route" },
 
   ["config"]: { section: "config managment", cb: config, description: "\t\t\t\toutputs to stdout the config as a json" },
