@@ -152,7 +152,7 @@ export const main = (): void => {
   const FAKE_TAB = "    ";
   const FAKE_DOUBLE_TAB = `${FAKE_TAB}${FAKE_TAB}`;
 
-  const featureIndex = `## Features\n\n${docJSON.map(doc => {
+  const featureIndex = `${docJSON.map(doc => {
     return `- [${doc.featureName}](#${doc.featureName.toLowerCase()})\n\n${doc.description ? `${FAKE_TAB}${doc.description}\n\n` : ""}${FAKE_DOUBLE_TAB}${doc.path}`;
   }).join("\n\n")}`;
 
@@ -163,9 +163,9 @@ export const main = (): void => {
       let paramTable = parseOptionTable(q);
       // let paramsTable = parseOptionTable(doc.params);
       if (paramTable.split("\n").length > 1) {
-        paramTable = `#### params${q && q.description ? ` (${q.description})` : ""}\n\n${paramTable}`;
+        paramTable = `### params${q && q.description ? ` (${q.description})` : ""}\n\n${paramTable}`;
       } else {
-        paramTable = paramTable === "" ? "" : `#### params${q && q.description ? ` (${q.description})` : ""}: ${paramTable}`;
+        paramTable = paramTable === "" ? "" : `### params${q && q.description ? ` (${q.description})` : ""}: ${paramTable}`;
       }
       paramsTable.push(paramTable);
     }
@@ -176,9 +176,9 @@ export const main = (): void => {
       let queryTable = parseOptionTable(q);
       // let paramsTable = parseOptionTable(doc.params);
       if (queryTable.split("\n").length > 1) {
-        queryTable = `#### query${q && q.description ? ` (${q.description})` : ""}\n\n${queryTable}`;
+        queryTable = `### query${q && q.description ? ` (${q.description})` : ""}\n\n${queryTable}`;
       } else {
-        queryTable = queryTable === "" ? "" : `#### query${q && q.description ? ` (${q.description})` : ""}: ${queryTable}`;
+        queryTable = queryTable === "" ? "" : `### query${q && q.description ? ` (${q.description})` : ""}: ${queryTable}`;
       }
       queryTables.push(queryTable);
     }
@@ -194,9 +194,9 @@ export const main = (): void => {
       let bodyTable = parseOptionTable(b);
 
       if (bodyTable.split("\n").length > 1) {
-        bodyTable = `#### body${b && b.description ? ` (${b.description})` : ""}\n\n${bodyTable}`;
+        bodyTable = `### body${b && b.description ? ` (${b.description})` : ""}\n\n${bodyTable}`;
       } else {
-        bodyTable = bodyTable === "" ? "" : `#### body${b && b.description ? ` (${b.description})` : ""}: ${bodyTable}`;
+        bodyTable = bodyTable === "" ? "" : `### body${b && b.description ? ` (${b.description})` : ""}: ${bodyTable}`;
       }
       bodyTables.push(bodyTable);
     }
@@ -209,19 +209,19 @@ export const main = (): void => {
       }
       let resultsTable = doc.result ? parseOptionTable(r) : "";
       if (resultsTable.split("\n").length > 1) {
-        resultsTable = `#### response.data${r.description ? ` (${r.description})` : ""}\n\n${resultsTable}`;
+        resultsTable = `### response${r.description ? ` (${r.description})` : ""}\n\n${resultsTable}`;
       } else {
-        resultsTable = resultsTable === "" ? "" : `#### response.data${r.description ? ` (${r.description})` : ""}: ${resultsTable}`;
+        resultsTable = resultsTable === "" ? "" : `### response${r.description ? ` (${r.description})` : ""}: ${resultsTable}`;
       }
       resultTables.push(resultsTable);
     }
 
     const pTable = policyTable(doc.policy);
 
-    return `### ${doc.featureName}\n\n` +
+    return `## ${doc.featureName}\n\n` +
       `${doc.description ? `${doc.description}\n\n` : ""}` +
       `${pTable ? `${pTable}\n\n` : ""}` +
-      `#### endpoint\n\n` +
+      `### endpoint\n\n` +
       `${methodUrlTable(doc)}\n\n` +
       // `${paramsTable ? `${paramsTable}\n\n` : ""}` +
       `${paramsTable.length > 0 ? `${paramsTable.join("\n\n")}\n\n` : ""}` +
