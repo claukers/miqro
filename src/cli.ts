@@ -10,7 +10,6 @@ import { main as configInit } from "./cmds/config-init";
 import { main as config } from "./cmds/config";
 import { main as configBash } from "./cmds/config-bash";
 import { main as configEnv } from "./cmds/config-env";
-//@miqro/handlers
 import { main as newRoute } from "./cmds/handler-apiroute-new";
 import { main as newMain } from "./cmds/handler-main-new";
 //@miqro/database
