@@ -7,6 +7,7 @@ export const getDOCJSON = ({ dirname, subPath }: { dirname: string; subPath: str
   method?: Method | Method[];
   description?: string;
   policy?: GroupPolicy;
+  headers?: ParseOptions | ParseOptions[];
   session?: false | true | SessionHandlerOptions;
   params?: false | ParseOptions | ParseOptions[];
   query?: false | ParseOptions | ParseOptions[];
@@ -16,10 +17,14 @@ export const getDOCJSON = ({ dirname, subPath }: { dirname: string; subPath: str
 }[] => {
   const apiTraverse = traverseAPIRouteDir(basename(dirname).toUpperCase(), resolve(ConfigPathResolver.getBaseDirname(), dirname), subPath, undefined, logger);
   const docJSON = Object.keys(apiTraverse).map(featureName => {
-    const { session, policy, path, method, description, params, query, body, result } = apiTraverse[featureName];
+    const { path, method, options } = apiTraverse[featureName];
+    const { session, policy, description } = options ? options : { session: undefined, policy: undefined, description: undefined };
+    const { params, query, body, headers } = options && options.request ? options.request : { params: undefined, query: undefined, body: undefined, headers: undefined };
+    const result = options && options.response !== true ? options.response : undefined;
     return {
       path,
       method,
+      headers,
       session: session ? typeof session === "function" ? true : session : false,
       policy,
       params,
