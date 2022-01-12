@@ -2,7 +2,7 @@
 
 helpers for creating apps with nodejs **http** module and **sequelize**.
 
-this module is just a **cli** and bundle of the following npm modules.
+this module is just a **cli** for.
 
 - [@miqro/core](https://www.npmjs.com/package/@miqro/core)
 
