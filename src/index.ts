@@ -1,2 +1,1 @@
-export * from "@miqro/core";
-export * from "@miqro/runner";
+export * from "./test";

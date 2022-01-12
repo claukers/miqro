@@ -4,6 +4,7 @@ import { CLIUtil } from "@miqro/core";
 import { main as start } from "./cmds/start";
 import { mainJS as newJS } from "./cmds/new";
 import { mainTS as newTS } from "./cmds/new";
+import { main as testMain } from "./cmds/test";
 import { main as apiDocJSON } from "./cmds/doc-json";
 import { main as apiDocMD } from "./cmds/doc-md";
 import { main as configInit } from "./cmds/config-init";
@@ -42,6 +43,8 @@ CLIUtil.cliFlow({
 
   ["doc"]: { section: "api documentation", cb: apiDocJSON, description: "\t\t\t\toutputs to stdout an api folder auto doc as a json" },
   ["doc:md"]: { cb: apiDocMD, description: "\t\t\t\toutputs to a file an api folder auto doc as a markdown" },
+
+  ["test"]: { cb: testMain, description: "\t\t\t\trun test files." },
 
   ["db:console"]: { section: "sequelize helpers", cb: consoleCMD, description: "\t\t\truns a readline interface that send the input as a query" },
   ["db:dump:data"]: { cb: dumpData, description: "\t\t\tdump the data of the database (only defined models)" },

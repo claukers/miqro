@@ -102,12 +102,12 @@ export const mainJS = (typescript = false): void => {
     "src"
   ]
 }`);
-    execSync(`npm install typescript --save-dev`, {
+    /*execSync(`npm install typescript --save-dev`, {
       cwd: appFolder
     });
     execSync(`npm install @types/node --save-dev`, {
       cwd: appFolder
-    });
+    });*/
   }
 
   execSync(
