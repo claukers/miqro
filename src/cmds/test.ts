@@ -8,7 +8,7 @@ export const main = async (): Promise<void> => {
 
   const startMS = Date.now();
 
-  const args = extractFlags(process.argv.slice(2), {
+  const args = extractFlags(process.argv.slice(3), {
     flags: {
       i: {
         description: "isolate default",
