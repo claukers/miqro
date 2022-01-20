@@ -1,4 +1,4 @@
-import { checkEnvVariables, SimpleMap, loadConfig } from "@miqro/core";
+import { checkEnvVariables, loadConfig } from "@miqro/core";
 import { resolve } from "path";
 import { readFileSync } from "fs";
 import { loadSequelize } from "../utils/db";
@@ -30,7 +30,7 @@ export const main = async (): Promise<void> => {
   const modelList = models.split(",").map(o => o.trim());
 
   const db = loadSequelize();
-  const out: SimpleMap<any[]> = JSON.parse(readFileSync(resolve(process.cwd(), outfile)).toString());
+  const out: { [key: string]: any[] } = JSON.parse(readFileSync(resolve(process.cwd(), outfile)).toString());
   for (const modelName of modelList) {
     if (out[modelName] && db.models[modelName]) {
       const list = out[modelName].map(i => {
@@ -45,8 +45,8 @@ export const main = async (): Promise<void> => {
         for (const m of list) {
           try {
             await db.models[modelName].create(m);
-          } catch(e: any) {
-            if(BULK_CREATE_IGNORE_ERROR === "true") {
+          } catch (e: any) {
+            if (BULK_CREATE_IGNORE_ERROR === "true") {
               console.error("error pushing");
               console.error(e.message);
               console.error("");
@@ -60,8 +60,8 @@ export const main = async (): Promise<void> => {
         while ((current = list.splice(0, bulkCount)).length > 0) {
           try {
             await db.models[modelName].bulkCreate(current);
-          } catch(e: any) {
-            if(BULK_CREATE_IGNORE_ERROR === "true") {
+          } catch (e: any) {
+            if (BULK_CREATE_IGNORE_ERROR === "true") {
               console.error("error pushing");
               console.error(e.message);
               console.error("");

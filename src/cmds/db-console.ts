@@ -1,4 +1,4 @@
-import { getLogger, loadConfig } from "@miqro/core";
+import { loadConfig, getLogger } from "@miqro/core";
 import { createInterface } from "readline";
 import { loadSequelize } from "../utils/db";
 

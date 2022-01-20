@@ -1,6 +1,6 @@
 import { getLogger } from "@miqro/core";
-import fs from "fs";
-import path from "path";
+import { readFileSync, existsSync, writeFileSync } from "fs";
+import { join } from "path";
 import { loadModels, loadSequelizeRC } from "..";
 import { getMigration, MigrationState, parseDifference, reverseModels, sortActions, writeMigration } from "./migrate";
 
@@ -16,12 +16,12 @@ export const syncMakeMigrationsImpl = (): void => {
   const logger = getLogger("makemigrations");
 
   try {
-    if (!fs.existsSync(sequelizeRC["models-path"])) {
+    if (!existsSync(sequelizeRC["models-path"])) {
       logger.error("Can't find models directory. Use `sequelize init` to create it");
       return;
     }
 
-    if (!fs.existsSync(sequelizeRC["migrations-path"])) {
+    if (!existsSync(sequelizeRC["migrations-path"])) {
       logger.error("Can't find migrations directory. Use `sequelize init` to create it");
       return;
     }
@@ -30,7 +30,7 @@ export const syncMakeMigrationsImpl = (): void => {
     let previousState: MigrationState;
 
     try {
-      previousState = JSON.parse(fs.readFileSync(path.join(sequelizeRC["migrations-path"], "_current.json")).toString());
+      previousState = JSON.parse(readFileSync(join(sequelizeRC["migrations-path"], "_current.json")).toString());
     } catch (e) {
       previousState = {
         revision: 0,
@@ -48,15 +48,15 @@ export const syncMakeMigrationsImpl = (): void => {
 
 
     // backup _current file
-    if (fs.existsSync(path.join(sequelizeRC["migrations-path"], "_current.json"))) {
-      fs.writeFileSync(path.join(sequelizeRC["migrations-path"], "_current_bak.json"),
-        fs.readFileSync(path.join(sequelizeRC["migrations-path"], "_current.json"))
+    if (existsSync(join(sequelizeRC["migrations-path"], "_current.json"))) {
+      writeFileSync(join(sequelizeRC["migrations-path"], "_current_bak.json"),
+        readFileSync(join(sequelizeRC["migrations-path"], "_current.json"))
       );
     }
 
     // save current state
     currentState.revision = previousState.revision + 1;
-    fs.writeFileSync(path.join(sequelizeRC["migrations-path"], "_current.json"), JSON.stringify(currentState, null, 4));
+    writeFileSync(join(sequelizeRC["migrations-path"], "_current.json"), JSON.stringify(currentState, null, 4));
   } catch (e) {
     logger.error(e);
     throw e;
@@ -77,12 +77,12 @@ export const makemigrationsImpl = (): string | undefined | null => {
   const logger = getLogger("makemigrations");
 
   try {
-    if (!fs.existsSync(sequelizeRC["models-path"])) {
+    if (!existsSync(sequelizeRC["models-path"])) {
       logger.error("Can't find models directory. Use `sequelize init` to create it");
       return;
     }
 
-    if (!fs.existsSync(sequelizeRC["migrations-path"])) {
+    if (!existsSync(sequelizeRC["migrations-path"])) {
       logger.error("Can't find migrations directory. Use `sequelize init` to create it");
       return;
     }
@@ -91,7 +91,7 @@ export const makemigrationsImpl = (): string | undefined | null => {
     let previousState: MigrationState;
 
     try {
-      previousState = JSON.parse(fs.readFileSync(path.join(sequelizeRC["migrations-path"], "_current.json")).toString());
+      previousState = JSON.parse(readFileSync(join(sequelizeRC["migrations-path"], "_current.json")).toString());
     } catch (e) {
       previousState = {
         revision: 0,
@@ -125,15 +125,15 @@ export const makemigrationsImpl = (): string | undefined | null => {
     });
 
     // backup _current file
-    if (fs.existsSync(path.join(sequelizeRC["migrations-path"], "_current.json"))) {
-      fs.writeFileSync(path.join(sequelizeRC["migrations-path"], "_current_bak.json"),
-        fs.readFileSync(path.join(sequelizeRC["migrations-path"], "_current.json"))
+    if (existsSync(join(sequelizeRC["migrations-path"], "_current.json"))) {
+      writeFileSync(join(sequelizeRC["migrations-path"], "_current_bak.json"),
+        readFileSync(join(sequelizeRC["migrations-path"], "_current.json"))
       );
     }
 
     // save current state
     currentState.revision = previousState.revision + 1;
-    fs.writeFileSync(path.join(sequelizeRC["migrations-path"], "_current.json"), JSON.stringify(currentState, null, 4));
+    writeFileSync(join(sequelizeRC["migrations-path"], "_current.json"), JSON.stringify(currentState, null, 4));
 
     // write migration to file
     const info = writeMigration(currentState.revision,

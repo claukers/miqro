@@ -1,8 +1,6 @@
-import fs from "fs";
-
-import path from "path";
-
-import { DEEPDIFF } from "./deep-diff";
+import { diff } from "deep-diff";
+import { writeFileSync } from "fs";
+import { join } from "path";
 
 interface TableMap {
   [tableName: string]: {
@@ -358,7 +356,7 @@ interface DiffAction {
 export const parseDifference = (previousState: TableMap, currentState: TableMap, logger: any): DiffAction[] => {
   //    log(JSON.stringify(currentState, null, 4));
   const actions: DiffAction[] = [];
-  const difference = DEEPDIFF.diff(previousState, currentState);
+  const difference = diff(previousState, currentState);
   if (difference) {
     for (const df of difference) {
       //    log (JSON.stringify(df, null, 4));
@@ -399,7 +397,7 @@ export const parseDifference = (previousState: TableMap, currentState: TableMap,
                     actionType: "addIndex",
                     tableName,
                     depends: [tableName]
-                  }, ...{ ...df.rhs.indexes[_i] }
+                  }, ...{ ...(df.rhs.indexes as any)[_i] }
                 });
               }
             }
@@ -880,9 +878,9 @@ module.exports = {
   name = name.replace(" ", "_");
   const now = new Date();
   const timestamp = `${now.getFullYear()}${now.getMonth() + 1 < 10 ? "0" : ""}${now.getMonth() + 1}${now.getDate() < 10 ? "0" : ""}${now.getDate()}${now.getHours() < 10 ? "0" : ""}${now.getHours()}${now.getMinutes() < 10 ? "0" : ""}${now.getMinutes()}${now.getSeconds() < 10 ? "0" : ""}${now.getSeconds()}-${revision}`;
-  const filename = path.join(migrationsDir, timestamp + ((name != "") ? `-${name}` : "") + ".js");
+  const filename = join(migrationsDir, timestamp + ((name != "") ? `-${name}` : "") + ".js");
 
-  fs.writeFileSync(filename, template);
+  writeFileSync(filename, template);
 
   return { filename, info };
 };

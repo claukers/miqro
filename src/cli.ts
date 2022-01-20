@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 //@miqro/core
-import { CLIUtil } from "@miqro/core";
+import { mainCMD } from "./utils";
 import { main as start } from "./cmds/start";
 import { mainJS as newJS } from "./cmds/new";
 import { mainTS as newTS } from "./cmds/new";
@@ -23,7 +23,7 @@ import { main as pushData } from "./cmds/db-push-data";
 import { main as dumpData } from "./cmds/db-dump-data";
 
 // noinspection SpellCheckingInspection
-CLIUtil.cliFlow({
+mainCMD({
 
   ["new"]: { section: "quick start", cb: newJS, description: "\t\t\t\tcreate a new project" },
   ["new:typescript"]: { cb: newTS, description: "\t\t\tcreate a new typescript project" },

@@ -2,7 +2,7 @@ import { makemigrationsImpl, syncMakeMigrationsImpl } from "./automigrations";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { templates } from "../../utils/templates";
-import { ConfigFileNotFoundError, ConfigPathResolver, getLogger, Logger, parse } from "@miqro/core";
+import { ConfigPathResolver, parse, getLogger, Logger, ConfigFileNotFoundError } from "@miqro/core";
 
 const logger = console;
 

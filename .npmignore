@@ -7,10 +7,10 @@ test/data/*.log
 .idea
 docs/
 .vscode/
-#src/
+src/
 test/
 .eslintrc
-#tsconfig.json
+tsconfig.json
 .editorconfig
 .nycrc
 .github/

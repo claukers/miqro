@@ -1,6 +1,6 @@
 {
   "name": "miqro",
-  "version": "1.6.10",
+  "version": "2.0.0",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,21 +11,21 @@
     "prepare": "npm run build",
     "prebuild": "rm -Rf dist;",
     "build": "tsc",
-    "test": "echo 'test disabled'",
-    "lint": "eslint ./src --ext ts",
-    "fixlint": "eslint ./src --ext ts --fix"
+    "pretest": "npm run build",
+    "test": "miqro-test test/*.test.js"
   },
   "author": "claukers",
   "license": "ISC",
   "dependencies": {
-    "@miqro/core": "^1.4.0",
-    "@miqro/runner": "^1.1.6"
+    "@miqro/core": "^1.5.1",
+    "@miqro/runner": "^1.2.2",
+    "@miqro/test": "^0.0.2",
+    "deep-diff": "1.0.2"
   },
   "devDependencies": {
+    "@types/cookie": "^0.4.1",
+    "@types/deep-diff": "1.0.1",
     "@types/node": "^16.7.10",
-    "@typescript-eslint/eslint-plugin": "^5.3.0",
-    "@typescript-eslint/parser": "^5.3.0",
-    "eslint": "^8.2.0",
     "typescript": "^4.4.4"
   },
   "engines": {

@@ -1,5 +1,5 @@
-import { SessionHandlerOptions, ConfigPathResolver, GroupPolicy, Logger, Method, ParseOptions } from "@miqro/core";
-import { traverseAPIRouteDir } from "@miqro/core/dist/handler/api-router-utils";
+import { ConfigPathResolver, ParseOptions, Logger, SessionHandlerOptions, GroupPolicy, Method } from "@miqro/core";
+import { traverseAPIRouteDir } from "@miqro/core/dist/common/api-router-utils";
 import { basename, resolve } from "path";
 
 export const getDOCJSON = ({ dirname, subPath }: { dirname: string; subPath: string; }, logger: Logger): {

@@ -1,4 +1,4 @@
-import { checkEnvVariables, SimpleMap, loadConfig } from "@miqro/core";
+import { checkEnvVariables, loadConfig } from "@miqro/core";
 import { resolve } from "path";
 import { writeFileSync } from "fs";
 import { loadSequelize } from "../utils/db";
@@ -24,7 +24,7 @@ export const main = async (): Promise<void> => {
   loadConfig();
 
   const db = loadSequelize();
-  const out: SimpleMap<any[]> = {};
+  const out: { [key: string]: any[] } = {};
   logger.info(`beware that if the model is not implicitly defined in db.models it will be dumped.`);
   const models = Object.keys(db.models);
   for (const modelName of models) {

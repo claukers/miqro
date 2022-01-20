@@ -1,1 +1,1 @@
-export * from "./test";
+// this package is just a development cli

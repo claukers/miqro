@@ -1,4 +1,4 @@
-import { ConfigPathResolver, getLogger, GroupPolicy, loadConfig, Method, ParseOption, ParseOptionMap } from "@miqro/core";
+import { getLogger, ParseOptionMap, ParseOption, ConfigPathResolver, loadConfig, GroupPolicy, Method } from "@miqro/core";
 import { resolve } from "path";
 import { writeFileSync } from "fs";
 
