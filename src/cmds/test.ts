@@ -10,6 +10,6 @@ export const main = (): void => {
 
   loadConfig();
 
-  //execSync(`npx @miqro/runner ${process.argv.slice(3).join(" ")}`);
+  //execSync(`npx @miqro/test ${process.argv.slice(3).join(" ")}`);
   execSync(`${process.argv[0]} ${mainPath()} ${process.argv.slice(3).join(" ")}`)
 }
