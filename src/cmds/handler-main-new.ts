@@ -82,4 +82,6 @@ export const main = (): void => {
   });
 
   writeFileSync(filePath, mainTemplates[ext]());
+
+  console.log(`file ${filePath} created`);
 }

@@ -87,6 +87,7 @@ export const mainCMD = (cmds: { [key: string]: { cb: Callback<void> | Callback<P
         }
         logger.info(`\t${cmd}\t${cmds[cmd].description}`);
       }
+      logger.info("");
       if (exit) {
         process.exit(1);
       }

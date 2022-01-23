@@ -3,28 +3,40 @@ import { mkdirSync, writeFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
 const templates = {
-  ts: (path: string) =>
-    `import { APIRoute, Context } from "@miqro/core";
+  ts: (noMethod=false) =>
+    noMethod ? `import { APIRoute } from "@miqro/core";
 
-const route: APIRoute = {
-  path: "${path}",
-  method: "POST",
-  handler: async (ctx: Context) => {
+export default {
+  method: "GET",
+  handler: async (ctx) => {
     return {
-      text: \`Hello \${ctx.body.name}!\`
+      text: \`Hello\`
+    }
+  }
+} as APIRoute;
+` : `import { APIRoute } from "@miqro/core";
+
+export default {
+  handler: async (ctx) => {
+    return {
+      text: \`Hello\`
+    }
+  }
+} as APIRoute;
+`,
+  js: (noMethod=false) =>
+    noMethod ? `module.exports = {
+  method: "GET
+  handler: async (ctx) => {
+    return {
+      text: \`Hello\`
     }
   }
 };
-
-export default route;
-`,
-  js: (path: string) =>
-    `module.exports = {
-  path: "${path}",
-  method: "POST",
+` : `module.exports = {
   handler: async (ctx) => {
     return {
-      text: \`Hello \${ctx.body.name}!\`
+      text: \`Hello\`
     }
   }
 };
@@ -39,7 +51,7 @@ export const main = (): void => {
 
   const identifier = process.argv[3].toLocaleLowerCase();
 
-  const split = identifier.split("_");
+  const split = identifier.split("_").map(s=>s.trim()).filter(s=>s);
 
   const dots = split.filter(s => s.indexOf(".") !== -1);
   if (dots.length > 0) {
@@ -52,6 +64,8 @@ export const main = (): void => {
 
   const ext = existsSync(resolve(ConfigPathResolver.getBaseDirname(), "tsconfig.json")) ? "ts" : "js";
 
+  const noMethod = ["post", "get", "put", "delete", "patch", "options"].indexOf(split[0].toLocaleLowerCase()) === -1;
+
   const filePath = resolve(path, `${split[0]}.${ext}`);
   if (existsSync(filePath)) {
     throw new Error(`file ${filePath} already exists! doing nothing`);
@@ -63,5 +77,5 @@ export const main = (): void => {
     recursive: true
   });
 
-  writeFileSync(filePath, templates[ext](`/${split[0]}`));
+  writeFileSync(filePath, templates[ext](noMethod));
 }

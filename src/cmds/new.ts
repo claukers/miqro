@@ -11,8 +11,12 @@ const packageTemplate = {
   "private": true,
   "main": "dist/main.js",
   "scripts": {
+    "prebuild": "rm -Rf dist/;",
     "build": "tsc",
-    "start": "node dist/main.js"
+    "prestart": "npm run build",
+    "start": "node dist/main.js",
+    "pretest": "npm run build",
+    "test": "miqro-test -r test/ -n"
   },
   "devDependencies": {
   },
@@ -29,7 +33,8 @@ const packageTemplate = {
   "private": true,
   "main": "src/main.js",
   "scripts": {
-    "start": "node src/main.js"
+    "start": "node src/main.js",
+    "test": "miqro-test -r test/ -n"
   },
   "devDependencies": {
   },
@@ -79,6 +84,10 @@ export const mainJS = (typescript = false): void => {
     writeFileSync(resolve(appFolder, "tsconfig.json"), `{
   "compileOnSave": true,
   "compilerOptions": {
+    "lib": ["es2021"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es2021",
     "strict": false,
     "outDir": "./dist/",
     "removeComments": true,
@@ -86,13 +95,7 @@ export const mainJS = (typescript = false): void => {
     "preserveConstEnums": true,
     "sourceMap": true,
     "esModuleInterop": true,
-    "declaration": true,
-    "moduleResolution": "node",
-    "module": "commonjs",
-    "target": "es2017",
-    "lib": [
-      "es2017"
-    ]
+    "declaration": true
   },
   "exclude": [
     "node_modules",
@@ -102,13 +105,17 @@ export const mainJS = (typescript = false): void => {
     "src"
   ]
 }`);
-    /*execSync(`npm install typescript --save-dev`, {
+    execSync(`npm install typescript --save-dev`, {
       cwd: appFolder
     });
     execSync(`npm install @types/node --save-dev`, {
       cwd: appFolder
-    });*/
+    });
   }
+
+  execSync(`npm install @miqro/test --save-dev`, {
+    cwd: appFolder
+  });
 
   execSync(
     `npx miqro new:main src_main`,
@@ -123,6 +130,23 @@ export const mainJS = (typescript = false): void => {
       cwd: appFolder
     }
   );
+
+  mkdirSync(resolve(appFolder, "test"), {
+    recursive: true
+  });
+
+  execSync(
+    `npx miqro test:new test_api_health`,
+    {
+      cwd: appFolder
+    }
+  );
+
+  console.log(`new project created on ${appFolder}`);
+
+  console.log(`cd ${identifier}`);
+
+  console.log(`npm run start`);  
 }
 
 export const mainTS = (): void => mainJS(true);
