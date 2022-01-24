@@ -4,9 +4,7 @@ import { resolve } from "path";
 
 const testTemplates = {
   js: (category: string) =>
-    `const { it, requireMock, fake } = require("@miqro/test");
-
-const options = {
+    `const options = {
 	category: "${category}",
 	before: async () => {
 

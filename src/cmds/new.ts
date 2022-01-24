@@ -2,6 +2,13 @@ import { mkdirSync, writeFileSync, existsSync } from "fs";
 import { resolve } from "path";
 import { execSync } from "../utils";
 
+const gitignoreTemplate = {
+  ts: () => `node_modules/
+dist/
+`,
+  js: () => `node_modules/`
+};
+
 const packageTemplate = {
   ts: (name: string) =>
     `{
@@ -111,6 +118,9 @@ export const mainJS = (typescript = false): void => {
     execSync(`npm install @types/node --save-dev`, {
       cwd: appFolder
     });
+    writeFileSync(resolve(appFolder, ".gitignore"), gitignoreTemplate.ts());
+  } else {
+    writeFileSync(resolve(appFolder, ".gitignore"), gitignoreTemplate.js());
   }
 
   execSync(`npm install @miqro/test --save-dev`, {
