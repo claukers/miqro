@@ -1,8 +1,9 @@
-import { getLogger, ParseOptionMap, ParseOption, ConfigPathResolver, loadConfig, GroupPolicy, Method } from "@miqro/core";
-import { resolve } from "path";
-import { writeFileSync } from "fs";
+import {ConfigPathResolver, getLogger, GroupPolicy, loadConfig, Method} from "@miqro/core";
+import {ParseOption, ParseOptionMap} from "@miqro/parser";
+import {resolve} from "path";
+import {writeFileSync} from "fs";
 
-import { getDOCJSON } from "../utils/doc";
+import {getDOCJSON} from "../utils/doc";
 
 export const main = (): void => {
 
@@ -34,7 +35,7 @@ export const main = (): void => {
     });
   }
 
-  const docJSON = getDOCJSON({ dirname, subPath }, getLogger("miqro"));
+  const docJSON = getDOCJSON({dirname, subPath}, getLogger("miqro"));
 
   const policyTable = (policy: GroupPolicy | undefined | false): string => {
     if (policy) {
@@ -110,8 +111,8 @@ export const main = (): void => {
     return range;
   };
 
-  const parseOptionTable = (options: { options: ParseOption[] | ParseOptionMap; } | false | undefined, subName = "", tableHeaders = 0): string => {
-    if (options) {
+  const parseOptionTable = (options: { options: ParseOption[] | ParseOptionMap; } | boolean | undefined, subName = "", tableHeaders = 0): string => {
+    if (typeof options !== "boolean" && options) {
       let padding = "";
       for (let i = 0; i < tableHeaders; i++) {
         padding += "| ";
@@ -136,7 +137,7 @@ export const main = (): void => {
           })}`;
           return out;
         } else if (o.type === "nested" || o.arrayType === "nested") {
-          out += `\n${parseOptionTable({ options: o.nestedOptions ? o.nestedOptions.options : [] }, `${subName}${o.name}${o.type === "array" ? "[..]" : ""}.`, tableHeaders ? tableHeaders + 1 : 1)}`;
+          out += `\n${parseOptionTable({options: o.nestedOptions ? o.nestedOptions.options : []}, `${subName}${o.name}${o.type === "array" ? "[..]" : ""}.`, tableHeaders ? tableHeaders + 1 : 1)}`;
           return out;
         } else {
           return out;
@@ -158,14 +159,14 @@ export const main = (): void => {
 
   writeFileSync(resolve(ConfigPathResolver.getBaseDirname(), outPath), `${featureIndex}\n\n` + docJSON.map(doc => {
     const param = doc.params instanceof Array ? doc.params : [doc.params];
+
     const paramsTable = [];
     for (const q of param) {
-      let paramTable = parseOptionTable(q);
-      // let paramsTable = parseOptionTable(doc.params);
+      let paramTable = typeof q === "string" ? `${q}` : parseOptionTable(q);
       if (paramTable.split("\n").length > 1) {
-        paramTable = `### params${q && q.description ? ` (${q.description})` : ""}\n\n${paramTable}`;
+        paramTable = `### params${typeof q !== "boolean" && typeof q !== "string" && q && q.description ? ` (${q.description})` : ""}\n\n${paramTable}`;
       } else {
-        paramTable = paramTable === "" ? "" : `### params${q && q.description ? ` (${q.description})` : ""}: ${paramTable}`;
+        paramTable = paramTable === "" ? "" : `### params${typeof q !== "boolean" && typeof q !== "string" && q && q.description ? ` (${q.description})` : ""}: ${paramTable}`;
       }
       if (paramTable !== "") {
         paramsTable.push(paramTable);
@@ -175,12 +176,12 @@ export const main = (): void => {
     const query = doc.query instanceof Array ? doc.query : [doc.query];
     const queryTables = [];
     for (const q of query) {
-      let queryTable = parseOptionTable(q);
+      let queryTable = typeof q === "string" ? `${q}` : parseOptionTable(q);
       // let paramsTable = parseOptionTable(doc.params);
       if (queryTable.split("\n").length > 1) {
-        queryTable = `### query${q && q.description ? ` (${q.description})` : ""}\n\n${queryTable}`;
+        queryTable = `### query${typeof q !== "boolean" && typeof q !== "string" && q && q.description ? ` (${q.description})` : ""}\n\n${queryTable}`;
       } else {
-        queryTable = queryTable === "" ? "" : `### query${q && q.description ? ` (${q.description})` : ""}: ${queryTable}`;
+        queryTable = queryTable === "" ? "" : `### query${typeof q !== "boolean" && typeof q !== "string" && q && q.description ? ` (${q.description})` : ""}: ${queryTable}`;
       }
       if (queryTable !== "") {
         queryTables.push(queryTable);
@@ -195,29 +196,28 @@ export const main = (): void => {
     const body = doc.body instanceof Array ? doc.body : [doc.body];
     const bodyTables = [];
     for (const b of body) {
-      let bodyTable = parseOptionTable(b);
-
+      let bodyTable = typeof b === "string" ? `${b}` : parseOptionTable(b);
       if (bodyTable.split("\n").length > 1) {
-        bodyTable = `### body${b && b.description ? ` (${b.description})` : ""}\n\n${bodyTable}`;
+        bodyTable = `### body${typeof b !== "boolean" && typeof b !== "string" && b && b.description ? ` (${b.description})` : ""}\n\n${bodyTable}`;
       } else {
-        bodyTable = bodyTable === "" ? "" : `### body${b && b.description ? ` (${b.description})` : ""}: ${bodyTable}`;
+        bodyTable = bodyTable === "" ? "" : `### body${typeof b !== "boolean" && typeof b !== "string" && b && b.description ? ` (${b.description})` : ""}: ${bodyTable}`;
       }
       if (bodyTable !== "") {
         bodyTables.push(bodyTable);
       }
     }
 
-    const results = doc.result instanceof Array ? doc.result : [doc.result];
+    const results = doc.response instanceof Array ? doc.response : [doc.response];
     const resultTables = [];
     for (const r of results) {
       if (!r) {
         continue;
       }
-      let resultsTable = doc.result ? parseOptionTable(r) : "";
+      let resultsTable = r && typeof r !== "string" && typeof r !== "boolean" ? parseOptionTable(r) : r;
       if (resultsTable.split("\n").length > 1) {
-        resultsTable = `### response${r.description ? ` (${r.description})` : ""}\n\n${resultsTable}`;
+        resultsTable = `### response${typeof r !== "boolean" && typeof r !== "string" && r.description ? ` (${r.description})` : ""}\n\n${resultsTable}`;
       } else {
-        resultsTable = resultsTable === "" ? "" : `### response${r.description ? ` (${r.description})` : ""}: ${resultsTable}`;
+        resultsTable = resultsTable === "" ? "" : `### response${typeof r !== "boolean" && typeof r !== "string" && r.description ? ` (${r.description})` : ""}: ${resultsTable}`;
       }
       if (resultsTable !== "") {
         resultTables.push(resultsTable);
@@ -237,5 +237,4 @@ export const main = (): void => {
       `${bodyTables.length > 0 ? `${bodyTables.join("\n\n")}\n\n` : ""}` +
       `${resultTables.length > 0 ? `${resultTables.join("\n\n")}\n\n` : ""}`;
   }).join("\n\n"));
-
 }

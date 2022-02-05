@@ -12,6 +12,7 @@ import { main as configBash } from "./cmds/config-bash";
 import { main as configEnv } from "./cmds/config-env";
 import { main as newRoute } from "./cmds/handler-apiroute-new";
 import { main as newTest } from "./cmds/new-test";
+import { main as serve } from "./cmds/serve";
 import { main as newMain } from "./cmds/handler-main-new";
 //@miqro/database
 import { main as dbInit } from "./cmds/db-init";
@@ -40,6 +41,8 @@ mainCMD({
   ["config:init"]: { cb: configInit, description: "\t\t\tinits your config folder" },
 
   ["start"]: { section: "cluster start", cb: start, description: "\t\t\t\tstart a nodejs script in cluster mode and restart if crash." },
+
+  ["serve"]: { section: "serve static files", cb: serve, description: "\t\t\t\tserve static files." },
 
   ["doc"]: { section: "api documentation", cb: apiDocJSON, description: "\t\t\t\toutputs to stdout an api folder auto doc as a json" },
   ["doc:md"]: { cb: apiDocMD, description: "\t\t\t\toutputs to a file an api folder auto doc as a markdown" },

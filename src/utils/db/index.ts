@@ -2,7 +2,8 @@ import { makemigrationsImpl, syncMakeMigrationsImpl } from "./automigrations";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { templates } from "../../utils/templates";
-import { ConfigPathResolver, parse, getLogger, Logger, ConfigFileNotFoundError } from "@miqro/core";
+import { ConfigPathResolver, getLogger, Logger, ConfigFileNotFoundError } from "@miqro/core";
+import {parse} from "@miqro/parser";
 
 const logger = console;
 
@@ -26,12 +27,12 @@ export const loadSequelizeRC = (sequelizercPath: string = ConfigPathResolver.get
     // noinspection SpellCheckingInspection
     /* eslint-disable  @typescript-eslint/no-var-requires */
     const sequelizerc: SequelizeRC = require(sequelizercPath);
-    return parse(sequelizercPath, sequelizerc, [
+    return parse(sequelizerc, [
       { name: "config", type: "string", required: true },
       { name: "migrations-path", type: "string", required: true },
       { name: "seeders-path", type: "string", required: true },
       { name: "models-path", type: "string", required: true }
-    ], "no_extra") as SequelizeRC;
+    ], "no_extra", sequelizercPath) as SequelizeRC;
   }
 };
 
