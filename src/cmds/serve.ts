@@ -10,6 +10,10 @@ export const main = (): void => {
         description: "proxy",
         hasValue: true
       },
+      "proxy-cert-ignore": {
+        description: "proxy ignore certs",
+        hasValue: false
+      },
       "port": {
         description: "port",
         hasValue: true
@@ -52,7 +56,8 @@ export const main = (): void => {
       proxyURL.pathname = normalizePath(proxyURL.pathname);
       app.use(ReadBuffer());
       app.use(Proxy({
-        url: proxyURL.toString()
+        url: proxyURL.toString(),
+        rejectUnauthorized: !flags.flags.hasOwnProperty("proxy-cert-ignore")
       }), proxyPath);
     }
   }
