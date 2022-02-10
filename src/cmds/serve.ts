@@ -2,31 +2,35 @@ import {App, loadConfig, LoggerHandler, Proxy, ReadBuffer, Static} from "@miqro/
 import {extractFlags} from "../utils";
 import {URL} from "url";
 import {normalizePath} from "@miqro/core/dist/common/tokenize-match";
+import {existsSync, statSync} from "fs";
+
+const usage = `usage: [PORT=8080] npx miqro serve [directory=./] [path=/] [--index404 ./index.html] [--proxy-cert-ignore] [--port 8080] [--proxy /api=https://host/api]`;
 
 export const main = (): void => {
   const flags = extractFlags(process.argv.slice(3), {
     flags: {
-      "proxy": {
-        description: "proxy",
-        hasValue: true
-      },
-      "proxy-cert-ignore": {
-        description: "proxy ignore certs",
-        hasValue: false
-      },
-      "port": {
-        description: "port",
-        hasValue: true
+      "index404": {
+        description: "file to handle 404", hasValue: true
+      }, "proxy": {
+        description: "proxy", hasValue: true
+      }, "proxy-cert-ignore": {
+        description: "proxy ignore certs", hasValue: false
+      }, "port": {
+        description: "port", hasValue: true
       }
     }
   });
 
   if (flags.files.length > 2) {
-    throw new Error(`invalid number of args\nusage: [PORT=8080] npx miqro serve [directory=./] [path=/]`);
+    throw new Error(`invalid arguments.\n${usage}`);
+  }
+
+  if (flags.flags.index404 instanceof Array) {
+    throw new Error(`invalid index404!.\n${usage}`);
   }
 
   if (flags.flags.port instanceof Array) {
-    throw new Error(`invalid number of args\nusage: [PORT=8080] npx miqro serve [directory=./] [path=/] [--port 8080] [--proxy /api=https://host/api]`);
+    throw new Error(`invalid port!.\n${usage}`);
   }
 
   let [directory, path] = flags.files;
@@ -38,7 +42,11 @@ export const main = (): void => {
   const PORT = flags.flags.port ? flags.flags.port : (process.env.PORT ? process.env.PORT : 8080);
 
   if (PORT === undefined) {
-    throw new Error("port not defined");
+    throw new Error(`invalid port!.\n${usage}`);
+  }
+
+  if (!existsSync(directory) || !statSync(directory).isDirectory()) {
+    throw new Error(`${directory} directory not found!\n${usage}`);
   }
 
   const app = new App();
@@ -54,17 +62,17 @@ export const main = (): void => {
       const proxyPath = normalizePath(proxySplit[0]);
       const proxyURL = new URL(proxySplit[1]);
       proxyURL.pathname = normalizePath(proxyURL.pathname);
-      app.use(ReadBuffer());
-      app.use(Proxy({
-        url: proxyURL.toString(),
-        rejectUnauthorized: !flags.flags.hasOwnProperty("proxy-cert-ignore")
-      }), proxyPath);
+      const proxyRouter = Proxy({
+        url: proxyURL.toString(), rejectUnauthorized: !flags.flags.hasOwnProperty("proxy-cert-ignore")
+      });
+      console.log("setting up proxy to %s on %s", proxyURL.toString(), proxyPath);
+      proxyRouter.use(ReadBuffer());
+      app.use(proxyRouter, proxyPath);
     }
   }
 
   app.use(Static({
-    directory,
-    list: true
+    directory, list: true, index404: flags.flags.index404 ? flags.flags.index404 as string : undefined
   }), path);
   app.listen(PORT, () => {
     console.log("serving " + directory + " on " + path + " on port " + PORT);

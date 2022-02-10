@@ -17,7 +17,7 @@
   "author": "claukers",
   "license": "ISC",
   "dependencies": {
-    "@miqro/core": "^1.5.8",
+    "@miqro/core": "../core",
     "@miqro/parser": "^0.0.3",
     "@miqro/runner": "^1.2.5",
     "@miqro/test": "^0.0.10",
