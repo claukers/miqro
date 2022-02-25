@@ -3,11 +3,13 @@ import { resolve } from "path";
 import { ConfigPathResolver, loadConfig } from "@miqro/core";
 import { templates } from "../utils/templates";
 
+export const usage = "usage: [NODE_ENV=development] npx miqro config:init";
+
 export const main = (): void => {
   const logger = console;
 
   if (process.argv.length !== 3) {
-    throw new Error(`invalid number of args`);
+    throw new Error(`invalid number of args. ${usage}`);
   }
 
   loadConfig();

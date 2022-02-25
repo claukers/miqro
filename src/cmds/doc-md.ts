@@ -5,10 +5,12 @@ import {writeFileSync} from "fs";
 
 import {getDOCJSON} from "../utils/doc";
 
+export const usage = `usage: [NODE_ENV=development] npx miqro doc:md <api_folder> <subPath> <out.md>`;
+
 export const main = (): void => {
 
   if (process.argv.length !== 6) {
-    throw new Error(`arguments: <api_folder> <subPath> <out.md>`);
+    throw new Error(usage);
   }
 
   const dirname = process.argv[3];

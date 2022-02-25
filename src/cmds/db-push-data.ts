@@ -3,11 +3,13 @@ import { resolve } from "path";
 import { readFileSync } from "fs";
 import { loadSequelize } from "../utils/db";
 
+export const usage = "usage: [NODE_ENV=development] [BULK_CREATE_COUNT=10] [BULK_CREATE_IGNORE_ERROR=true] npx miqro db:push:data <outfile> <modelA,..>";
+
 export const main = async (): Promise<void> => {
   const outfile = process.argv[3];
   const models = process.argv[4];
   if (process.argv.length !== 5) {
-    throw new Error(`[BULK_CREATE_COUNT=10] [BULK_CREATE_IGNORE_ERROR=true] arguments: <outfile> <modelA,..>`);
+    throw new Error(usage);
   }
 
   if (typeof outfile !== "string") {

@@ -2,6 +2,8 @@ import { ConfigPathResolver, loadConfig } from "@miqro/core";
 import { mkdirSync, writeFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
+export const usage = `usage: [NODE_ENV=development] npx miqro new:test <identifier ex: SRC_MAIN>`;
+
 const testTemplates = {
   js: (category: string) =>
     `const options = {
@@ -23,7 +25,7 @@ it("happy path", async () => {
 export const main = (): void => {
 
   if (process.argv.length !== 4 || process.argv[3].length < 1) {
-    throw new Error(`arguments: <identifier ex: SRC_MAIN>`);
+    throw new Error(usage);
   }
 
   const identifier = process.argv[3].toLocaleLowerCase();

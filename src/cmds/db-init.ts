@@ -5,11 +5,13 @@ import { execSync } from "../utils";
 import { initDBConfig } from "../utils/db";
 import { templates } from "../utils/templates";
 
+export const usage = "usage: [NODE_ENV=development] npx miqro db:init";
+
 export const main = (): void => {
   const logger = console;
 
   if (process.argv.length !== 3) {
-    throw new Error(`invalid number of args`);
+    throw new Error(`invalid number of args. ${usage}`);
   }
 
   const initEnvFile = (path: string, template: string): void => {

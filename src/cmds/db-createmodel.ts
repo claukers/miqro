@@ -4,12 +4,14 @@ import { templates } from "../utils/templates";
 import { ConfigPathResolver, loadConfig } from "@miqro/core";
 import { loadSequelizeRC } from "../utils/db";
 
+export const usage = "usage: [NODE_ENV=development] npx miqro db:create:model <modelname>";
+
 export const main = (): void => {
   const logger = console;
   const modelname = process.argv[3];
 
   if (process.argv.length !== 4) {
-    throw new Error(`arguments: <modelname>`);
+    throw new Error(usage);
   }
 
   if (typeof modelname !== "string") {

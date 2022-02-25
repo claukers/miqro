@@ -3,11 +3,13 @@ import { resolve } from "path";
 import { writeFileSync } from "fs";
 import { loadSequelize } from "../utils/db";
 
+export const usage = "usage: [NODE_ENV=development] [LIMIT_COUNT=100] npx miqro db:dump:data <outfile>";
+
 export const main = async (): Promise<void> => {
   const logger = console;
   const outfile = process.argv[3];
   if (process.argv.length !== 4) {
-    throw new Error(`[LIMIT_COUNT=100] arguments: <outfile>`);
+    throw new Error(`invalid number of args. ${usage}`);
   }
 
   if (typeof outfile !== "string") {

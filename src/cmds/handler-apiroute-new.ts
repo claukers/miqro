@@ -1,9 +1,9 @@
-import { ConfigPathResolver, loadConfig } from "@miqro/core";
-import { mkdirSync, writeFileSync, existsSync } from "fs";
-import { resolve } from "path";
+import {ConfigPathResolver, loadConfig} from "@miqro/core";
+import {existsSync, mkdirSync, writeFileSync} from "fs";
+import {resolve} from "path";
 
 const templates = {
-  ts: (noMethod=false) =>
+  ts: (noMethod = false) =>
     noMethod ? `import { APIRoute } from "@miqro/core";
 
 export default {
@@ -24,7 +24,7 @@ export default {
   }
 } as APIRoute;
 `,
-  js: (noMethod=false) =>
+  js: (noMethod = false) =>
     noMethod ? `module.exports = {
   method: "GET
   handler: async (ctx) => {
@@ -43,19 +43,21 @@ export default {
 `
 }
 
+export const usage = `usage: [NODE_ENV=development] npx miqro new:route <identifier ex: SRC_API_V1_HEALTH>`;
+
 export const main = (): void => {
 
   if (process.argv.length !== 4 || process.argv[3].length < 1) {
-    throw new Error(`arguments: <identifier ex: SRC_API_V1_HEALTH>`);
+    throw new Error(usage);
   }
 
   const identifier = process.argv[3].toLocaleLowerCase();
 
-  const split = identifier.split("_").map(s=>s.trim()).filter(s=>s);
+  const split = identifier.split("_").map(s => s.trim()).filter(s => s);
 
   const dots = split.filter(s => s.indexOf(".") !== -1);
   if (dots.length > 0) {
-    throw new Error(`identifier cannot contain dots\narguments: <identifier ex: SRC_API_V1_HEALTH>`);
+    throw new Error(`identifier cannot contain dots\n${usage}`);
   }
 
   loadConfig();

@@ -1,6 +1,6 @@
-import { mkdirSync, writeFileSync, existsSync } from "fs";
-import { resolve } from "path";
-import { execSync } from "../utils";
+import {existsSync, mkdirSync, writeFileSync} from "fs";
+import {resolve} from "path";
+import {execSync} from "../utils";
 
 const gitignoreTemplate = {
   ts: () => `node_modules/
@@ -52,9 +52,12 @@ const packageTemplate = {
 }`
 }
 
+export const usageJS = `usage: npx miqro new <identifier ex: NEW_APP>`;
+export const usageTS = `usage: npx miqro new:typescript <identifier ex: NEW_APP>`;
+
 export const mainJS = (typescript = false): void => {
   if (process.argv.length !== 4 || process.argv[3].length < 1) {
-    throw new Error(`arguments: <name ex: NEW_APP>`);
+    throw new Error(typescript ? usageTS : usageJS);
   }
 
   const identifier = process.argv[3].toLocaleLowerCase();
@@ -156,7 +159,7 @@ export const mainJS = (typescript = false): void => {
 
   console.log(`cd ${identifier}`);
 
-  console.log(`npm run start`);  
+  console.log(`npm run start`);
 }
 
 export const mainTS = (): void => mainJS(true);

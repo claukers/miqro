@@ -49,10 +49,12 @@ app.listen(PORT, () => {
 `
 }
 
+export const usage = `usage: [NODE_ENV=development] npx miqro new:main <identifier ex: NEW_APP>`;
+
 export const main = (): void => {
 
   if (process.argv.length !== 4 || process.argv[3].length < 1) {
-    throw new Error(`arguments: <identifier ex: SRC_MAIN>`);
+    throw new Error(usage);
   }
 
   const identifier = process.argv[3].toLocaleLowerCase();

@@ -4,7 +4,7 @@ import {URL} from "url";
 import {normalizePath} from "@miqro/core/dist/common/tokenize-match";
 import {existsSync, statSync} from "fs";
 
-const usage = `usage: [PORT=8080] npx miqro serve [directory=./] [path=/] [--index404 ./index.html] [--proxy-cert-ignore] [--port 8080] [--proxy /api=https://host/api]`;
+export const usage = `usage: [NODE_ENV=development] npx miqro serve [directory=./] [path=/] [--index404 ./index.html] [--proxy-cert-ignore] [--port 8080] [--proxy /api=https://host/api]`;
 
 export const main = (): void => {
   const flags = extractFlags(process.argv.slice(3), {

@@ -1,10 +1,10 @@
-import { execSync as cpExec, ExecSyncOptionsWithBufferEncoding } from "child_process";
+import {execSync as cpExec, ExecSyncOptionsWithBufferEncoding} from "child_process";
 
 export const execSync = (cmd: string, options?: ExecSyncOptionsWithBufferEncoding): void => {
   console.log(cmd);
   cpExec(
     cmd,
-    options ? { stdio: 'inherit', ...options } : { stdio: 'inherit' }
+    options ? {stdio: 'inherit', ...options} : {stdio: 'inherit'}
   );
 }
 
@@ -48,7 +48,7 @@ export const extractFlags = (args: string[], options?: {
     const arg = args[i];
     if (arg.indexOf("-") === 0) {
       const argName = arg.substring(arg.indexOf("--") === 0 ? 2 : 1);
-      const ignoreValue = options && options.flags && options.flags[argName] && options.flags[argName].hasValue === false ? true : false; 
+      const ignoreValue = options && options.flags && options.flags[argName] && options.flags[argName].hasValue === false ? true : false;
       const argValue = !ignoreValue && args.length > i + 1 && args[i + 1] && args[i + 1].indexOf("-") != 0 ? args[i + 1] : null;
       const flag = flags[argName];
       if (flag instanceof Array) {
@@ -65,10 +65,19 @@ export const extractFlags = (args: string[], options?: {
       files.push(arg);
     }
   }
-  return { flags, files };
+  return {flags, files};
 }
 
-export const mainCMD = (cmds: { [key: string]: { cb: Callback<void> | Callback<Promise<void>>; description: string; section?: string; } }, usage: string, logger: {
+const getTabs = (n?: number) => {
+  n = n ? n : 1;
+  let ret = "";
+  for (let i = 0; i < n; i++) {
+    ret += "\t";
+  }
+  return ret;
+}
+
+export const mainCMD = (cmds: { [key: string]: { cb: Callback<void> | Callback<Promise<void>>; description: string; section?: string; tabs?: number } }, usage: string, logger: {
   error: (...args: any[]) => void;
   info: (...args: any[]) => void;
 } | Console, cmdArg = process.argv[2], exit = true): void => {
@@ -80,12 +89,14 @@ export const mainCMD = (cmds: { [key: string]: { cb: Callback<void> | Callback<P
         logger.error(e.message);
       }
       logger.info(`${usage}`);
-      logger.info(`Available commands:`);
+      logger.info(`Available commands:\n`);
       for (const cmd of Object.keys(cmds)) {
-        if (cmds[cmd].section) {
+        /*if (cmds[cmd].section) {
           logger.info(`\n${cmds[cmd].section}\n`);
-        }
-        logger.info(`\t${cmd}\t${cmds[cmd].description}`);
+        }*/
+        const description = cmds[cmd].description.split("\n").map(s => `${getTabs(/*cmds[cmd].tabs*/1)}${s}`).join("\n");
+        //logger.info(`\t${cmd}\n${description}`);
+        logger.info(`${cmd}\n${description}`);
       }
       logger.info("");
       if (exit) {

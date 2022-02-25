@@ -1,7 +1,9 @@
 import {existsSync, statSync, watch, watchFile} from "fs";
 import {execSync} from "../utils";
 
-const usage = (message?: string) => `${message}.\nusage: npx miqro watch <directory> <cmd>`;
+const usageMessage = (message?: string) => `${message ? `${message}.\n` : ""}usage: npx miqro watch <directory> <cmd>`;
+
+export const usage = usageMessage();
 
 function setupWatch(directory: string, cmd: string, timeout: number = 1000) {
   watchFile(directory, () => {
@@ -35,7 +37,7 @@ function queueRunCMD(cmd: string, timeout: number) {
 export const main = (): void => {
 
   if (process.argv.length < 5) {
-    throw new Error(usage("invalid number of args"));
+    throw new Error(usageMessage("invalid number of args"));
   }
 
   const directory = process.argv[3];
@@ -43,7 +45,7 @@ export const main = (): void => {
   const timeout = process.env.WATCH_TIMEOUT ? parseInt(process.env.WATCH_TIMEOUT, 10) : undefined;
 
   if (!existsSync(directory) || !statSync(directory).isDirectory()) {
-    throw new Error(usage("directory not found!"));
+    throw new Error(usageMessage("directory not found!"));
   }
 
   console.log(`setting up watch on ${directory} with cmd ${cmd}`);

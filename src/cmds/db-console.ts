@@ -2,9 +2,11 @@ import { loadConfig, getLogger } from "@miqro/core";
 import { createInterface } from "readline";
 import { loadSequelize } from "../utils/db";
 
+export const usage = "usage: [NODE_ENV=development] npx miqro db:console";
+
 export const main = (): void => {
   if (process.argv.length !== 3) {
-    throw new Error(`invalid number of args`);
+    throw new Error(`invalid number of args. ${usage}`);
   }
 
   loadConfig();
