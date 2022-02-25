@@ -91,9 +91,9 @@ export const mainCMD = (cmds: { [key: string]: { cb: Callback<void> | Callback<P
       logger.info(`${usage}`);
       logger.info(`Available commands:\n`);
       for (const cmd of Object.keys(cmds)) {
-        if (cmds[cmd].section) {
+        /*if (cmds[cmd].section) {
           logger.info(`\n${cmds[cmd].section}\n`);
-        }
+        }*/
         //const description = cmds[cmd].description.split("\n").map(s => `${getTabs(/*cmds[cmd].tabs*/2)}${s}`).join("\n");
         const description = cmds[cmd].description.split("\n").map(s => `${getTabs(/*cmds[cmd].tabs*/1)}${s}`).join("\n");
         //logger.info(`\t${cmd}\n${description}`);
