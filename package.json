@@ -20,10 +20,10 @@
     "@miqro/core": "^1.5.11",
     "@miqro/parser": "^0.0.5",
     "@miqro/runner": "^1.2.5",
-    "@miqro/test": "^0.0.11",
     "deep-diff": "1.0.2"
   },
   "devDependencies": {
+    "@miqro/test": "^0.0.11",
     "@types/cookie": "^0.4.1",
     "@types/deep-diff": "1.0.1",
     "@types/node": "^16.7.10",

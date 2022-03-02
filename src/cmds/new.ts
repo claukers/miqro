@@ -149,7 +149,7 @@ export const mainJS = (typescript = false): void => {
   });
 
   execSync(
-    `npx miqro test:new test_api_health`,
+    `npx miqro new:test test_api_health`,
     {
       cwd: appFolder
     }
