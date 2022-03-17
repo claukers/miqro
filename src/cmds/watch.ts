@@ -9,7 +9,9 @@ function setupWatch(directory: string, cmd: string, timeout: number = 1000) {
   watchFile(directory, () => {
     queueRunCMD(cmd, timeout);
   });
-  watch(directory, () => {
+  watch(directory, {
+    recursive: true
+  }, () => {
     queueRunCMD(cmd, timeout);
   });
 }
