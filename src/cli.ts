@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-//@miqro/core
 import {mainCMD} from "./utils";
 import {main as start, usage as startUsage} from "./cmds/start";
 import {main as watch, usage as watchUsage} from "./cmds/watch";
@@ -14,7 +13,6 @@ import {main as newRoute, usage as newRouteUsage} from "./cmds/handler-apiroute-
 import {main as newTest, usage as newTestUsage} from "./cmds/new-test";
 import {main as serve, usage as serveUsage} from "./cmds/serve";
 import {main as newMain, usage as newMainUsage} from "./cmds/handler-main-new";
-//@miqro/database
 import {main as dbInit, usage as dbInitUsage} from "./cmds/db-init";
 import {main as makeMigrations, usage as makeMigrationsUsage} from "./cmds/db-makemigrations";
 import {main as syncMakeMigrations, usage as syncMakeMigrationsUsage} from "./cmds/db-sync-makemigrations";
@@ -22,6 +20,8 @@ import {main as consoleCMD, usage as consoleCMDUsage} from "./cmds/db-console";
 import {main as createModel, usage as createModelUsage} from "./cmds/db-createmodel";
 import {main as pushData, usage as pushDataUsage} from "./cmds/db-push-data";
 import {main as dumpData, usage as dumpDataUsage} from "./cmds/db-dump-data";
+import {main as migrate, usage as migrateUsage} from "./cmds/db-migrate";
+import {main as generateTemplatesCache, usage as generateTemplatesCacheUsage} from "./cmds/wc-cache-templates";
 
 // noinspection SpellCheckingInspection
 mainCMD({
@@ -75,6 +75,12 @@ mainCMD({
     cb: serve, description: `serve static files. ${serveUsage}`
   },
 
+  /*["generate:html:cache"]: {
+    section: "web components",
+    tabs: 6,
+    cb: generateTemplatesCache, description: `generate cache.js for webcomponents. ${generateTemplatesCacheUsage}`
+  },*/
+
   ["doc"]: {
     section: "api documentation",
     tabs: 5,
@@ -111,6 +117,7 @@ mainCMD({
     tabs: 1,
     description: `regenerate _current.json in the migrations folder to force the 'local' migration state to be the same as the current models. ${syncMakeMigrationsUsage}`
   },
+  ["db:migrate"]: {cb: migrate, tabs: 4, description: `loads config/<NODE_ENV>/*.env config and runs npx sequelize-cli db:migrate <...args>. ${migrateUsage}`},
   ["db:init"]: {cb: dbInit, tabs: 5, description: `init sequelize configuration. ${dbInitUsage}`},
   ["db:create:model"]: {cb: createModel, tabs: 4, description: `creates an example model. ${createModelUsage}`}
 }, "npx miqro <command> [args]", console);
