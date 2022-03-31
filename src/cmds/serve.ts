@@ -9,6 +9,9 @@ export const usage = `usage: [NODE_ENV=development] npx miqro serve [directory=.
 export const main = (): void => {
   const flags = extractFlags(process.argv.slice(3), {
     flags: {
+      "index404Status": {
+        description: "status to handle index404 status", hasValue: true
+      },
       "index404": {
         description: "file to handle 404", hasValue: true
       }, "proxy": {
@@ -72,7 +75,10 @@ export const main = (): void => {
   }
 
   app.use(Static({
-    directory, list: true, index404: flags.flags.index404 ? flags.flags.index404 as string : undefined
+    directory,
+    list: true,
+    index404: flags.flags.index404 ? flags.flags.index404 as string : undefined,
+    index404Status: flags.flags.index404Status ? parseInt(flags.flags.index404Status as string, 10) : undefined
   }), path);
   app.listen(PORT, () => {
     console.log("serving " + directory + " on " + path + " on port " + PORT);
