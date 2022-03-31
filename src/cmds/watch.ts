@@ -28,10 +28,14 @@ function queueRunCMD(cmd: string, timeout: number) {
   }
   cmdTimeout = setTimeout(() => {
     running = true;
-    execSync(cmd, {
-      cwd: process.cwd(),
-      env: process.env
-    });
+    try {
+      execSync(cmd, {
+        cwd: process.cwd(),
+        env: process.env
+      });
+    } catch(e) {
+      console.error(e);
+    }
     running = false;
   }, timeout)
 }
