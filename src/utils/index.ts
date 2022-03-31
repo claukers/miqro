@@ -24,7 +24,7 @@ const routeCMDModule = async (cmdArg: string | undefined, cmds: { [key: string]:
         await cmds[cmdArg].cb();
       } catch (e: any) {
         if (e && e.message) {
-          logger.error(e);
+          logger.error("Error running command. " + e.message);
         }
         if (exit) {
           process.exit(1);
