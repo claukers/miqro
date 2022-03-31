@@ -15,11 +15,12 @@ export const featuresEnvFile = `####################
 export const dbEnvFile = `####################
 ## db
 DB_URI=sqlite://user:password@localhost:3306/devdb
+DB_POOL=false
 DB_DIALECT_SSL=true
 DB_POOL_MAX=5
 DB_POOL_MIN=0
 DB_POOL_ACQUIRE=30000
-DB_POOL_IDDLE=10000
+DB_POOL_IDLE=10000
 DB_STORAGE=./dev.sqlite3
 `;
 
@@ -80,18 +81,19 @@ module.exports.Sequelize = Sequelize;
 `;
 // noinspection SpellCheckingInspection
 const dbConfig =
-  `const { loadConfig, checkEnvVariables } = require("@miqro/core");
+  `const { URL } = require("url");
 
-loadConfig();
-
-const { URL } = require("url");
-
-const [DB_URI] = checkEnvVariables(["DB_URI"]);
-const [DB_POOL, DB_POOL_ACQUIRE, DB_POOL_IDDLE, DB_POOL_MAX, DB_POOL_MIN] = checkEnvVariables(["DB_POOL", "DB_POOL_ACQUIRE", "DB_POOL_IDDLE", "DB_POOL_MAX", "DB_POOL_MIN"], ["false", "30000", "10000", "5", "0"]);
+const DB_URI = process.env.DB_URI;
+const DB_POOL = process.env.DB_POOL ? process.env.DB_POOL : "false";
+const DB_POOL_ACQUIRE = process.env.DB_POOL_ACQUIRE ? process.env.DB_POOL_ACQUIRE : "30000";
+const DB_POOL_IDLE = process.env.DB_POOL_IDLE ? process.env.DB_POOL_IDLE : "10000";
+const DB_POOL_MAX = process.env.DB_POOL_MAX ? process.env.DB_POOL_MAX : "5";
+const DB_POOL_MIN = process.env.DB_POOL_MIN ? process.env.DB_POOL_MIN : "0";
+const DB_DIALECT_SSL = process.env.DB_DIALECT_SSL === "true" || process.env.DB_DIALECT_SSL === undefined ? true : false;
 
 const pool = DB_POOL === "true" ? {
   acquire: parseInt(DB_POOL_ACQUIRE, 10),
-  idle: parseInt(DB_POOL_IDDLE, 10),
+  idle: parseInt(DB_POOL_IDLE, 10),
   max: parseInt(DB_POOL_MAX, 10),
   min: parseInt(DB_POOL_MIN, 10)
 } : undefined;
@@ -106,7 +108,7 @@ module.exports = {
   password: parsed.password,
   dialect: parsed.protocol.substring(0, parsed.protocol.length - 1),
   dialectOptions: {
-    ssl: process.env.DB_DIALECT_SSL === "true" || process.env.DB_DIALECT_SSL === undefined ? true : false
+    ssl: DB_DIALECT_SSL
   },
   pool,
   storage: process.env.DB_STORAGE
@@ -124,40 +126,8 @@ module.exports = {
 };
 `;
 
-const exampleModel = (modelName: string, typescript?: boolean): string => {
-  return typescript ? `import { Sequelize, DataTypes, ModelCtor, Model } from "sequelize";
-  
-export interface ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)} { 
-  name: string; 
-  timestamp: number; 
-};
-export type ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}Model = Model<${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}>;
-export type ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}ModelCtor = ModelCtor<${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}Model>;
-
-module.exports = (sequelize: Sequelize): ${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}ModelCtor => {
-  const ${modelName} = sequelize.define<${modelName.charAt(0).toUpperCase()}${modelName.substring(1)}Model>("${modelName}", {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: ""
-    },
-    timestamp: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0
-    }
-  }, {});
-  /* eslint-disable  @typescript-eslint/ban-ts-comment */
-  // @ts-ignore
-  ${modelName}.associate = function (models) {
-    // associations can be defined here
-    // ${modelName}.belongsTo(models.....)
-  };
-  return ${modelName};
-  };
-
-
-  ` : `module.exports = (sequelize, DataTypes) => {
+const exampleModel = (modelName: string): string => {
+  return `module.exports = (sequelize, DataTypes) => {
   const ${modelName} = sequelize.define("${modelName}", {
     name: {
       type: DataTypes.STRING,
