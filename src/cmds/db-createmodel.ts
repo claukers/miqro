@@ -1,20 +1,20 @@
-import { existsSync, mkdirSync, writeFileSync } from "fs";
-import { resolve } from "path";
-import { templates } from "../utils/templates";
-import { ConfigPathResolver, loadConfig } from "@miqro/core";
-import { loadSequelizeRC } from "../utils/db";
+import {existsSync, mkdirSync, writeFileSync} from "fs";
+import {resolve} from "path";
+import {templates} from "../utils/templates";
+import {loadConfig} from "@miqro/core";
+import {loadSequelizeRC} from "../utils/db";
 
 export const usage = "usage: [NODE_ENV=development] npx miqro db:create:model <modelname>";
 
 export const main = (): void => {
   const logger = console;
-  const modelname = process.argv[3];
+  const modelName = process.argv[3];
 
   if (process.argv.length !== 4) {
     throw new Error(usage);
   }
 
-  if (typeof modelname !== "string") {
+  if (typeof modelName !== "string") {
     throw new Error(`<modelname> must be a string!`);
   }
 
@@ -23,8 +23,7 @@ export const main = (): void => {
   const config = loadSequelizeRC();
 
   // disable experimental typescript support
-  const typescript = false; //existsSync(resolve(ConfigPathResolver.getBaseDirname(), "tsconfig.json")) ? true : false;
-  const modelsFolder = typescript ? resolve(ConfigPathResolver.getBaseDirname(), "src", "models") : config["models-path"];
+  const modelsFolder = config["models-path"];
 
   if (!existsSync(modelsFolder)) {
     logger.warn(`models folder [${modelsFolder}] doesnt exists!`);
@@ -34,13 +33,13 @@ export const main = (): void => {
     });
   }
 
-  const modelPath = resolve(modelsFolder, `${modelname.toLowerCase()}${typescript ? ".ts" : ".js"}`);
+  const modelPath = resolve(modelsFolder, `${modelName.toLowerCase()}.js`);
 
   if (existsSync(modelPath)) {
     throw new Error(`${modelPath} already exists!`);
   }
   logger.info(`creating [${modelPath}]!`);
 
-  writeFileSync(modelPath, templates.exampleModel(modelname, typescript));
+  writeFileSync(modelPath, templates.exampleModel(modelName));
 
 }
