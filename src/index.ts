@@ -1,1 +1,1 @@
-// this package is just a development cli
+console.warn("this package is just a development cli");
