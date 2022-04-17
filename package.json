@@ -18,12 +18,12 @@
   "license": "ISC",
   "dependencies": {
     "@miqro/core": "^1.5.13",
-    "@miqro/parser": "^0.0.7",
+    "@miqro/parser": "^0.1.0",
     "@miqro/runner": "^1.2.6",
     "deep-diff": "1.0.2"
   },
   "devDependencies": {
-    "@miqro/test": "0.0.12",
+    "@miqro/test": "../test",
     "@types/cookie": "0.4.1",
     "@types/deep-diff": "1.0.1",
     "@types/node": "17.0.23",
