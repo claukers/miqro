@@ -6,19 +6,9 @@ export const usage = `usage: [NODE_ENV=development] npx miqro new:test <identifi
 
 const testTemplates = {
   js: (category: string) =>
-    `const options = {
-	category: "${category}",
-	before: async () => {
+    `it("happy path", async () => {
 
-	},
-	after: async () => {
-
-	}
-};
-
-it("happy path", async () => {
-
-}, options)
+})
 `
 }
 
