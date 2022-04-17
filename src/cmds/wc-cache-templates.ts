@@ -18,7 +18,7 @@ function recursiveSearch(path: string, found: string[] = []) {
   return found;
 }
 
-export const usage = "npx miqro generate:template:cache <src> <out.js>";
+export const usage = "npx miqro generate:template:cache <src> <out.json>";
 
 export const main = async () => {
 
@@ -39,25 +39,14 @@ export const main = async () => {
   console.log("caching %o", foundTemplates);
   console.log("to %s", outFilePath);
   const cache: {
-    [key: string]: {
-      location: {
-        url: string
-      },
-      content: string
-    }
+    [key: string]: string;
   } = {};
   for (const template of foundTemplates) {
     if (template) {
       const url = relative(path, template);
-      const content = readFileSync(template).toString("utf-8");
-      cache[url] = {
-        location: {
-          url
-        },
-        content
-      };
+      cache[url] = readFileSync(template).toString("utf-8");
     }
   }
-  writeFileSync(outFilePath, `module.exports = ${JSON.stringify(cache, undefined, 0)};`
+  writeFileSync(outFilePath, `${JSON.stringify(cache, undefined, 0)}`
   );
 }
