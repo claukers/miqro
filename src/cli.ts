@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import {mainCMD} from "./utils";
 import {main as start, usage as startUsage} from "./cmds/start";
+import {main as test, usage as testUsage} from "./cmds/test";
 import {main as watch, usage as watchUsage} from "./cmds/watch";
 import {mainJS as newJS, mainTS as newTS, usageJS as newJSUsage, usageTS as newTSUsage} from "./cmds/new";
 import {main as apiDocJSON, usage as apiDocJSONUsage} from "./cmds/doc-json";
@@ -71,7 +72,7 @@ mainCMD({
 
   ["serve"]: {
     //section: "serve static files",
-    tabs: 6,
+    tabs: 5,
     cb: serve, description: `serve static files. ${serveUsage}`
   },
 
@@ -93,7 +94,9 @@ mainCMD({
     description: `outputs to a file an api folder auto doc as a markdown. ${apiDocMDUsage}`
   },
 
-  ["new:test"]: {section: "testing", cb: newTest, tabs: 4, description: `create new test.js file. ${newTestUsage}`},
+  ["test"]: {section: "testing", cb: test, tabs: 5, description: `run test files. ${testUsage}`},
+
+  ["new:test"]: {cb: newTest, tabs: 4, description: `create new test.js file. ${newTestUsage}`},
 
   ["db:console"]: {
     section: "sequelize helpers",
@@ -109,7 +112,7 @@ mainCMD({
   ["db:push:data"]: {cb: pushData, tabs: 4, description: `push a dump to the database. ${pushDataUsage}`},
   ["db:make:migration"]: {
     cb: makeMigrations,
-    tabs: 2,
+    tabs: 3,
     description: `seeks changes in your models and creates migrations. ${makeMigrationsUsage}`
   },
   ["db:make:migration:force:clean:state"]: {
