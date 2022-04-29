@@ -17,7 +17,7 @@ const routeCMDModule = async (cmdArg: string | undefined, cmds: { [key: string]:
   if (!cmdArg) {
     throw new Error("no command");
   } else {
-    if (!cmds[cmdArg]) {
+    if (!cmds.hasOwnProperty(cmdArg)) {
       throw new Error("command " + cmdArg + " not found!");
     } else {
       try {
@@ -42,7 +42,7 @@ export const extractFlags = (args: string[], options?: {
     }
   }
 }): { flags: { [key: string]: string | (string | null)[] | null }; files: string[]; } => {
-  const flags: { [key: string]: string | (string | null)[] | null } = {};
+  const flags: { [key: string]: string | (string | null)[] | null } = Object.create(null);
   const files: string[] = [];
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
