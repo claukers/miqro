@@ -66,7 +66,7 @@ export const main = (): void => {
       const proxyURL = new URL(proxySplit[1]);
       proxyURL.pathname = normalizePath(proxyURL.pathname);
       const proxyRouter = Proxy({
-        url: proxyURL.toString(), rejectUnauthorized: !flags.flags.hasOwnProperty("proxy-cert-ignore")
+        url: proxyURL.toString(), rejectUnauthorized: flags.flags["proxy-cert-ignore"] ? true : false
       });
       console.log("setting up proxy to %s on %s", proxyURL.toString(), proxyPath);
       proxyRouter.use(ReadBuffer());
