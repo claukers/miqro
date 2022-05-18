@@ -24,6 +24,8 @@ import {main as dumpData, usage as dumpDataUsage} from "./cmds/db-dump-data";
 import {main as migrate, usage as migrateUsage} from "./cmds/db-migrate";
 import {main as generateTemplatesCache, usage as generateTemplatesCacheUsage} from "./cmds/wc-cache-templates";
 
+console.log("asldkjdkla");
+
 // noinspection SpellCheckingInspection
 mainCMD({
 
