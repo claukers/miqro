@@ -12,3 +12,4 @@ apidoc/
 .vscode/
 /nbproject/private/
 .idea/
+.DS_Store

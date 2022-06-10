@@ -24,8 +24,6 @@ import {main as dumpData, usage as dumpDataUsage} from "./cmds/db-dump-data";
 import {main as migrate, usage as migrateUsage} from "./cmds/db-migrate";
 import {main as generateTemplatesCache, usage as generateTemplatesCacheUsage} from "./cmds/wc-cache-templates";
 
-console.log("asldkjdkla");
-
 // noinspection SpellCheckingInspection
 mainCMD({
 
@@ -78,11 +76,11 @@ mainCMD({
     cb: serve, description: `serve static files. ${serveUsage}`
   },
 
-  /*["generate:html:cache"]: {
+  ["generate:template:cache"]: {
     section: "web components",
     tabs: 6,
-    cb: generateTemplatesCache, description: `generate cache.js for webcomponents. ${generateTemplatesCacheUsage}`
-  },*/
+    cb: generateTemplatesCache, description: `generate a cache.json for webcomponents. ${generateTemplatesCacheUsage}`
+  },
 
   ["doc"]: {
     section: "api documentation",

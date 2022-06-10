@@ -7,7 +7,6 @@ import {existsSync, statSync} from "fs";
 export const usage = `usage: [NODE_ENV=development] npx miqro serve [directory=./] [path=/] [--index404 ./index.html] [--proxy-cert-ignore] [--port 8080] [--proxy /api=https://host/api]`;
 
 export const main = (): void => {
-  console.log("asldkjdkla");
   const flags = extractFlags(process.argv.slice(3), {
     flags: {
       "index404Status": {
@@ -56,10 +55,6 @@ export const main = (): void => {
   const app = new App();
   app.use(LoggerHandler());
 
-  console.log("asldkjdkla");
-
-  console.dir(flags);
-
   const proxyList = flags.flags.proxy instanceof Array ? flags.flags.proxy : [flags.flags.proxy];
   for (const proxy of proxyList) {
     if (proxy) {
@@ -86,7 +81,7 @@ export const main = (): void => {
     index404Status: flags.flags.index404Status ? parseInt(flags.flags.index404Status as string, 10) : undefined
   }), path);
   app.listen(PORT, () => {
-    console.log("serving " + directory + " on " + path + " on port " + PORT);
+    console.log("serving " + directory + " on http://localhost:%s%s", PORT, path);
   });
 }
 
