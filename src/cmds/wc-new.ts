@@ -3,44 +3,44 @@ import { resolve } from "path";
 import { execSync } from "../utils";
 
 const indexHTML = {
-  js: () => `<html>
-  <script type="text/javascript" src="app.bundle.min.js"></script>
-  <body>
-    <my-app></my-app>
-  </body>
-  </html>`
+  js: () => `<html>` +
+    `<script type="text/javascript" src="app.bundle.min.js"></script>` +
+    `<body>` +
+    `<my-app></my-app>` +
+    `</body>` +
+    `</html>`
 }
 
 const indexComponent = {
-  js: () => `const {define} = require("@miqro/web-components");
-
-  define("my-app", function() {
-    return "<p>Hello World!</p>";
-  });`,
-  ts: () => `import {define, RenderFunctionThis} from "@miqro/web-components";
-
-  define("my-app", function(this: RenderFunctionThis) {
-    return "<p>Hello World!</p>";
-  });`
+  js: () => `const {define} = require("@miqro/web-components")` +
+    `` +
+    `define("my-app", function() {` +
+    `  return "<p>Hello World!</p>";` +
+    `});`,
+  ts: () => `import {define, RenderFunctionThis} from "@miqro/web-components"` +
+    `` +
+    `define("my-app", function(this: RenderFunctionThis) {` +
+    `  return "<p>Hello World!</p>";` +
+    `});`
 }
 
 const webpackconfig = {
-  js: () => `module.exports = {
-    mode: "production",
-    entry: "./src/index.js",
-    output: {
-      path: require("path").resolve(__dirname, 'build'),
-      filename: "app.bundle.min.js"
-    }
-  };`,
-  ts: () => `module.exports = {
-    mode: "production",
-    entry: "./dist/index.js",
-    output: {
-      path: require("path").resolve(__dirname, 'build'),
-      filename: "app.bundle.min.js"
-    }
-  };`
+  js: () => `module.exports = {` +
+    `  mode: "production",` +
+    `  entry: "./src/index.js",` +
+    `  output: {` +
+    `    path: require("path").resolve(__dirname, 'build'),` +
+    `    filename: "app.bundle.min.js"` +
+    `  }` +
+    `};`,
+  ts: () => `module.exports = {` +
+    `  mode: "production",` +
+    `  entry: "./dist/index.js",` +
+    `  output: {` +
+    `    path: require("path").resolve(__dirname, 'build'),` +
+    `    filename: "app.bundle.min.js"` +
+    `  }` +
+    `};`,
 }
 
 const gitignoreTemplate = {
@@ -124,12 +124,12 @@ export const mainJS = (typescript = false): void => {
     }
   );
 
-  /*execSync(
+  execSync(
     `npm install @miqro/web-components --save`,
     {
       cwd: appFolder
     }
-  );*/
+  );
 
   if (typescript) {
     writeFileSync(resolve(appFolder, "tsconfig.json"), `{
