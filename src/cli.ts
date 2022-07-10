@@ -4,6 +4,7 @@ import {main as start, usage as startUsage} from "./cmds/start";
 import {main as test, usage as testUsage} from "./cmds/test";
 import {main as watch, usage as watchUsage} from "./cmds/watch";
 import {mainJS as newJS, mainTS as newTS, usageJS as newJSUsage, usageTS as newTSUsage} from "./cmds/new";
+import {mainJS as newFrontJS, mainTS as newFrontTS, usageJS as newFrontJSUsage, usageTS as newFrontTSUsage} from "./cmds/wc-new";
 import {main as apiDocJSON, usage as apiDocJSONUsage} from "./cmds/doc-json";
 import {main as apiDocMD, usage as apiDocMDUsage} from "./cmds/doc-md";
 import {main as configInit, usage as configInitUsage} from "./cmds/config-init";
@@ -28,11 +29,11 @@ import {main as generateTemplatesCache, usage as generateTemplatesCacheUsage} fr
 // noinspection SpellCheckingInspection
 mainCMD({
 
-  ["new"]: {section: "quick start", cb: newJS, tabs: 5, description: `create a new project. ${newJSUsage}`},
+  ["new"]: {section: "api development", cb: newJS, tabs: 5, description: `create a new project. ${newJSUsage}`},
   ["new:typescript"]: {cb: newTS, tabs: 4, description: `create a new typescript project. ${newTSUsage}`},
 
   ["new:main"]: {
-    section: "http scafolding",
+    //section: "http scafolding",
     cb: newMain,
     tabs: 4,
     description: `creates a new main file. ${newMainUsage}`
@@ -40,7 +41,7 @@ mainCMD({
   ["new:route"]: {cb: newRoute, tabs: 4, description: `creates a new route. ${newRouteUsage}`},
 
   ["config"]: {
-    section: "config managment",
+    //section: "config managment",
     cb: config,
     tabs: 5,
     description: `outputs to stdout the config as a json. ${configUsage}`
@@ -56,6 +57,32 @@ mainCMD({
     description: `outputs to stdout the config as a env file. ${configEnvUsage}`
   },
   ["config:init"]: {cb: configInit, tabs: 4, description: `inits your config folder. ${configInitUsage}`},
+
+  ["doc"]: {
+    //section: "api documentation",
+    tabs: 5,
+    cb: apiDocJSON,
+    description: `outputs to stdout an api folder auto doc as a json. ${apiDocJSONUsage}`
+  },
+  ["doc:md"]: {
+    cb: apiDocMD,
+    tabs: 5,
+    description: `outputs to a file an api folder auto doc as a markdown. ${apiDocMDUsage}`
+  },
+
+  ["new:front"]: {section: "front development", cb: newFrontJS, tabs: 4, description: `create a new project. ${newFrontJSUsage}`},
+  ["new:front:typescript"]: {cb: newFrontTS, tabs: 3, description: `create a new typescript project. ${newFrontTSUsage}`},
+
+  ["generate:template:cache"]: {
+    //section: "web components",
+    tabs: 3,
+    cb: generateTemplatesCache, description: `generate a cache.json for webcomponents. ${generateTemplatesCacheUsage}`
+  },
+
+  /*["sfc"]: {
+    tabs: 6,
+    cb: wcCompileSFC, description: `transpiles a single file webcomponent to commonjs file for packing. ${wcCompileSFCUsage}`
+  },*/
 
   ["start"]: {
     section: "start helpers",
@@ -75,29 +102,6 @@ mainCMD({
     //section: "serve static files",
     tabs: 5,
     cb: serve, description: `serve static files. ${serveUsage}`
-  },
-
-  ["generate:template:cache"]: {
-    section: "web components",
-    tabs: 6,
-    cb: generateTemplatesCache, description: `generate a cache.json for webcomponents. ${generateTemplatesCacheUsage}`
-  },
-
-  /*["sfc"]: {
-    tabs: 6,
-    cb: wcCompileSFC, description: `transpiles a single file webcomponent to commonjs file for packing. ${wcCompileSFCUsage}`
-  },*/
-
-  ["doc"]: {
-    section: "api documentation",
-    tabs: 5,
-    cb: apiDocJSON,
-    description: `outputs to stdout an api folder auto doc as a json. ${apiDocJSONUsage}`
-  },
-  ["doc:md"]: {
-    cb: apiDocMD,
-    tabs: 5,
-    description: `outputs to a file an api folder auto doc as a markdown. ${apiDocMDUsage}`
   },
 
   ["test"]: {section: "testing", cb: test, tabs: 5, description: `run test files. ${testUsage}`},
