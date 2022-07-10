@@ -12,34 +12,34 @@ const indexHTML = {
 }
 
 const indexComponent = {
-  js: () => `const {define} = require("@miqro/web-components")` +
-    `` +
-    `define("my-app", function() {` +
-    `  return "<p>Hello World!</p>";` +
+  js: () => `const {define} = require("@miqro/web-components")\n` +
+    `\n` +
+    `define("my-app", function() {\n` +
+    `  return "<p>Hello World!</p>";\n` +
     `});`,
-  ts: () => `import {define, RenderFunctionThis} from "@miqro/web-components"` +
-    `` +
-    `define("my-app", function(this: RenderFunctionThis) {` +
-    `  return "<p>Hello World!</p>";` +
+  ts: () => `import {define, RenderFunctionThis} from "@miqro/web-components"\n` +
+    `\n` +
+    `define("my-app", function(this: RenderFunctionThis) {\n` +
+    `  return "<p>Hello World!</p>";\n` +
     `});`
 }
 
 const webpackconfig = {
-  js: () => `module.exports = {` +
-    `  mode: "production",` +
-    `  entry: "./src/index.js",` +
-    `  output: {` +
-    `    path: require("path").resolve(__dirname, 'build'),` +
-    `    filename: "app.bundle.min.js"` +
-    `  }` +
+  js: () => `module.exports = {\n` +
+    `  mode: "production",\n` +
+    `  entry: "./src/index.js",\n` +
+    `  output: {\n` +
+    `    path: require("path").resolve(__dirname, 'build'),\n` +
+    `    filename: "app.bundle.min.js"\n` +
+    `  }\n` +
     `};`,
-  ts: () => `module.exports = {` +
-    `  mode: "production",` +
-    `  entry: "./dist/index.js",` +
-    `  output: {` +
-    `    path: require("path").resolve(__dirname, 'build'),` +
-    `    filename: "app.bundle.min.js"` +
-    `  }` +
+  ts: () => `module.exports = {\n` +
+    `  mode: "production",\n` +
+    `  entry: "./dist/index.js",\n` +
+    `  output: {\n` +
+    `    path: require("path").resolve(__dirname, 'build'),\n` +
+    `    filename: "app.bundle.min.js"\n` +
+    `  }\n` +
     `};`,
 }
 
