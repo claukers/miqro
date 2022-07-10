@@ -22,7 +22,7 @@ import {main as createModel, usage as createModelUsage} from "./cmds/db-createmo
 import {main as pushData, usage as pushDataUsage} from "./cmds/db-push-data";
 import {main as dumpData, usage as dumpDataUsage} from "./cmds/db-dump-data";
 import {main as migrate, usage as migrateUsage} from "./cmds/db-migrate";
-import {main as wcCompileSFC, usage as wcCompileSFCUsage} from "./cmds/wc-compile-sfc";
+//import {main as wcCompileSFC, usage as wcCompileSFCUsage} from "./cmds/wc-compile-sfc";
 import {main as generateTemplatesCache, usage as generateTemplatesCacheUsage} from "./cmds/wc-cache-templates";
 
 // noinspection SpellCheckingInspection
@@ -83,10 +83,10 @@ mainCMD({
     cb: generateTemplatesCache, description: `generate a cache.json for webcomponents. ${generateTemplatesCacheUsage}`
   },
 
-  ["sfc"]: {
+  /*["sfc"]: {
     tabs: 6,
     cb: wcCompileSFC, description: `transpiles a single file webcomponent to commonjs file for packing. ${wcCompileSFCUsage}`
-  },
+  },*/
 
   ["doc"]: {
     section: "api documentation",
