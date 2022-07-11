@@ -29,108 +29,108 @@ import {main as generateTemplatesCache, usage as generateTemplatesCacheUsage} fr
 // noinspection SpellCheckingInspection
 mainCMD({
 
-  ["new"]: {section: "api development", cb: newJS, tabs: 5, description: `create a new project. ${newJSUsage}`},
-  ["new:typescript"]: {cb: newTS, tabs: 4, description: `create a new typescript project. ${newTSUsage}`},
+  ["new"]: {section: "api development", cb: newJS, tabs: 5, description: `create a new project.`},
+  ["new:typescript"]: {cb: newTS, tabs: 4, description: `create a new typescript project.`},
 
   ["new:main"]: {
     //section: "http scafolding",
     cb: newMain,
     tabs: 4,
-    description: `creates a new main file. ${newMainUsage}`
+    description: `creates a new main file.`
   },
-  ["new:route"]: {cb: newRoute, tabs: 4, description: `creates a new route. ${newRouteUsage}`},
+  ["new:route"]: {cb: newRoute, tabs: 4, description: `creates a new route.`},
 
   ["config"]: {
     //section: "config managment",
     cb: config,
     tabs: 5,
-    description: `outputs to stdout the config as a json. ${configUsage}`
+    description: `print config as a json.`
   },
   ["config:bash"]: {
     cb: configBash,
     tabs: 4,
-    description: `outputs to stdout the config as a bash script. ${configBashUsage}`
+    description: `print config as a bash script.`
   },
   ["config:env"]: {
     cb: configEnv,
     tabs: 4,
-    description: `outputs to stdout the config as a env file. ${configEnvUsage}`
+    description: `print config as a env file.`
   },
-  ["config:init"]: {cb: configInit, tabs: 4, description: `inits your config folder. ${configInitUsage}`},
+  ["config:init"]: {cb: configInit, tabs: 4, description: `inits your config folder.`},
 
   ["doc"]: {
     //section: "api documentation",
     tabs: 5,
     cb: apiDocJSON,
-    description: `outputs to stdout an api folder auto doc as a json. ${apiDocJSONUsage}`
+    description: `api folder auto doc as a json.`
   },
   ["doc:md"]: {
     cb: apiDocMD,
     tabs: 5,
-    description: `outputs to a file an api folder auto doc as a markdown. ${apiDocMDUsage}`
+    description: `api folder auto doc as a markdown.`
   },
 
-  ["new:front"]: {section: "front development", cb: newFrontJS, tabs: 4, description: `create a new project. ${newFrontJSUsage}`},
-  ["new:front:typescript"]: {cb: newFrontTS, tabs: 3, description: `create a new typescript project. ${newFrontTSUsage}`},
+  ["new:front"]: {section: "front development", cb: newFrontJS, tabs: 4, description: `create a new project.`},
+  ["new:front:typescript"]: {cb: newFrontTS, tabs: 3, description: `create a new typescript project.`},
 
   ["generate:template:cache"]: {
     //section: "web components",
     tabs: 3,
-    cb: generateTemplatesCache, description: `generate a cache.json for webcomponents. ${generateTemplatesCacheUsage}`
+    cb: generateTemplatesCache, description: `generate a cache.json for webcomponents.`
   },
 
   ["sfc"]: {
     tabs: 5,
-    cb: wcCompileSFC, description: `transform a sfc file to javascript. ${wcCompileSFCUsage}`
+    cb: wcCompileSFC, description: `transform a sfc file to javascript.`
   },
 
   ["start"]: {
     section: "start helpers",
     tabs: 5,
     cb: start,
-    description: `start a nodejs script in cluster mode and restart if crash. ${startUsage}`
+    description: `start a nodejs script in cluster mode.`
   },
 
   ["watch"]: {
     //section: "watch",
     cb: watch,
     tabs: 5,
-    description: `watch a folder for changes and runs a command if a change occours. ${watchUsage}`
+    description: `watch a folder for changes.`
   },
 
   ["serve"]: {
     //section: "serve static files",
     tabs: 5,
-    cb: serve, description: `serve static files. ${serveUsage}`
+    cb: serve, description: `serve static files.`
   },
 
-  ["test"]: {section: "testing", cb: test, tabs: 5, description: `run test files. ${testUsage}`},
+  ["test"]: {section: "testing", cb: test, tabs: 5, description: `run test files.`},
 
-  ["new:test"]: {cb: newTest, tabs: 4, description: `create new test.js file. ${newTestUsage}`},
+  ["new:test"]: {cb: newTest, tabs: 4, description: `create new test.js file.`},
 
   ["db:console"]: {
     section: "sequelize helpers",
     cb: consoleCMD,
     tabs: 4,
-    description: `runs a readline interface that send the input as a query. ${consoleCMDUsage}`
+    description: `a query console for sequelize.`
   },
   ["db:dump:data"]: {
     cb: dumpData,
     tabs: 4,
-    description: `dump the data of the database (only defined models). ${dumpDataUsage}`
+    description: `dump the data of the database.`
   },
-  ["db:push:data"]: {cb: pushData, tabs: 4, description: `push a dump to the database. ${pushDataUsage}`},
+  ["db:push:data"]: {cb: pushData, tabs: 4, description: `push a dump to the database.`},
   ["db:make:migration"]: {
     cb: makeMigrations,
     tabs: 3,
-    description: `seeks changes in your models and creates migrations. ${makeMigrationsUsage}`
+    description: `generate migrations from model changes.`
   },
   ["db:make:migration:force:clean:state"]: {
     cb: syncMakeMigrations,
     tabs: 1,
-    description: `regenerate _current.json in the migrations folder to force the 'local' migration state to be the same as the current models. ${syncMakeMigrationsUsage}`
+    description: `force 'local' model state.`
   },
-  ["db:migrate"]: {cb: migrate, tabs: 4, description: `loads config/<NODE_ENV>/*.env config and runs npx sequelize-cli db:migrate <...args>. ${migrateUsage}`},
-  ["db:init"]: {cb: dbInit, tabs: 5, description: `init sequelize configuration. ${dbInitUsage}`},
-  ["db:create:model"]: {cb: createModel, tabs: 4, description: `creates an example model. ${createModelUsage}`}
+  ["db:migrate"]: {cb: migrate, tabs: 4, description: `loads config and run migrations.`},
+  ["db:init"]: {cb: dbInit, tabs: 5, description: `init sequelize configuration.`},
+  ["db:create:model"]: {cb: createModel, tabs: 4, description: `creates an example model.`}
 }, "npx miqro <command> [args]", console);
