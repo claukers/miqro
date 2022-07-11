@@ -1,0 +1,16 @@
+<my-element data-shadow-root-mode="open">
+    <template>
+        <br />
+        <p>text</p>
+        <div>
+            <br />
+            <p>text</p>
+        </div>
+        <br />
+    </template>
+    <script type="module">
+        export default function () {
+            this.useAs("text", "hello");
+        }
+    </script>
+</my-element>

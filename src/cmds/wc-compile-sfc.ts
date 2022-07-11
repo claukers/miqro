@@ -1,7 +1,7 @@
-import {basename, dirname, extname, relative, resolve} from "path";
-import {existsSync, mkdirSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileSync} from "fs";
-import {parseXML2JSON} from "../utils/xml.js";
-import {extractFlags} from "../utils";
+import { basename, dirname, extname, relative, resolve } from "path";
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "fs";
+import { parseXML2JSON } from "../utils/xml.js";
+import { extractFlags } from "../utils";
 
 export const usage = "npx miqro sfc <sfcDir> <outDir> [-m @miqro/web-components] [-e \".js\"]";
 
@@ -23,7 +23,7 @@ export const main = async () => {
         description: "extension of input",
         hasValue: true
       },
-      "r": {
+      "c": {
         description: "remove output files",
         hasValue: false
       }
@@ -67,16 +67,13 @@ export const main = async () => {
             try {
               const outMainFileName = basename(filePath.substring(0, filePath.length - inputExtension.length) + extension);
               const outFileName = basename(filePath.substring(0, filePath.length - inputExtension.length) + "-component" + extension);
-              //const outTemplateFileName = basename(filePath.substring(0, filePath.length - inputExtension.length) + ".html");
               const realOutFileDirname = resolve(outDir, relative(sfcDir, dirname(filePath)));
               const realOutFilePath = resolve(realOutFileDirname, outFileName);
-              //const realTemplateOutFilePath = resolve(realOutFileDirname, outTemplateFileName);
               const realMainOutFilePath = resolve(realOutFileDirname, outMainFileName);
 
-              if (flags.flags.r !== undefined) {
+              if (flags.flags.c !== undefined) {
                 console.log("%s\n\tremoving %s\n\tremoving %s", filePath, realOutFilePath, realMainOutFilePath);
                 unlinkSync(realOutFilePath);
-                //unlinkSync(realTemplateOutFilePath);
                 unlinkSync(realMainOutFilePath);
               } else {
                 console.log("%s ->\n\t%s\n\t%s", filePath, realOutFilePath, realMainOutFilePath);
@@ -90,12 +87,8 @@ export const main = async () => {
                   componentRequireString
                 });
                 writeFileSync(realOutFilePath, jsContent);
-                //writeFileSync(realTemplateOutFilePath, templateContent);
-
                 const requireInput = "./" + relative(dirname(realMainOutFilePath), realOutFilePath);
-                //const requireTemplateInput = relative(dirname(realMainOutFilePath), realTemplateOutFilePath);
                 const commonJSANDESM = requireInput.substring(0, requireInput.length - extension.length) + ".js";
-
                 writeFileSync(realMainOutFilePath, mainJS(commonJSANDESM));
               }
             } catch (e) {
@@ -125,8 +118,12 @@ async function compileSFC(sfcPath: string, requireStrings: { defineRequireString
     throw new Error("bad sfc structure(1) for " + sfcPath);
   }
 
+
+
   const componentName = json.children[0].name.toLowerCase();
   const componentTemplateTag = json.children[0].children[0];
+  const componentScriptTag = json.children[0].children[1];
+
   const dataShadowRootMode = json.children[0].attributes[DATA_SHADOW_ROOT_MODE] ? json.children[0].attributes[DATA_SHADOW_ROOT_MODE] : undefined;
 
   let modeArg: undefined | boolean | {
@@ -140,15 +137,14 @@ async function compileSFC(sfcPath: string, requireStrings: { defineRequireString
       break;
     case "true":
     case "close":
-      modeArg = {mode: "closed"};
+      modeArg = { mode: "closed" };
       break;
     case "open":
-      modeArg = {mode: "open"};
+      modeArg = { mode: "open" };
       break;
   }
 
-  const componentScriptTag = json.children[0].children[1];
-  if (componentTemplateTag.name !== "TEMPLATE" || componentScriptTag.name !== "SCRIPT") {
+  if (componentTemplateTag.name.toUpperCase() !== "TEMPLATE" || componentScriptTag.name.toUpperCase() !== "SCRIPT") {
     throw new Error("bad sfc structure(2) for " + sfcPath);
   }
 
@@ -160,15 +156,29 @@ async function compileSFC(sfcPath: string, requireStrings: { defineRequireString
     throw new Error("bad sfc structure(3) for " + sfcPath);
   }
 
-  const jsContent = `${componentScriptTag.children[0].text}`;
-  //console.log("[" + jsContent + "]");
+  const scriptText = componentScriptTag.children[0].text as string;
 
-  const template = componentTemplateTag.children.map((tag: any) => tagToString(tag))
-    .join("");//.split("\n").map((l: string) => l.trim()).join("");
+  let baseTabulation: number | null = null;
+  let startTabulationIndex = 0;
+  const jsContent = scriptText.split("\n").map((l, i) => {
+    const trimmed = l.trim();
+    if (baseTabulation === null && trimmed !== "") {
+      baseTabulation = l.indexOf(trimmed);
+      startTabulationIndex = i;
+      const tabulationSubstring = l.substring(baseTabulation);
+      return tabulationSubstring.trim() !== "" ? tabulationSubstring : l;
 
-  const outFileContent = `${requireStrings.componentRequireString}\n\n${jsContent}`;
+    } else if (baseTabulation !== null) {
+      const tabulationSubstring = l.substring(baseTabulation);
+      return tabulationSubstring.trim() !== "" ? tabulationSubstring : l;
+    } else {
+      return "";
+    }
+  }).join("\n").slice(startTabulationIndex);
 
-  //console.log(outFileContent);
+  const template = componentTemplateTag.children.map((tag: any) => tagToString(tag)).join("");
+
+  const outFileContent = `${requireStrings.componentRequireString ? `${requireStrings.componentRequireString}\n\n`: ""}${jsContent}`;
 
   return [
     outFileContent,

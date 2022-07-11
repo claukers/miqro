@@ -1,7 +1,13 @@
-const {parser} = require("sax");
+import { SaxesParser as XMLParser } from "saxes";
 
-type XMLAttr = { name: string; value: string; };
-type Tag = { type: "root" | "comment" | "node" | "text"; text?: string; name: string; attributes: NodeJS.Dict<string>; isSelfClosing: boolean; children: Tag[]; }
+type Tag = {
+  type: "root" | "comment" | "node" | "text";
+  text?: string;
+  name: string;
+  attributes: NodeJS.Dict<string | { name: string; value: string; prefix: string; local: string; uri: string; }>;
+  isSelfClosing: boolean;
+  children: Tag[];
+}
 type Tree<T> = { readonly parent?: Tree<T>; readonly ref: T }
 
 export const parseXML2JSON = async (val: string): Promise<any> => {
@@ -17,15 +23,15 @@ export const parseXML2JSON = async (val: string): Promise<any> => {
     let current: undefined | Tree<Tag> = {
       ref: ret
     };
-    const p = parser(undefined, {
-      noscript: true,
-      trim: true
+    const p = new XMLParser({
+      /*noscript: true,
+      trim: true*/
     });
-    p.onerror = (e: Error) => {
-      // an error happened.
+    p.on("error", (e: Error) => {
       console.error(e);
-    };
-    p.oncomment = (c: string) => {
+      reject(e);
+    });
+    p.on("comment", (c: string) => {
       if (!current) {
         console.error("current null");
         process.exit(1);
@@ -39,8 +45,8 @@ export const parseXML2JSON = async (val: string): Promise<any> => {
         children: []
       };
       current.ref.children.push(node);
-    };
-    p.ontext = (t: string) => {
+    });
+    p.on("text", (t: string) => {
       if (!current) {
         console.error("current null");
         process.exit(1);
@@ -54,16 +60,18 @@ export const parseXML2JSON = async (val: string): Promise<any> => {
         children: []
       };
       current.ref.children.push(node);
-    };
-    p.onopentag = (node: Tag) => {
-      // opened a tag.  node has "name" and "attributes"
-      /*if (node.name.toLocaleLowerCase() === "bpmn:sequenceflow") {
-        console.log("open %o", node);
-      }*/
+    });
+    p.on("opentag", (t) => {
       if (!current) {
         console.error("current null");
         process.exit(1);
       }
+      const node: Tag = {
+        ...t,
+        type: "node",
+        text: "",
+        children: []
+      };
       node.type = "node";
       node.text = "";
       node.children = [];
@@ -73,13 +81,11 @@ export const parseXML2JSON = async (val: string): Promise<any> => {
         parent: current,
         ref: node
       }
-    };
-    p.onattribute = (attr: XMLAttr) => {
-      // console.dir(attr);
-    };
-    p.onclosetag = (node: string) => {
-      // opened a tag.  node has "name" and "attributes"
-      // console.log("close %s", node);
+    });
+    /*p.onattribute = (attr: XMLAttr) => {
+      
+    };*/
+    p.on("closetag", () => {
       if (!current) {
         console.error("current null");
         process.exit(1);
@@ -87,12 +93,10 @@ export const parseXML2JSON = async (val: string): Promise<any> => {
       current = current.parent ? current.parent : {
         ref: ret
       };
-    };
-    p.onend = () => {
-      // console.log("end");
-      // parser stream is done, and ready to have more stuff written to it.
+    });
+    p.on("end", () => {
       resolve(ret);
-    };
+    });
     p.write(val).close();
   });
 };
