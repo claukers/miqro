@@ -76,26 +76,26 @@ mainCMD({
   ["generate:template:cache"]: {
     //section: "web components",
     tabs: 3,
-    cb: generateTemplatesCache, description: `generate a cache.json for webcomponents.`
+    cb: generateTemplatesCache, description: `generate cache.json for webcomponents.`
   },
 
   ["sfc"]: {
     tabs: 5,
-    cb: wcCompileSFC, description: `transform a sfc file to javascript.`
+    cb: wcCompileSFC, description: `transform sfc files to javascript.`
   },
 
   ["start"]: {
     section: "start helpers",
     tabs: 5,
     cb: start,
-    description: `start a nodejs script in cluster mode.`
+    description: `start script in cluster mode.`
   },
 
   ["watch"]: {
     //section: "watch",
     cb: watch,
     tabs: 5,
-    description: `watch a folder for changes.`
+    description: `watch folder for changes.`
   },
 
   ["serve"]: {
