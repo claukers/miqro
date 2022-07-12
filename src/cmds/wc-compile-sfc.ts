@@ -5,7 +5,7 @@ import { extractFlags } from "../utils";
 
 export const usage = "npx miqro sfc <sfcDir> <outDir> [-m @miqro/web-components] [-e \".js\"]";
 
-const DATA_SHADOW_ROOT_MODE = "DATA-SHADOW-ROOT-MODE";
+const DATA_SHADOW_ROOT_MODE = "data-shadow-root-mode";
 
 export const main = async () => {
 
@@ -120,7 +120,7 @@ async function compileSFC(sfcPath: string, requireStrings: { defineRequireString
 
 
 
-  const componentName = json.children[0].name.toLowerCase();
+  const componentName = json.children[0].name;
   const componentTemplateTag = json.children[0].children[0];
   const componentScriptTag = json.children[0].children[1];
 
@@ -144,7 +144,7 @@ async function compileSFC(sfcPath: string, requireStrings: { defineRequireString
       break;
   }
 
-  if (componentTemplateTag.name.toUpperCase() !== "TEMPLATE" || componentScriptTag.name.toUpperCase() !== "SCRIPT") {
+  if (componentTemplateTag.name !== "template" || componentScriptTag.name !== "script") {
     throw new Error("bad sfc structure(2) for " + sfcPath);
   }
 
@@ -199,9 +199,9 @@ function getAttributes(tag: any): string {
   let ret = "";
   for (const attribute of attributes) {
     if (ret === "") {
-      ret = `${attribute.toLowerCase()}="${tag.attributes[attribute]}"`
+      ret = `${attribute}="${tag.attributes[attribute]}"`
     } else {
-      ret += ` ${attribute.toLowerCase()}="${tag.attributes[attribute]}"`
+      ret += ` ${attribute}="${tag.attributes[attribute]}"`
     }
   }
   return ret;
@@ -214,9 +214,9 @@ function tagToString(tag: any) {
     return `<!--${tag.text}-->`;
   } else if (tag.isSelfClosing) {
     const attrs = getAttributes(tag);
-    return `<${tag.name.toLowerCase()}${attrs ? ` ${attrs}` : ""}/>`
+    return `<${tag.name}${attrs ? ` ${attrs}` : ""}/>`
   } else {
     const attrs = getAttributes(tag);
-    return `<${tag.name.toLowerCase()}${attrs ? ` ${attrs}` : ""}>${tag.children.map((c: any) => tagToString(c)).join("\n")}</${tag.name.toLowerCase()}>`
+    return `<${tag.name}${attrs ? ` ${attrs}` : ""}>${tag.children.map((c: any) => tagToString(c)).join("\n")}</${tag.name}>`
   }
 }
