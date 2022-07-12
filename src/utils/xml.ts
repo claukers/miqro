@@ -1,4 +1,4 @@
-import { SaxesParser as XMLParser } from "saxes";
+import { parser } from "sax";
 
 type Tag = {
   type: "root" | "comment" | "node" | "text";
@@ -23,15 +23,15 @@ export const parseXML2JSON = async (val: string): Promise<any> => {
     let current: undefined | Tree<Tag> = {
       ref: ret
     };
-    const p = new XMLParser({
-      /*noscript: true,
-      trim: true*/
-    });
-    p.on("error", (e: Error) => {
+    const p = parser(false, {
+      noscript: true,
+      lowercase: true
+    })
+    p.onerror = (e: Error) => {
       console.error(e);
       reject(e);
-    });
-    p.on("comment", (c: string) => {
+    };
+    p.oncomment = (c: string) => {
       if (!current) {
         console.error("current null");
         process.exit(1);
@@ -45,8 +45,8 @@ export const parseXML2JSON = async (val: string): Promise<any> => {
         children: []
       };
       current.ref.children.push(node);
-    });
-    p.on("text", (t: string) => {
+    };
+    p.ontext = (t: string) => {
       if (!current) {
         console.error("current null");
         process.exit(1);
@@ -60,8 +60,8 @@ export const parseXML2JSON = async (val: string): Promise<any> => {
         children: []
       };
       current.ref.children.push(node);
-    });
-    p.on("opentag", (t) => {
+    };
+    p.onopentag = (t) => {
       if (!current) {
         console.error("current null");
         process.exit(1);
@@ -81,11 +81,11 @@ export const parseXML2JSON = async (val: string): Promise<any> => {
         parent: current,
         ref: node
       }
-    });
+    }
     /*p.onattribute = (attr: XMLAttr) => {
       
     };*/
-    p.on("closetag", () => {
+    p.onclosetag = () => {
       if (!current) {
         console.error("current null");
         process.exit(1);
@@ -93,10 +93,10 @@ export const parseXML2JSON = async (val: string): Promise<any> => {
       current = current.parent ? current.parent : {
         ref: ret
       };
-    });
-    p.on("end", () => {
+    };
+    p.onend = () => {
       resolve(ret);
-    });
+    };
     p.write(val).close();
   });
 };

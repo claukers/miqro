@@ -21,8 +21,9 @@
     "@miqro/parser": "^0.1.5",
     "@miqro/runner": "^1.2.8",
     "@miqro/test": "^0.2.4",
+    "@types/sax": "^1.2.4",
     "deep-diff": "1.0.2",
-    "saxes": "6.0.0"
+    "sax": "^1.2.4"
   },
   "devDependencies": {
     "@types/cookie": "0.4.1",
