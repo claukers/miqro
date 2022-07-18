@@ -43,9 +43,6 @@ export const main = async () => {
     `import {define} from "${webComponentsModule}"` :
     `import {define} from "${webComponentsModule}";`
 
-  const componentRequireString = extension === ".ts" ?
-    `import {FunctionComponentThis} from "${webComponentsModule}"` : ""
-
   const sfcDir = resolve(process.cwd(), flags.files[0]);
   const outDir = resolve(process.cwd(), flags.files[1]);
 
@@ -72,19 +69,18 @@ export const main = async () => {
               const realMainOutFilePath = resolve(realOutFileDirname, outMainFileName);
 
               if (flags.flags.c !== undefined) {
-                console.log("%s\n\tremoving %s\n\tremoving %s", filePath, realOutFilePath, realMainOutFilePath);
+                //console.log("%s\n\tremoving %s\n\tremoving %s", filePath, realOutFilePath, realMainOutFilePath);
                 unlinkSync(realOutFilePath);
                 unlinkSync(realMainOutFilePath);
               } else {
-                console.log("%s ->\n\t%s\n\t%s", filePath, realOutFilePath, realMainOutFilePath);
+                //console.log("%s ->\n\t%s\n\t%s", filePath, realOutFilePath, realMainOutFilePath);
                 if (!existsSync(realOutFileDirname)) {
                   mkdirSync(realOutFileDirname, {
                     recursive: true
                   });
                 }
                 const [jsContent, mainJS] = await compileSFC(filePath, {
-                  defineRequireString,
-                  componentRequireString
+                  defineRequireString
                 });
                 writeFileSync(realOutFilePath, jsContent);
                 const requireInput = "./" + relative(dirname(realMainOutFilePath), realOutFilePath);
@@ -104,7 +100,7 @@ export const main = async () => {
   await Promise.allSettled(tE.map(t => t()));
 }
 
-async function compileSFC(sfcPath: string, requireStrings: { defineRequireString: string; componentRequireString: string; }, extension: string = ".js"): Promise<[string, ((path: string) => string)]> {
+async function compileSFC(sfcPath: string, requireStrings: { defineRequireString: string; }, extension: string = ".js"): Promise<[string, ((path: string) => string)]> {
   const json = await parseXML2JSON(readFileSync(sfcPath).toString());
 
   json.children = json.children.filter((c: any) => c.name !== "TEXT");
@@ -178,10 +174,8 @@ async function compileSFC(sfcPath: string, requireStrings: { defineRequireString
 
   const template = componentTemplateTag.children.map((tag: any) => tagToString(tag)).join("");
 
-  const outFileContent = `${requireStrings.componentRequireString ? `${requireStrings.componentRequireString}\n\n`: ""}${jsContent}`;
-
   return [
-    outFileContent,
+    jsContent,
     (jsContentPath: string) =>
       `${requireStrings.defineRequireString ? `${requireStrings.defineRequireString}\n` : ""}` +
       `import render from "${jsContentPath}";\n\n` +
