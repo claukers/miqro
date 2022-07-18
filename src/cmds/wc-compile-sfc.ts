@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, unlinkSync,
 import { parseXML2JSON } from "../utils/xml.js";
 import { extractFlags } from "../utils";
 
-export const usage = "npx miqro sfc <sfcDir> <outDir> [-m @miqro/web-components] [-e \".js\"]";
+export const usage = "npx miqro sfc <sfcDir> <outDir> [-n component] [-m @miqro/web-components] [-e \".js\"]";
 
 const DATA_SHADOW_ROOT_MODE = "data-shadow-root-mode";
 
@@ -11,6 +11,10 @@ export const main = async () => {
 
   const flags = extractFlags(process.argv.slice(3), {
     flags: {
+      "n": {
+        description: "function name",
+        hasValue: true
+      },
       "m": {
         description: "module to require defineFunction",
         hasValue: true
@@ -34,6 +38,8 @@ export const main = async () => {
   }
 
   const extension = flags.flags.o ? flags.flags.o as string : ".js";
+
+  const functionName = flags.flags.n ? flags.flags.n as string : "component";
 
   const inputExtension = flags.flags.i ? flags.flags.i as string : ".sfc";
 
@@ -63,14 +69,14 @@ export const main = async () => {
           tE.push(async function () {
             try {
               const outMainFileName = basename(filePath.substring(0, filePath.length - inputExtension.length) + extension);
-              const outFileName = basename(filePath.substring(0, filePath.length - inputExtension.length) + "-component" + extension);
+              //const outFileName = basename(filePath.substring(0, filePath.length - inputExtension.length) + "-component" + extension);
               const realOutFileDirname = resolve(outDir, relative(sfcDir, dirname(filePath)));
-              const realOutFilePath = resolve(realOutFileDirname, outFileName);
+              //const realOutFilePath = resolve(realOutFileDirname, outFileName);
               const realMainOutFilePath = resolve(realOutFileDirname, outMainFileName);
 
               if (flags.flags.c !== undefined) {
                 //console.log("%s\n\tremoving %s\n\tremoving %s", filePath, realOutFilePath, realMainOutFilePath);
-                unlinkSync(realOutFilePath);
+                //unlinkSync(realOutFilePath);
                 unlinkSync(realMainOutFilePath);
               } else {
                 //console.log("%s ->\n\t%s\n\t%s", filePath, realOutFilePath, realMainOutFilePath);
@@ -79,13 +85,14 @@ export const main = async () => {
                     recursive: true
                   });
                 }
-                const [jsContent, mainJS] = await compileSFC(filePath, {
-                  defineRequireString
+                const jsContent = await compileSFC(filePath, {
+                  defineRequireString,
+                  functionName
                 });
-                writeFileSync(realOutFilePath, jsContent);
-                const requireInput = "./" + relative(dirname(realMainOutFilePath), realOutFilePath);
-                const commonJSANDESM = requireInput.substring(0, requireInput.length - extension.length) + ".js";
-                writeFileSync(realMainOutFilePath, mainJS(commonJSANDESM));
+                //writeFileSync(realOutFilePath, jsContent);
+                //const requireInput = "./" + relative(dirname(realMainOutFilePath), realOutFilePath);
+                //const commonJSANDESM = requireInput.substring(0, requireInput.length - extension.length) + ".js";
+                writeFileSync(realMainOutFilePath, jsContent);
               }
             } catch (e) {
               console.error(e);
@@ -100,7 +107,7 @@ export const main = async () => {
   await Promise.allSettled(tE.map(t => t()));
 }
 
-async function compileSFC(sfcPath: string, requireStrings: { defineRequireString: string; }, extension: string = ".js"): Promise<[string, ((path: string) => string)]> {
+async function compileSFC(sfcPath: string, requireStrings: { defineRequireString: string; functionName: string; }, extension: string = ".js"): Promise<string> {
   const json = await parseXML2JSON(readFileSync(sfcPath).toString());
 
   json.children = json.children.filter((c: any) => c.name !== "TEXT");
@@ -174,18 +181,14 @@ async function compileSFC(sfcPath: string, requireStrings: { defineRequireString
 
   const template = componentTemplateTag.children.map((tag: any) => tagToString(tag)).join("");
 
-  return [
-    jsContent,
-    (jsContentPath: string) =>
-      `${requireStrings.defineRequireString ? `${requireStrings.defineRequireString}\n` : ""}` +
-      `import render from "${jsContentPath}";\n\n` +
-      `define("${componentName}", render, ${JSON.stringify({
-        template,
-        ...(dataShadowRootMode === undefined ? {} : {
-          shadowInit: modeArg
-        })
-      })});`
-  ];
+  return `${requireStrings.defineRequireString ? `${requireStrings.defineRequireString}\n` : ""}` +
+    `${requireStrings.defineRequireString ? "\n" : ""}${jsContent}\n` +
+    `define("${componentName}", ${requireStrings.functionName}, ${JSON.stringify({
+      template,
+      ...(dataShadowRootMode === undefined ? {} : {
+        shadowInit: modeArg
+      })
+    })});`
 }
 
 function getAttributes(tag: any): string {
