@@ -70,7 +70,7 @@ mainCMD({
     description: `api folder auto doc as a markdown.`
   },
 
-  ["new:front"]: {section: "front development", cb: newFrontJS, tabs: 4, description: `create a new project.`},
+  /*["new:front"]: {section: "front development", cb: newFrontJS, tabs: 4, description: `create a new project.`},
   ["new:front:typescript"]: {cb: newFrontTS, tabs: 3, description: `create a new typescript project.`},
 
   ["generate:template:cache"]: {
@@ -82,7 +82,7 @@ mainCMD({
   ["sfc"]: {
     tabs: 5,
     cb: wcCompileSFC, description: `transform sfc files to javascript.`
-  },
+  },*/
 
   ["start"]: {
     section: "start helpers",

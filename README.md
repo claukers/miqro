@@ -26,13 +26,6 @@ config:init                             inits your config folder.
 doc                                     api folder auto doc as a json.
 doc:md                                  api folder auto doc as a markdown.
 
-==front development==
-
-new:front                               create a new project.
-new:front:typescript                    create a new typescript project.
-generate:template:cache                 generate cache.json for webcomponents.
-sfc                                     transform sfc files to javascript.
-
 ==start helpers==
 
 start                                   start script in cluster mode.
