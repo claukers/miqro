@@ -4,7 +4,6 @@ import {main as start, usage as startUsage} from "./cmds/start";
 import {main as test, usage as testUsage} from "./cmds/test";
 import {main as watch, usage as watchUsage} from "./cmds/watch";
 import {mainJS as newJS, mainTS as newTS, usageJS as newJSUsage, usageTS as newTSUsage} from "./cmds/new";
-import {mainJS as newFrontJS, mainTS as newFrontTS, usageJS as newFrontJSUsage, usageTS as newFrontTSUsage} from "./cmds/wc-new";
 import {main as apiDocJSON, usage as apiDocJSONUsage} from "./cmds/doc-json";
 import {main as apiDocMD, usage as apiDocMDUsage} from "./cmds/doc-md";
 import {main as configInit, usage as configInitUsage} from "./cmds/config-init";
@@ -23,8 +22,6 @@ import {main as createModel, usage as createModelUsage} from "./cmds/db-createmo
 import {main as pushData, usage as pushDataUsage} from "./cmds/db-push-data";
 import {main as dumpData, usage as dumpDataUsage} from "./cmds/db-dump-data";
 import {main as migrate, usage as migrateUsage} from "./cmds/db-migrate";
-import {main as wcCompileSFC, usage as wcCompileSFCUsage} from "./cmds/wc-compile-sfc";
-import {main as generateTemplatesCache, usage as generateTemplatesCacheUsage} from "./cmds/wc-cache-templates";
 
 // noinspection SpellCheckingInspection
 mainCMD({
@@ -69,20 +66,6 @@ mainCMD({
     tabs: 5,
     description: `api folder auto doc as a markdown.`
   },
-
-  /*["new:front"]: {section: "front development", cb: newFrontJS, tabs: 4, description: `create a new project.`},
-  ["new:front:typescript"]: {cb: newFrontTS, tabs: 3, description: `create a new typescript project.`},
-
-  ["generate:template:cache"]: {
-    //section: "web components",
-    tabs: 3,
-    cb: generateTemplatesCache, description: `generate cache.json for webcomponents.`
-  },
-
-  ["sfc"]: {
-    tabs: 5,
-    cb: wcCompileSFC, description: `transform sfc files to javascript.`
-  },*/
 
   ["start"]: {
     section: "start helpers",
