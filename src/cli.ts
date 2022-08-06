@@ -1,27 +1,27 @@
 #!/usr/bin/env node
 import {mainCMD} from "./utils";
-import {main as start, usage as startUsage} from "./cmds/start";
-import {main as test, usage as testUsage} from "./cmds/test";
-import {main as watch, usage as watchUsage} from "./cmds/watch";
-import {mainJS as newJS, mainTS as newTS, usageJS as newJSUsage, usageTS as newTSUsage} from "./cmds/new";
-import {main as apiDocJSON, usage as apiDocJSONUsage} from "./cmds/doc-json";
-import {main as apiDocMD, usage as apiDocMDUsage} from "./cmds/doc-md";
-import {main as configInit, usage as configInitUsage} from "./cmds/config-init";
-import {main as config, usage as configUsage} from "./cmds/config";
-import {main as configBash, usage as configBashUsage} from "./cmds/config-bash";
-import {main as configEnv, usage as configEnvUsage} from "./cmds/config-env";
-import {main as newRoute, usage as newRouteUsage} from "./cmds/handler-apiroute-new";
-import {main as newTest, usage as newTestUsage} from "./cmds/new-test";
-import {main as serve, usage as serveUsage} from "./cmds/serve";
-import {main as newMain, usage as newMainUsage} from "./cmds/handler-main-new";
-import {main as dbInit, usage as dbInitUsage} from "./cmds/db-init";
-import {main as makeMigrations, usage as makeMigrationsUsage} from "./cmds/db-makemigrations";
-import {main as syncMakeMigrations, usage as syncMakeMigrationsUsage} from "./cmds/db-sync-makemigrations";
-import {main as consoleCMD, usage as consoleCMDUsage} from "./cmds/db-console";
-import {main as createModel, usage as createModelUsage} from "./cmds/db-createmodel";
-import {main as pushData, usage as pushDataUsage} from "./cmds/db-push-data";
-import {main as dumpData, usage as dumpDataUsage} from "./cmds/db-dump-data";
-import {main as migrate, usage as migrateUsage} from "./cmds/db-migrate";
+import {main as start} from "./cmds/start";
+import {main as test} from "./cmds/test";
+import {main as watch} from "./cmds/watch";
+import {mainJS as newJS, mainTS as newTS} from "./cmds/new";
+import {main as apiDocJSON} from "./cmds/doc-json";
+import {main as apiDocMD} from "./cmds/doc-md";
+import {main as configInit} from "./cmds/config-init";
+import {main as config} from "./cmds/config";
+import {main as configBash} from "./cmds/config-bash";
+import {main as configEnv} from "./cmds/config-env";
+import {main as newRoute} from "./cmds/handler-apiroute-new";
+import {main as newTest} from "./cmds/new-test";
+import {main as serve} from "./cmds/serve";
+import {main as newMain} from "./cmds/handler-main-new";
+import {main as dbInit} from "./cmds/db-init";
+import {main as makeMigrations} from "./cmds/db-makemigrations";
+import {main as syncMakeMigrations} from "./cmds/db-sync-makemigrations";
+import {main as consoleCMD} from "./cmds/db-console";
+import {main as createModel} from "./cmds/db-createmodel";
+import {main as pushData} from "./cmds/db-push-data";
+import {main as dumpData} from "./cmds/db-dump-data";
+import {main as migrate} from "./cmds/db-migrate";
 
 // noinspection SpellCheckingInspection
 mainCMD({
