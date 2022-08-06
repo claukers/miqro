@@ -14,3 +14,4 @@ tsconfig.json
 .editorconfig
 .nycrc
 .github/
+src/
