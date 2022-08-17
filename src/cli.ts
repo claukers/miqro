@@ -3,7 +3,7 @@ import {mainCMD} from "./utils";
 import {main as start} from "./cmds/start";
 import {main as test} from "./cmds/test";
 import {main as watch} from "./cmds/watch";
-import {mainJS as newJS, mainTS as newTS} from "./cmds/new";
+import {/*mainJS as newJS, */mainTS as newTS} from "./cmds/new";
 import {main as apiDocJSON} from "./cmds/doc-json";
 import {main as apiDocMD} from "./cmds/doc-md";
 import {main as configInit} from "./cmds/config-init";
@@ -22,54 +22,62 @@ import {main as createModel} from "./cmds/db-createmodel";
 import {main as pushData} from "./cmds/db-push-data";
 import {main as dumpData} from "./cmds/db-dump-data";
 import {main as migrate} from "./cmds/db-migrate";
+import {mainTS as newTSFront} from "./cmds/wc-new";
 
 // noinspection SpellCheckingInspection
 mainCMD({
 
-  ["new"]: {section: "api development", cb: newJS, tabs: 5, description: `create a new project.`},
-  ["new:typescript"]: {cb: newTS, tabs: 4, description: `create a new typescript project.`},
+  ["new:api"]: {section: "api development", cb: newTS, tabs: 4, description: `create a new project.`},
+  //["new:typescript"]: {cb: newTS, tabs: 4, description: `create a new typescript project.`},
 
-  ["new:main"]: {
+  ["new:api:main"]: {
     //section: "http scafolding",
     cb: newMain,
-    tabs: 4,
+    tabs: 3,
     description: `creates a new main file.`
   },
-  ["new:route"]: {cb: newRoute, tabs: 4, description: `creates a new route.`},
+  ["new:api:route"]: {cb: newRoute, tabs: 3, description: `creates a new route.`},
 
   ["config"]: {
     //section: "config managment",
     cb: config,
-    tabs: 5,
+    tabs: 4,
     description: `print config as a json.`
   },
   ["config:bash"]: {
     cb: configBash,
-    tabs: 4,
+    tabs: 3,
     description: `print config as a bash script.`
   },
   ["config:env"]: {
     cb: configEnv,
-    tabs: 4,
+    tabs: 3,
     description: `print config as a env file.`
   },
-  ["config:init"]: {cb: configInit, tabs: 4, description: `inits your config folder.`},
+  ["config:init"]: {cb: configInit, tabs: 3, description: `inits your config folder.`},
 
   ["doc"]: {
     //section: "api documentation",
-    tabs: 5,
+    tabs: 4,
     cb: apiDocJSON,
     description: `api folder auto doc as a json.`
   },
   ["doc:md"]: {
     cb: apiDocMD,
-    tabs: 5,
+    tabs: 4,
     description: `api folder auto doc as a markdown.`
   },
 
+  /*["new:front"]: {
+    section: "front end development",
+    cb: newTSFront,
+    tabs: 3,
+    description: `create a new web-components project.`
+  },*/
+
   ["start"]: {
     section: "start helpers",
-    tabs: 5,
+    tabs: 4,
     cb: start,
     description: `start script in cluster mode.`
   },
@@ -77,43 +85,43 @@ mainCMD({
   ["watch"]: {
     //section: "watch",
     cb: watch,
-    tabs: 5,
+    tabs: 4,
     description: `watch folder for changes.`
   },
-
+  
   ["serve"]: {
     //section: "serve static files",
-    tabs: 5,
+    tabs: 4,
     cb: serve, description: `serve static files.`
   },
 
-  ["test"]: {section: "testing", cb: test, tabs: 5, description: `run test files.`},
+  ["test"]: {section: "testing", cb: test, tabs: 4, description: `run test files.`},
 
-  ["new:test"]: {cb: newTest, tabs: 4, description: `create new test.js file.`},
+  ["new:test"]: {cb: newTest, tabs: 3, description: `create new test.js file.`},
 
   ["db:console"]: {
     section: "sequelize helpers",
     cb: consoleCMD,
-    tabs: 4,
+    tabs: 3,
     description: `a query console for sequelize.`
   },
   ["db:dump:data"]: {
     cb: dumpData,
-    tabs: 4,
+    tabs: 3,
     description: `dump the data of the database.`
   },
-  ["db:push:data"]: {cb: pushData, tabs: 4, description: `push a dump to the database.`},
+  ["db:push:data"]: {cb: pushData, tabs: 3, description: `push a dump to the database.`},
   ["db:make:migration"]: {
     cb: makeMigrations,
-    tabs: 3,
+    tabs: 2,
     description: `generate migrations from model changes.`
   },
-  ["db:make:migration:force:clean:state"]: {
+  ["db:migration:forceclean"]: {
     cb: syncMakeMigrations,
-    tabs: 1,
+    tabs: 2,
     description: `force 'local' model state.`
   },
-  ["db:migrate"]: {cb: migrate, tabs: 4, description: `loads config and run migrations.`},
-  ["db:init"]: {cb: dbInit, tabs: 5, description: `init sequelize configuration.`},
-  ["db:create:model"]: {cb: createModel, tabs: 4, description: `creates an example model.`}
+  ["db:migrate"]: {cb: migrate, tabs: 3, description: `loads config and run migrations.`},
+  ["db:init"]: {cb: dbInit, tabs: 4, description: `init sequelize configuration.`},
+  ["db:create:model"]: {cb: createModel, tabs: 3, description: `creates an example model.`}
 }, "npx miqro <command> [args]", console);

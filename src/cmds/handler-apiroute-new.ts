@@ -43,7 +43,7 @@ export default {
 `
 }
 
-export const usage = `usage: [NODE_ENV=development] npx miqro new:route <identifier ex: SRC_API_V1_HEALTH>`;
+export const usage = `usage: [NODE_ENV=development] npx miqro new:api:route <identifier ex: SRC_API_V1_HEALTH>`;
 
 export const main = (): void => {
 

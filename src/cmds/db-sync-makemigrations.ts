@@ -1,7 +1,7 @@
 import { syncMakeMigrations } from "../utils/db";
 import { loadConfig } from "@miqro/core";
 
-export const usage = "usage: [NODE_ENV=development] npx miqro db:make:migration:force:clean:state";
+export const usage = "usage: [NODE_ENV=development] npx miqro db:migration:forceclean";
 
 export const main = (): void => {
   if (process.argv.length !== 3) {

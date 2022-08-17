@@ -49,7 +49,7 @@ app.listen(PORT, () => {
 `
 }
 
-export const usage = `usage: [NODE_ENV=development] npx miqro new:main <identifier ex: NEW_APP>`;
+export const usage = `usage: [NODE_ENV=development] npx miqro new:api:main <identifier ex: NEW_APP>`;
 
 export const main = (): void => {
 

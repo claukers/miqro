@@ -1,6 +1,6 @@
-import {existsSync, mkdirSync, writeFileSync} from "fs";
-import {resolve} from "path";
-import {execSync} from "../utils";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { resolve } from "path";
+import { execSync } from "../utils";
 
 const gitignoreTemplate = {
   ts: () => `node_modules/
@@ -52,12 +52,11 @@ const packageTemplate = {
 }`
 }
 
-export const usageJS = `usage: npx miqro new <identifier ex: NEW_APP>`;
-export const usageTS = `usage: npx miqro new:typescript <identifier ex: NEW_APP>`;
+export const usageTS = `usage: npx miqro new:api <identifier ex: NEW_APP>`;
 
-export const mainJS = (typescript = false): void => {
+export const mainTS = (): void => {
   if (process.argv.length !== 4 || process.argv[3].length < 1) {
-    throw new Error(typescript ? usageTS : usageJS);
+    throw new Error(usageTS);
   }
 
   const identifier = process.argv[3].toLocaleLowerCase();
@@ -74,7 +73,7 @@ export const mainJS = (typescript = false): void => {
     recursive: true
   });
 
-  writeFileSync(resolve(appFolder, "package.json"), packageTemplate[typescript ? "ts" : "js"](identifier));
+  writeFileSync(resolve(appFolder, "package.json"), packageTemplate["ts"](identifier));
 
   execSync(
     `npm install miqro --save-dev`,
@@ -90,8 +89,8 @@ export const mainJS = (typescript = false): void => {
     }
   );
 
-  if (typescript) {
-    writeFileSync(resolve(appFolder, "tsconfig.json"), `{
+
+  writeFileSync(resolve(appFolder, "tsconfig.json"), `{
   "compileOnSave": true,
   "compilerOptions": {
     "lib": ["es2021"],
@@ -115,30 +114,28 @@ export const mainJS = (typescript = false): void => {
     "src"
   ]
 }`);
-    execSync(`npm install typescript --save-dev`, {
-      cwd: appFolder
-    });
-    execSync(`npm install @types/node --save-dev`, {
-      cwd: appFolder
-    });
-    writeFileSync(resolve(appFolder, ".gitignore"), gitignoreTemplate.ts());
-  } else {
-    writeFileSync(resolve(appFolder, ".gitignore"), gitignoreTemplate.js());
-  }
+  execSync(`npm install typescript --save-dev`, {
+    cwd: appFolder
+  });
+  execSync(`npm install @types/node --save-dev`, {
+    cwd: appFolder
+  });
+  writeFileSync(resolve(appFolder, ".gitignore"), gitignoreTemplate.ts());
+
 
   execSync(`npm install @miqro/test --save-dev`, {
     cwd: appFolder
   });
 
   execSync(
-    `npx miqro new:main src_main`,
+    `npx miqro new:api:main src_main`,
     {
       cwd: appFolder
     }
   );
 
   execSync(
-    `npx miqro new:route src_api_health`,
+    `npx miqro new:api:route src_api_health`,
     {
       cwd: appFolder
     }
@@ -161,5 +158,3 @@ export const mainJS = (typescript = false): void => {
 
   console.log(`npm run start`);
 }
-
-export const mainTS = (): void => mainJS(true);
