@@ -2,7 +2,7 @@ import {execSync} from "../utils";
 import {mainPath} from "@miqro/runner";
 import {loadConfig} from "@miqro/core";
 
-export const usage = "usage: [NODE_ENV=development] CLUSTER_COUNT=1 [DISABLE_RESTART=true|false] npx miqro start <script> [...args]";
+export const usage = "usage: [NODE_ENV=development] CLUSTER_COUNT=os.cpus().length [DISABLE_RESTART=true|false] npx miqro start <script> [...args]";
 
 export const main = (): void => {
 

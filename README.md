@@ -24,7 +24,6 @@ config:bash			    print config as a bash script.
 config:env			    print config as a env file.
 config:init			    inits your config folder.
 doc				        api folder auto doc as a json.
-doc:md				    api folder auto doc as a markdown.
 
 ==start helpers==
 

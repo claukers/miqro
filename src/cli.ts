@@ -5,7 +5,7 @@ import {main as test} from "./cmds/test";
 import {main as watch} from "./cmds/watch";
 import {/*mainJS as newJS, */mainTS as newTS} from "./cmds/new";
 import {main as apiDocJSON} from "./cmds/doc-json";
-import {main as apiDocMD} from "./cmds/doc-md";
+//import {main as apiDocMD} from "./cmds/doc-md.ts.disable";
 import {main as configInit} from "./cmds/config-init";
 import {main as config} from "./cmds/config";
 import {main as configBash} from "./cmds/config-bash";
@@ -62,11 +62,11 @@ mainCMD({
     cb: apiDocJSON,
     description: `api folder auto doc as a json.`
   },
-  ["doc:md"]: {
+  /*["doc:md"]: {
     cb: apiDocMD,
     tabs: 4,
     description: `api folder auto doc as a markdown.`
-  },
+  },*/
 
   /*["new:front"]: {
     section: "front end development",
@@ -80,6 +80,12 @@ mainCMD({
     tabs: 4,
     cb: start,
     description: `start script in cluster mode.`
+  },
+
+  ["cluster"]: {
+    tabs: 4,
+    cb: start,
+    description: `alias for start command.`
   },
 
   ["watch"]: {
