@@ -12,7 +12,7 @@
     "prebuild": "rm -Rf dist;",
     "build": "tsc",
     "pretest": "npm run build",
-    "test": "miqro-test test/*.test.js"
+    "test": "node --enable-source-maps --test test/*.test.js"
   },
   "author": "claukers",
   "license": "ISC",

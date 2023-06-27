@@ -1,6 +1,7 @@
 const {mainCMD, extractFlags} = require("../dist/utils");
 const {strictEqual} = require("assert");
 const {fake} = require("@miqro/test");
+const {describe, it} = require("node:test");
 
 describe("cli functional tests", () => {
   it("cli happy path", async () => {
