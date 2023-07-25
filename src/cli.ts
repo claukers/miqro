@@ -91,8 +91,6 @@ mainCMD({
     cb: serve, description: `serve static files.`
   },
 
-  //["test"]: {section: "testing", cb: test, tabs: 4, description: `run test files.`},
-
   ["new:test"]: {cb: newTest, tabs: 3, description: `create new test.js file.`},
 
 }, "npx miqro <command> [args]", console);

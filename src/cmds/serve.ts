@@ -1,13 +1,16 @@
-import {normalizePath, App, loadConfig, LoggerHandler, Proxy, ReadBuffer, Static} from "@miqro/core";
-import {extractFlags} from "../utils";
-import {URL} from "url";
-import {existsSync, statSync} from "fs";
+import { normalizePath, App, loadConfig, LoggerHandler, Proxy, ReadBuffer, Static } from "@miqro/core";
+import { extractFlags } from "../utils";
+import { URL } from "url";
+import { existsSync, statSync } from "fs";
 
 export const usage = `usage: [NODE_ENV=development] npx miqro serve [directory=./] [path=/] [--index404 ./index.html] [--proxy-cert-ignore] [--port 8080] [--proxy /api=https://host/api]`;
 
-export const main = (): void => {
+export const main = async (): Promise<void> => {
   const flags = extractFlags(process.argv.slice(3), {
     flags: {
+      "help": {
+        description: "get help page", hasValue: false
+      },
       "index404Status": {
         description: "status to handle index404 status", hasValue: true
       },
@@ -22,6 +25,11 @@ export const main = (): void => {
       }
     }
   });
+  
+  if(flags.flags.help !== undefined) {
+    console.log(usage);
+    process.exit(102);
+  }
 
   if (flags.files.length > 2) {
     throw new Error(`invalid arguments.\n${usage}`);
@@ -79,8 +87,7 @@ export const main = (): void => {
     index404: flags.flags.index404 ? flags.flags.index404 as string : undefined,
     index404Status: flags.flags.index404Status ? parseInt(flags.flags.index404Status as string, 10) : undefined
   }), path);
-  app.listen(PORT, () => {
-    console.log("serving " + directory + " on http://localhost:%s%s", PORT, path);
-  });
+  await app.listen(PORT);
+  console.log("serving " + directory + " on http://localhost:%s%s", PORT, path);
 }
 
