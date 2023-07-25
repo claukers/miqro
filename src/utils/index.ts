@@ -1,10 +1,10 @@
-import {execSync as cpExec, ExecSyncOptionsWithBufferEncoding} from "child_process";
+import { execSync as cpExec, ExecSyncOptionsWithBufferEncoding } from "child_process";
 
 export const execSync = (cmd: string, options?: ExecSyncOptionsWithBufferEncoding): void => {
   console.log(cmd);
   cpExec(
     cmd,
-    options ? {stdio: 'inherit', ...options} : {stdio: 'inherit'}
+    options ? { stdio: 'inherit', ...options } : { stdio: 'inherit' }
   );
 }
 
@@ -65,7 +65,7 @@ export const extractFlags = (args: string[], options?: {
       files.push(arg);
     }
   }
-  return {flags, files};
+  return { flags, files };
 }
 
 const getTabs = (n?: number) => {
@@ -77,7 +77,27 @@ const getTabs = (n?: number) => {
   return ret;
 }
 
-export const mainCMD = (cmds: { [key: string]: { cb: Callback<void> | Callback<Promise<void>>; description: string; section?: string; tabs?: number } }, usage: string, logger: {
+export function getUsage(cmds: CMDMap, usage: string) {
+  let out = "";
+  out += `${usage}`;
+  out += `Available commands:\n\n`;
+  for (const cmd of Object.keys(cmds)) {
+    if (cmds[cmd].section) {
+      out += `\n==${cmds[cmd].section}==\n\n`;
+    }
+    //const description = cmds[cmd].description.split("\n").map(s => `${getTabs(/*cmds[cmd].tabs*/2)}${s}`).join("\n");
+    //const description = cmds[cmd].description.split("\n").map(s => `${getTabs(/*cmds[cmd].tabs*/1)}${s}`).join("\n");
+    const description = cmds[cmd].description.split("\n").map(s => `${getTabs(cmds[cmd].tabs)}${s}`).join("\n");
+    out += `${cmd}${description}\n`;
+    //logger.info(`${cmd}\n${description}`);
+  }
+  out += "\n";
+  return out;
+}
+
+interface CMDMap { [key: string]: { cb: Callback<void> | Callback<Promise<void>>; description: string; section?: string; tabs?: number } }
+
+export const mainCMD = (cmds: CMDMap, usage: string, logger: {
   error: (...args: any[]) => void;
   info: (...args: any[]) => void;
 } | Console, cmdArg = process.argv[2], exit = true): void => {
@@ -88,19 +108,7 @@ export const mainCMD = (cmds: { [key: string]: { cb: Callback<void> | Callback<P
       if (e && e.message) {
         logger.error(e.message);
       }
-      logger.info(`${usage}`);
-      logger.info(`Available commands:\n`);
-      for (const cmd of Object.keys(cmds)) {
-        if (cmds[cmd].section) {
-          logger.info(`\n==${cmds[cmd].section}==\n`);
-        }
-        //const description = cmds[cmd].description.split("\n").map(s => `${getTabs(/*cmds[cmd].tabs*/2)}${s}`).join("\n");
-        //const description = cmds[cmd].description.split("\n").map(s => `${getTabs(/*cmds[cmd].tabs*/1)}${s}`).join("\n");
-        const description = cmds[cmd].description.split("\n").map(s => `${getTabs(cmds[cmd].tabs)}${s}`).join("\n");
-        logger.info(`${cmd}${description}`);
-        //logger.info(`${cmd}\n${description}`);
-      }
-      logger.info("");
+      logger.info(getUsage(cmds, usage));
       if (exit) {
         process.exit(1);
       }
