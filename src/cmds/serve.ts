@@ -1,7 +1,6 @@
-import {App, loadConfig, LoggerHandler, Proxy, ReadBuffer, Static} from "@miqro/core";
+import {normalizePath, App, loadConfig, LoggerHandler, Proxy, ReadBuffer, Static} from "@miqro/core";
 import {extractFlags} from "../utils";
 import {URL} from "url";
-import {normalizePath} from "@miqro/core/dist/common/tokenize-match";
 import {existsSync, statSync} from "fs";
 
 export const usage = `usage: [NODE_ENV=development] npx miqro serve [directory=./] [path=/] [--index404 ./index.html] [--proxy-cert-ignore] [--port 8080] [--proxy /api=https://host/api]`;

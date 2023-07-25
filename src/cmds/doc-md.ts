@@ -1,5 +1,5 @@
 import { getLogger, loadConfig } from "@miqro/core";
-import { getDOCJSON } from "../utils/doc/json";
+import { getMDDoc } from "../utils/doc/md";
 
 export const usage = `usage: [NODE_ENV=development] npx miqro doc <api_folder> <subPath> [apiName]`;
 
@@ -15,5 +15,5 @@ export const main = async (): Promise<void> => {
 
   loadConfig();
 
-  console.log(JSON.stringify(await getDOCJSON({ dirname, subPath, apiName }), undefined, 2));
+  console.log(await getMDDoc({ dirname, subPath, apiName }));
 }

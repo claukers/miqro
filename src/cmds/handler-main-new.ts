@@ -16,14 +16,17 @@ const [PORT] = checkEnvVariables(["PORT"], ["8080"]);
 
 const logger = getLogger("server");
 
-const app = new App();
-app.use(middleware());
-app.use(APIRouter({
-  dirname: resolve(__dirname, "api")
-}, logger));
-app.listen(PORT, () => {
+async function main() {
+  const app = new App();
+  app.use(middleware());
+  app.use(await APIRouter({
+    dirname: resolve(__dirname, "api")
+  }, logger));
+  await app.listen();
   logger.info("listening on " + PORT);
-});
+}
+
+main().catch(e => logger.error(e));
 `,
   js: () =>
     `const { APIRouter, App, checkEnvVariables, getLogger, middleware } = require("@miqro/core");
@@ -38,14 +41,17 @@ const [PORT] = checkEnvVariables(["PORT"], ["8080"]);
 
 const logger = getLogger("server");
 
-const app = new App();
-app.use(middleware());
-app.use(APIRouter({
-  dirname: resolve(__dirname, "api")
-}, logger));
-app.listen(PORT, () => {
+async function main() {
+  const app = new App();
+  app.use(middleware());
+  app.use(await APIRouter({
+    dirname: resolve(__dirname, "api")
+  }, logger));
+  await app.listen();
   logger.info("listening on " + PORT);
-});
+}
+
+main().catch(e => logger.error(e));
 `
 }
 

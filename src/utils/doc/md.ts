@@ -1,0 +1,142 @@
+import { GroupPolicy, Handler, Logger, RouteJSONDoc } from "@miqro/core";
+import { ParseBaseType, ParserArgs, ParserMode } from "@miqro/parser";
+import { getDOCJSON } from "./json";
+
+export async function getMDDoc(args: { showFilePath?: boolean; apiName?: string; dirname: string; subPath: string; }, logger?: Logger) {
+
+  const jsonDOC = await getDOCJSON(args, logger);
+
+  const pathList = Object.keys(jsonDOC);
+
+  let outMD = "";
+
+  for (const path of pathList) {
+    const pathData = jsonDOC[path];
+    const methods = Object.keys(pathData);
+    for (const method of methods) {
+      const apiData: RouteJSONDoc = pathData[method];
+      outMD += `## ${apiData.identifier}${args.showFilePath ? (apiData as any).___filePath : ""}\n\n`;
+      if (apiData.name) {
+        outMD += `${apiData.name}\n\n`;
+      }
+      if (apiData.description) {
+        outMD += `${apiData.description}\n\n`;
+      }
+      outMD += `[${method}] ${path}\n\n`;
+      if (apiData.policy) {
+        outMD += `### policy\n\n`;
+        outMD += policyToString(apiData.policy);
+      }
+      if (apiData.request) {
+        const requestOutMD = parserToString(apiData.request);
+        outMD += requestOutMD !== "" ? `### request\n\n${requestOutMD}` : "";
+      }
+      if (apiData.response) {
+        const responseOutMD = parserToString(apiData.response);
+        outMD += responseOutMD !== "" ? `### response\n\n${responseOutMD}` : "";
+      }
+    }
+  }
+  return outMD;
+}
+
+function policyToString(policy: GroupPolicy): string {
+  let outMD = "| groups | policy |\n";
+  outMD += "|--------|--------|\n";
+  outMD += `| ${(policy.groups instanceof Array ? policy.groups : [policy.groups]).join(",")} | ${policy.groupPolicy} |\n\n`;
+  return outMD;
+}
+
+export function parserToString(parser: {
+  headers?: ParserArgs | ParserArgs[];
+  headersMode?: ParserMode;
+  query?: ParserArgs | boolean | ParserArgs[];
+  queryMode?: ParserMode;
+  params?: ParserArgs | boolean | ParserArgs[];
+  paramsMode?: ParserMode;
+  body?: ParserArgs | boolean | ParserArgs[];
+  bodyMode?: ParserMode;
+}): string {
+  let outMD = "";
+  if (parser.params && typeof parser.params !== "boolean") {
+    outMD += `#### path params\n\n`;
+    outMD += parserPartToString(parser.params, parser.paramsMode);
+  }
+  if (parser.headers) {
+    outMD += `#### headers\n\n`;
+    outMD += parserPartToString(parser.headers, parser.headersMode);
+  }
+  if (parser.query && parser.query !== true) {
+    outMD += `#### query\n\n`;
+    outMD += parserPartToString(parser.query, parser.queryMode);
+  }
+  if (parser.body && parser.body !== true) {
+    outMD += `#### body\n\n`;
+    outMD += parserPartToString(parser.body, parser.bodyMode);
+  }
+  return outMD;
+}
+
+function parserPartToString(arg: ParserArgs | false | ParserArgs[], mode?: ParserMode): string {
+  if (arg === false) {
+    return "not allowed";
+  }
+  let outMD = "";
+  let maxTabulation = 1;
+  const parsers: ParserArgs[] = arg instanceof Array ? arg : [arg];
+  for (const parser of parsers) {
+    const ret = internalParserToString(parser);
+    if (ret.maxTabulation > maxTabulation) {
+      maxTabulation = ret.maxTabulation;
+    }
+    outMD += `| | ${getTabulation(ret.maxTabulation * 2)}\n`;
+    outMD += `|--------|--------${getTabulation(ret.maxTabulation * 2, true)}\n`;
+    outMD += `${ret.out}\n\n`;
+  }
+  return outMD
+}
+
+function internalParserToString(parser: string | ParserArgs, tabulation = 1): { out: string, maxTabulation: number } {
+  let outMD = "";
+  let maxTabulation = tabulation;
+  if (typeof parser === "string") {
+    outMD += `${getTabulation(tabulation)}${parser}|\n`;
+  } else {
+    const attrNames = Object.keys(parser);
+    for (const name of attrNames) {
+      const p = parser[name];
+      if (typeof p === "string") {
+        outMD += `${getTabulation(tabulation)}${name} | ${p}|\n`;
+      } else if (p.type === "nested") {
+        outMD += `${getTabulation(tabulation)}${name} | ${p.type}|\n`;
+        const ret = parserBaseNestedTypeToString(p, tabulation + 1);
+        if (maxTabulation < ret.maxTabulation) {
+          maxTabulation = ret.maxTabulation;
+        }
+        outMD += `${ret.out}`;
+      } else if (p.type === "regex") {
+        outMD += `${getTabulation(tabulation)}${name} | ${p.regex}|\n`;
+      } else {
+        outMD += `${getTabulation(tabulation)}${name} | ${p.type}|\n`;
+      }
+    }
+  }
+  return {
+    out: outMD,
+    maxTabulation
+  };
+}
+
+function parserBaseNestedTypeToString(arg: ParseBaseType, tabulation: number): { out: string; maxTabulation: number } {
+  const options = arg.nestedOptions && arg.nestedOptions.options ? arg.nestedOptions.options : {};
+  //const outMD = `${getTabulation(tabulation)}name | type |\n${getTabulation(tabulation)}--------|--------|\n`;
+  return internalParserToString(options, tabulation);
+}
+
+function getTabulation(n: number, header = false) {
+  let out = "";
+  for (let i = 0; i < n; i++) {
+    out += header ? "-|" : "| ";
+  }
+  return out;
+}
