@@ -13,43 +13,44 @@ const packageTemplate = {
   ts: (name: string) =>
     `{
   "name": "${name}",
+  "type": "module",
   "version": "1.0.0",
   "description": "",
   "private": true,
-  "main": "dist/main.js",
   "scripts": {
-    "prebuild": "rm -Rf dist/;",
+    "prebuild": "rm -Rf build/;",
     "build": "tsc",
     "prestart": "npm run build",
-    "start": "node dist/main.js",
+    "start": "node --enable-source-maps build/main.js",
+    "cluster": "NODE_OPTIONS=--enable-source-maps miqro cluster build/main.js",
     "pretest": "npm run build",
-    "test": "node --enable-source-maps --test src/",
-    "coverage": "node --enable-source-maps --experimental-test-coverage --test src/"
+    "test": "node --enable-source-maps --test test/",
+    "coverage": "node --enable-source-maps --experimental-test-coverage --test test/"
   },
   "devDependencies": {
   },
   "dependencies": {
   },
-  "author": "",
-  "license": "ISC"
+  "author": ""
 }`,
   js: (name: string) =>
     `{
   "name": "${name}",
+  "type": "module",
   "version": "1.0.0",
   "description": "",
   "private": true,
-  "main": "src/main.js",
   "scripts": {
     "start": "node src/main.js",
-    "test": "miqro-test -r test/ -n"
+    "cluster": "miqro cluster src/main.js",
+    "test": "node --test test/",
+    "coverage": "node --experimental-test-coverage --test test/"
   },
   "devDependencies": {
   },
   "dependencies": {
   },
-  "author": "",
-  "license": "ISC"
+  "author": ""
 }`
 }
 
@@ -95,11 +96,11 @@ export const mainTS = (): void => {
   "compileOnSave": true,
   "compilerOptions": {
     "lib": ["es2021"],
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "es2022",
+    "moduleResolution": "Node16",
     "target": "es2021",
     "strict": false,
-    "outDir": "./dist/",
+    "outDir": "./build/",
     "removeComments": true,
     "noImplicitAny": false,
     "preserveConstEnums": true,

@@ -20,7 +20,7 @@ async function main() {
   const app = new Server();
   app.use(middleware());
   app.use(await APIRouter({
-    dirname: resolve(__dirname, "api")
+    dirname: resolve("./build/api")
   }, logger));
   await app.listen();
   logger.info("listening on " + PORT);

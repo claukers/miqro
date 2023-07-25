@@ -14,7 +14,7 @@ import { strictEqual } from "assert";
 
 it("happy path health", async () => {
   const response = await TestHelper(new Server().use(await APIRouter({
-    dirname: resolve("./dist/api")
+    dirname: resolve("./build/api")
   })), {
     url: "/api/health"
   });
