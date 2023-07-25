@@ -7,10 +7,19 @@ export const usage = `usage: [NODE_ENV=development] npx miqro new:test <identifi
 const testTemplates = {
   js: (category: string) =>
     `import { it } from "node:test";
+import { TestHelper } from "@miqro/test-http";
+import { Server, APIRouter } from "@miqro/core";
+import { resolve } from "path";
+import { strictEqual } from "assert";
 
-    it("happy path", async () => {
-
-})
+it("happy path health", async () => {
+  const response = await TestHelper(new Server().use(await APIRouter({
+    dirname: resolve("./dist/api")
+  })), {
+    url: "/api/health"
+  });
+  strictEqual(response.status, 200);
+});
 `
 }
 
