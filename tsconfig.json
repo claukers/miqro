@@ -9,7 +9,7 @@
     "module": "commonjs",
     "moduleResolution": "node16",
     "target": "es2021",
-    "outDir": "./dist/",
+    "outDir": "./build/",
     "removeComments": false,
     "noImplicitAny": true,
     "sourceMap": false,

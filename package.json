@@ -2,14 +2,14 @@
   "name": "miqro",
   "version": "2.0.2",
   "description": "",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "bin": {
-    "miqro": "dist/cli.js"
+    "miqro": "build/cli.js"
   },
   "scripts": {
     "prepare": "npm run build",
-    "prebuild": "rm -Rf dist;",
+    "prebuild": "rm -Rf build;",
     "build": "tsc",
     "pretest": "npm run build",
     "test": "node --enable-source-maps --test test/*.test.js"

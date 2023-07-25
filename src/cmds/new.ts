@@ -147,15 +147,20 @@ export const mainTS = (): void => {
   });
 
   execSync(
-    `npx miqro new:test test_api_health`,
+    `npx miqro new:api:route:test test_api_health`,
     {
       cwd: appFolder
     }
   );
+
+  console.log("");
+  console.log("");
 
   console.log(`new project created on ${appFolder}`);
 
   console.log(`cd ${identifier}`);
 
   console.log(`npm run start`);
+  
+  console.log("");
 }

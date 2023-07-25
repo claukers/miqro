@@ -4,7 +4,7 @@ coverage/
 npm-debug.log
 bla.sh
 log.txt
-dist/
+build/
 old/
 test/data/bla.log
 query.js

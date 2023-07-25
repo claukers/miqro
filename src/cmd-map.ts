@@ -17,7 +17,10 @@ export const usage = "npx miqro <command> [args]";
 
 export const CMDS = {
 
-  ["new:api"]: { section: "api development", cb: newTS, tabs: 4, description: `create a new project.` },
+  ["new:api"]: {
+    //section: "api development", 
+    cb: newTS, tabs: 4, description: `create a new project.`
+  },
   //["new:typescript"]: {cb: newTS, tabs: 4, description: `create a new typescript project.`},
 
   ["new:api:main"]: {
@@ -27,6 +30,7 @@ export const CMDS = {
     description: `creates a new main file.`
   },
   ["new:api:route"]: { cb: newRoute, tabs: 3, description: `creates a new route.` },
+  ["new:api:route:test"]: { cb: newTest, tabs: 2, description: `create new test.js file for an apirouter.` },
 
   ["config"]: {
     //section: "config managment",
@@ -66,7 +70,7 @@ export const CMDS = {
   },*/
 
   ["start"]: {
-    section: "start helpers",
+    //section: "start helpers",
     tabs: 4,
     cb: start,
     description: `start script in cluster mode.`
@@ -91,10 +95,8 @@ export const CMDS = {
     cb: serve, description: `serve static files.`
   },
 
-  ["new:test"]: { cb: newTest, tabs: 3, description: `create new test.js file.` },
-
   ["help"]: {
-    section: "help",
+    //section: "help",
     cb: help,
     tabs: 4, description: "prints this page"
   }
