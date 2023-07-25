@@ -4,7 +4,7 @@ import { resolve } from "path";
 
 const mainTemplates = {
   ts: () =>
-    `import { APIRouter, App, checkEnvVariables, getLogger, middleware } from "@miqro/core";
+    `import { APIRouter, Server, checkEnvVariables, getLogger, middleware } from "@miqro/core";
 import { resolve } from "path";
 
 /*
@@ -17,7 +17,7 @@ const [PORT] = checkEnvVariables(["PORT"], ["8080"]);
 const logger = getLogger("server");
 
 async function main() {
-  const app = new App();
+  const app = new Server();
   app.use(middleware());
   app.use(await APIRouter({
     dirname: resolve(__dirname, "api")

@@ -23,7 +23,8 @@ const packageTemplate = {
     "prestart": "npm run build",
     "start": "node dist/main.js",
     "pretest": "npm run build",
-    "test": "miqro-test -r test/ -n"
+    "test": "node --enable-source-maps --test src/",
+    "coverage": "node --enable-source-maps --experimental-test-coverage --test src/"
   },
   "devDependencies": {
   },
@@ -123,7 +124,7 @@ export const mainTS = (): void => {
   writeFileSync(resolve(appFolder, ".gitignore"), gitignoreTemplate.ts());
 
 
-  execSync(`npm install @miqro/test --save-dev`, {
+  execSync(`npm install @miqro/test-http --save-dev`, {
     cwd: appFolder
   });
 
