@@ -17,12 +17,13 @@ const [PORT] = checkEnvVariables(["PORT"], ["8080"]);
 const logger = getLogger("server");
 
 async function main() {
-  const app = new Server();
-  app.use(middleware());
-  app.use(await APIRouter({
+  const server = new Server();
+  server.use(middleware());
+  server.use(await APIRouter({
     dirname: resolve("./build/api")
-  }, logger));
-  await app.listen();
+  }), "/api");
+  await server.listen(PORT);
+  server.logPaths(logger);
   logger.info("listening on " + PORT);
 }
 
@@ -42,12 +43,13 @@ const [PORT] = checkEnvVariables(["PORT"], ["8080"]);
 const logger = getLogger("server");
 
 async function main() {
-  const app = new App();
-  app.use(middleware());
-  app.use(await APIRouter({
+  const server = new App();
+  server.use(middleware());
+  server.use(await APIRouter({
     dirname: resolve(__dirname, "api")
-  }, logger));
-  await app.listen();
+  }), "/api");
+  await server.listen(PORT);
+  server.logPaths(logger);
   logger.info("listening on " + PORT);
 }
 
