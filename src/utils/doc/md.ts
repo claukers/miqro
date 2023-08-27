@@ -1,4 +1,4 @@
-import { GroupPolicy, Handler, Logger, RouteJSONDoc } from "@miqro/core";
+import { GroupPolicy, Logger, RouteJSONDoc } from "@miqro/core";
 import { ParseBaseType, ParserArgs, ParserMode } from "@miqro/parser";
 import { getDOCJSON } from "./json";
 

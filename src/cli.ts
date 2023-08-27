@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { CMDS, usage } from "./cmd-map";
+import { CMD_MAP, usage } from "./cmd-map";
 import { mainCMD } from "./utils";
 
-mainCMD(CMDS, usage, console);
+mainCMD(CMD_MAP, usage, console);

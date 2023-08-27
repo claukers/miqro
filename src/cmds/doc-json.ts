@@ -1,4 +1,4 @@
-import { getLogger, loadConfig } from "@miqro/core";
+import { loadConfig } from "@miqro/core";
 import { getDOCJSON } from "../utils/doc/json";
 
 export const usage = `usage: [NODE_ENV=development] npx miqro doc <api_folder> <subPath> [apiName]`;

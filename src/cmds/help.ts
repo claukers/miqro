@@ -1,6 +1,6 @@
-import { CMDS, usage } from "../cmd-map";
+import { CMD_MAP, usage } from "../cmd-map";
 import { getUsage } from "../utils";
 
 export function main() {
-  console.log(getUsage(CMDS, usage));
+  console.log(getUsage(CMD_MAP, usage));
 }

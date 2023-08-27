@@ -1,5 +1,5 @@
 import { ConfigPathResolver, loadConfig } from "@miqro/core";
-import { mkdirSync, writeFileSync, existsSync } from "fs";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
 
 const mainTemplates = {

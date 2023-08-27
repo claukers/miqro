@@ -1,4 +1,4 @@
-import { normalizePath, App, loadConfig, LoggerHandler, Proxy, ReadBuffer, Static } from "@miqro/core";
+import { App, loadConfig, LoggerHandler, normalizePath, Proxy, ReadBuffer, Static } from "@miqro/core";
 import { extractFlags } from "../utils";
 import { URL } from "url";
 import { existsSync, statSync } from "fs";

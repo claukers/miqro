@@ -15,7 +15,7 @@ import { main as newMain } from "./cmds/handler-main-new";
 
 export const usage = "npx miqro <command> [args]";
 
-export const CMDS = {
+export const CMD_MAP = {
 
   ["new:api"]: {
     //section: "api development", 
@@ -24,16 +24,16 @@ export const CMDS = {
   //["new:typescript"]: {cb: newTS, tabs: 4, description: `create a new typescript project.`},
 
   ["new:api:main"]: {
-    //section: "http scafolding",
+    //section: "http scaffolding",
     cb: newMain,
     tabs: 3,
     description: `creates a new main file.`
   },
   ["new:api:route"]: { cb: newRoute, tabs: 3, description: `creates a new route.` },
-  ["new:api:route:test"]: { cb: newTest, tabs: 2, description: `create new test.js file for an apirouter.` },
+  ["new:api:route:test"]: { cb: newTest, tabs: 2, description: `create new test.js file for an APIRouter.` },
 
   ["config"]: {
-    //section: "config managment",
+    //section: "config management",
     cb: config,
     tabs: 4,
     description: `print config as a json.`

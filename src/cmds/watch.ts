@@ -1,5 +1,5 @@
-import {existsSync, statSync, watch, watchFile} from "fs";
-import {execSync} from "../utils";
+import { existsSync, statSync, watch, watchFile } from "fs";
+import { execSync } from "../utils";
 
 const usageMessage = (message?: string) => `${message ? `${message}.\n` : ""}usage: npx miqro watch <directory> <cmd>`;
 

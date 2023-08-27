@@ -1,4 +1,4 @@
-import { RouterJSONDoc, APIRouter, ConfigPathResolver, Logger } from "@miqro/core";
+import { APIRouter, ConfigPathResolver, Logger, RouterJSONDoc } from "@miqro/core";
 import { ParserArgs } from "@miqro/parser";
 import { resolve } from "path";
 

@@ -1,6 +1,6 @@
-import {existsSync, mkdir, mkdirSync, writeFileSync} from "fs";
-import {resolve} from "path";
-import {execSync} from "../utils";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { resolve } from "path";
+import { execSync } from "../utils";
 
 const indexHTML = {
   js: () => `<html>` +

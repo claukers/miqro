@@ -1,6 +1,6 @@
-import {ConfigPathResolver, loadConfig} from "@miqro/core";
-import {existsSync, mkdirSync, writeFileSync} from "fs";
-import {resolve} from "path";
+import { ConfigPathResolver, loadConfig } from "@miqro/core";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { resolve } from "path";
 
 const templates = {
   ts: (noMethod = false) =>
