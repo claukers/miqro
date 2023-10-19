@@ -1,5 +1,5 @@
 import { GroupPolicy, Logger, RouteJSONDoc } from "@miqro/core";
-import { ParseBaseType, ParserArgs, ParserMode } from "@miqro/parser";
+import { Schema, SchemaProperties, ParserArgs, ParserMode } from "@miqro/parser";
 import { getDOCJSON } from "./json";
 
 export async function getMDDoc(args: { showFilePath?: boolean; apiName?: string; dirname: string; subPath: string; }, logger?: Logger) {
@@ -48,13 +48,13 @@ function policyToString(policy: GroupPolicy): string {
 }
 
 export function parserToString(parser: {
-  headers?: ParserArgs | ParserArgs[];
+  headers?: string | SchemaProperties | SchemaProperties[];
   headersMode?: ParserMode;
-  query?: ParserArgs | boolean | ParserArgs[];
+  query?: string | SchemaProperties | boolean | SchemaProperties[];
   queryMode?: ParserMode;
-  params?: ParserArgs | boolean | ParserArgs[];
+  params?: string | SchemaProperties | boolean | SchemaProperties[];
   paramsMode?: ParserMode;
-  body?: ParserArgs | boolean | ParserArgs[];
+  body?: string | SchemaProperties | boolean | SchemaProperties[];
   bodyMode?: ParserMode;
 }): string {
   let outMD = "";
@@ -77,13 +77,13 @@ export function parserToString(parser: {
   return outMD;
 }
 
-function parserPartToString(arg: ParserArgs | false | ParserArgs[], mode?: ParserMode): string {
+function parserPartToString(arg: string | SchemaProperties | false | SchemaProperties[], mode?: ParserMode): string {
   if (arg === false) {
     return "not allowed";
   }
   let outMD = "";
   let maxTabulation = 1;
-  const parsers: ParserArgs[] = arg instanceof Array ? arg : [arg];
+  const parsers: Array<SchemaProperties | string> | string = arg instanceof Array ? arg : typeof arg === "string" ? [arg] : [arg];
   for (const parser of parsers) {
     const ret = internalParserToString(parser);
     if (ret.maxTabulation > maxTabulation) {
@@ -96,7 +96,7 @@ function parserPartToString(arg: ParserArgs | false | ParserArgs[], mode?: Parse
   return outMD
 }
 
-function internalParserToString(parser: string | ParserArgs, tabulation = 1): { out: string, maxTabulation: number } {
+function internalParserToString(parser: string | SchemaProperties, tabulation = 1): { out: string, maxTabulation: number } {
   let outMD = "";
   let maxTabulation = tabulation;
   if (typeof parser === "string") {
@@ -107,9 +107,9 @@ function internalParserToString(parser: string | ParserArgs, tabulation = 1): { 
       const p = parser[name];
       if (typeof p === "string") {
         outMD += `${getTabulation(tabulation)}${name} | ${p}|\n`;
-      } else if (p.type === "nested") {
+      } else if (p.type === "object") {
         outMD += `${getTabulation(tabulation)}${name} | ${p.type}|\n`;
-        const ret = parserBaseNestedTypeToString(p, tabulation + 1);
+        const ret = parserBaseObjectTypeToString(p, tabulation + 1);
         if (maxTabulation < ret.maxTabulation) {
           maxTabulation = ret.maxTabulation;
         }
@@ -127,8 +127,8 @@ function internalParserToString(parser: string | ParserArgs, tabulation = 1): { 
   };
 }
 
-function parserBaseNestedTypeToString(arg: ParseBaseType, tabulation: number): { out: string; maxTabulation: number } {
-  const options = arg.nestedOptions && arg.nestedOptions.options ? arg.nestedOptions.options : {};
+function parserBaseObjectTypeToString(arg: Schema, tabulation: number): { out: string; maxTabulation: number } {
+  const options: SchemaProperties = arg.properties ? arg.properties : {};
   //const outMD = `${getTabulation(tabulation)}name | type |\n${getTabulation(tabulation)}--------|--------|\n`;
   return internalParserToString(options, tabulation);
 }
