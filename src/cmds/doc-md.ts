@@ -1,5 +1,5 @@
 import { loadConfig } from "@miqro/core";
-import { getMDDoc } from "../utils/doc/md";
+import { getMDDoc } from "../utils/doc/md.js";
 
 export const usage = `usage: [NODE_ENV=development] npx miqro doc <api_folder> <subPath> [apiName]`;
 

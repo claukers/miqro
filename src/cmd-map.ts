@@ -1,17 +1,17 @@
-import { main as start } from "./cmds/start";
-import { main as watch } from "./cmds/watch";
-import { mainTS as newTS } from "./cmds/new";
-import { main as apiDocJSON } from "./cmds/doc-json";
-import { main as apiDocMD } from "./cmds/doc-md";
-import { main as configInit } from "./cmds/config-init";
-import { main as config } from "./cmds/config";
-import { main as configBash } from "./cmds/config-bash";
-import { main as configEnv } from "./cmds/config-env";
-import { main as newRoute } from "./cmds/handler-apiroute-new";
-import { main as newTest } from "./cmds/new-test";
-import { main as serve } from "./cmds/serve";
-import { main as help } from "./cmds/help";
-import { main as newMain } from "./cmds/handler-main-new";
+import { main as start } from "./cmds/start.js";
+import { main as watch } from "./cmds/watch.js";
+import { mainTS as newTS } from "./cmds/new.js";
+import { main as apiDocJSON } from "./cmds/doc-json.js";
+import { main as apiDocMD } from "./cmds/doc-md.js";
+import { main as configInit } from "./cmds/config-init.js";
+import { main as config } from "./cmds/config.js";
+import { main as configBash } from "./cmds/config-bash.js";
+import { main as configEnv } from "./cmds/config-env.js";
+import { main as newRoute } from "./cmds/handler-apiroute-new.js";
+import { main as newTest } from "./cmds/new-test.js";
+import { main as serve } from "./cmds/serve.js";
+import { main as help } from "./cmds/help.js";
+import { main as newMain } from "./cmds/handler-main-new.js";
 
 export const usage = "npx miqro <command> [args]";
 

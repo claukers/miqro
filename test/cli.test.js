@@ -1,7 +1,36 @@
-const {mainCMD, extractFlags} = require("../build/utils");
-const {strictEqual} = require("assert");
-const {fake} = require("@miqro/test");
-const {describe, it} = require("node:test");
+import { mainCMD, extractFlags } from "../build/utils/index.js";
+import { strictEqual } from "assert";
+import { describe, it } from "node:test";
+
+function fake(cb) {
+  const ret = (...args) => {
+    ret.callArgs.push(args);
+    ret.callCount++;
+    try {
+      const r = cb(...args);
+      ret.returnValues.push(r);
+      ret.throws.push(undefined);
+      return r;
+    }
+    catch (e) {
+      ret.returnValues.push(undefined);
+      ret.throws.push(e);
+      throw e;
+    }
+  };
+  ret.callCount = 0;
+  ret.returnValues = [];
+  ret.throws = [];
+  ret.callArgs = [];
+  ret.reset = () => {
+    ret.callArgs = [];
+    ret.throws = [];
+    ret.returnValues = [];
+    ret.callCount = 0;
+  };
+  return ret;
+}
+
 
 describe("cli functional tests", () => {
   it("cli happy path", async () => {

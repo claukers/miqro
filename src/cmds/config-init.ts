@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { ConfigPathResolver, loadConfig } from "@miqro/core";
-import { templates } from "../utils/templates";
+import { templates } from "../utils/templates.js";
 
 export const usage = "usage: [NODE_ENV=development] npx miqro config:init";
 

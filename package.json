@@ -1,9 +1,10 @@
 {
   "name": "miqro",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "type": "module",
   "bin": {
     "miqro": "build/cli.js"
   },
@@ -23,7 +24,6 @@
     "@miqro/runner": "../runner"
   },
   "devDependencies": {
-    "@miqro/test": "^0.2.9",
     "@types/cookie": "0.4.1",
     "@types/node": "^20.4.5",
     "typescript": "5.0.4"

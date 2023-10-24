@@ -1,4 +1,4 @@
-import { execSync } from "../utils";
+import { execSync } from "../utils/index.js";
 import { mainPath } from "@miqro/runner";
 import { loadConfig } from "@miqro/core";
 

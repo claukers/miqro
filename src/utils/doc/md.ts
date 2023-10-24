@@ -1,6 +1,12 @@
-import { GroupPolicy, Logger, RouteJSONDoc } from "@miqro/core";
-import { Schema, SchemaProperties, ParserArgs, ParserMode } from "@miqro/parser";
-import { getDOCJSON } from "./json";
+import { GroupPolicy, Logger, ParserMode, RouteJSONDoc, SchemaProperties } from "@miqro/core";
+import { Schema } from "@miqro/parser";
+import { getDOCJSON } from "./json.js";
+
+/*interface SchemaProperties {
+  [key: string]: Schema | string;
+}
+
+type ParserMode = "add_extra" | "no_extra" | "remove_extra"*/
 
 export async function getMDDoc(args: { showFilePath?: boolean; apiName?: string; dirname: string; subPath: string; }, logger?: Logger) {
 
