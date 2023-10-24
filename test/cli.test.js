@@ -28,7 +28,7 @@ function fake(cb) {
     ret.returnValues = [];
     ret.callCount = 0;
   };
-  return ret;
+  return ret;node
 }
 
 
