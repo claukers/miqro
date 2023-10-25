@@ -95,8 +95,8 @@ function parserPartToString(arg: string | SchemaProperties | false | SchemaPrope
     if (ret.maxTabulation > maxTabulation) {
       maxTabulation = ret.maxTabulation;
     }
-    outMD += `| | ${getTabulation(ret.maxTabulation * 2)}\n`;
-    outMD += `|--------|--------${getTabulation(ret.maxTabulation * 2, true)}\n`;
+    outMD += `| name | type | description | ${getTabulation(ret.maxTabulation * 2)}\n`;
+    outMD += `|--------|-------|-------|${getTabulation(ret.maxTabulation * 2, true)}\n`;
     outMD += `${ret.out}\n\n`;
   }
   return outMD
@@ -111,19 +111,44 @@ function internalParserToString(parser: string | SchemaProperties, tabulation = 
     const attrNames = Object.keys(parser);
     for (const name of attrNames) {
       const p = parser[name];
+      const description = typeof p === "string" ? "" : p.description ? p.description : "";
       if (typeof p === "string") {
         outMD += `${getTabulation(tabulation)}${name} | ${p}|\n`;
       } else if (p.type === "object") {
-        outMD += `${getTabulation(tabulation)}${name} | ${p.type}|\n`;
+        outMD += `${getTabulation(tabulation)}${name} | ${p.type}| ${description}|\n`;
         const ret = parserBaseObjectTypeToString(p, tabulation + 1);
         if (maxTabulation < ret.maxTabulation) {
           maxTabulation = ret.maxTabulation;
         }
         outMD += `${ret.out}`;
+      } else if (p.type === "dict") {
+        outMD += `${getTabulation(tabulation)}${name} | Dict\\<${p.dictType}\\>| ${description}|\n`;
+        if (p.dictType === "object") {
+          const ret = parserBaseObjectTypeToString(p, tabulation + 1);
+          if (maxTabulation < ret.maxTabulation) {
+            maxTabulation = ret.maxTabulation;
+          }
+          outMD += `${ret.out}`;
+        }
+      } else if (p.type === "array") {
+        outMD += `${getTabulation(tabulation)}${name} | Array\\<${p.arrayType}\\>| ${description}|\n`;
+        if (p.arrayType === "object") {
+          const ret = parserBaseObjectTypeToString(p, tabulation + 1);
+          if (maxTabulation < ret.maxTabulation) {
+            maxTabulation = ret.maxTabulation;
+          }
+          outMD += `${ret.out}`;
+        }
       } else if (p.type === "regex") {
-        outMD += `${getTabulation(tabulation)}${name} | ${p.regex}|\n`;
+        outMD += `${getTabulation(tabulation)}${name} | ${p.regex}| ${description}|\n`;
+      } else if (p.type === "enum") {
+        outMD += `${getTabulation(tabulation)}${name} | ${p.type}| ${description}|\n`;
+        outMD += `${getTabulation(tabulation + 1)}| ${p.enumValues?.join(",")}|\n`;
+        if (maxTabulation < tabulation + 1) {
+          maxTabulation = tabulation + 1;
+        }
       } else {
-        outMD += `${getTabulation(tabulation)}${name} | ${p.type}|\n`;
+        outMD += `${getTabulation(tabulation)}${name} | ${p.type}| ${description}|\n`;
       }
     }
   }
@@ -136,7 +161,7 @@ function internalParserToString(parser: string | SchemaProperties, tabulation = 
 function parserBaseObjectTypeToString(arg: Schema, tabulation: number): { out: string; maxTabulation: number } {
   const options: SchemaProperties = arg.properties ? arg.properties : {};
   //const outMD = `${getTabulation(tabulation)}name | type |\n${getTabulation(tabulation)}--------|--------|\n`;
-  return internalParserToString(options, tabulation);
+  return internalParserToString(options, tabulation + 1);
 }
 
 function getTabulation(n: number, header = false) {
