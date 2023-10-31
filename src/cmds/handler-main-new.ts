@@ -4,7 +4,7 @@ import { resolve } from "path";
 
 const mainTemplates = {
   ts: () =>
-    `import { APIRouter, Server, checkEnvVariables, getLogger, middleware } from "@miqro/core";
+    `import { APIRouter, Server, checkEnvVariables, getLogger } from "@miqro/core";
 import { resolve } from "path";
 
 /*
@@ -18,7 +18,6 @@ const logger = getLogger("server");
 
 async function main() {
   const server = new Server();
-  server.use(middleware());
   server.use(await APIRouter({
     dirname: resolve("./build/api")
   }), "/api");
@@ -30,7 +29,7 @@ async function main() {
 main().catch(e => logger.error(e));
 `,
   js: () =>
-    `const { APIRouter, App, checkEnvVariables, getLogger, middleware } = require("@miqro/core");
+    `const { APIRouter, App, checkEnvVariables, getLogger } = require("@miqro/core");
 const { resolve } = require("path");
 
 /*
@@ -44,7 +43,6 @@ const logger = getLogger("server");
 
 async function main() {
   const server = new App();
-  server.use(middleware());
   server.use(await APIRouter({
     dirname: resolve(__dirname, "api")
   }), "/api");

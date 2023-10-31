@@ -96,7 +96,7 @@ export const mainTS = (): void => {
   "compileOnSave": true,
   "compilerOptions": {
     "lib": ["es2021"],
-    "module": "es2022",
+    "module": "Node16",
     "moduleResolution": "Node16",
     "target": "es2021",
     "strict": false,

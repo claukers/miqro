@@ -16,7 +16,7 @@ it("happy path health", async () => {
   const response = await TestHelper(new Server().use(await APIRouter({
     dirname: resolve("./build/api")
   })), {
-    url: "/api/health"
+    url: "/health"
   });
   strictEqual(response.status, 200);
 });
