@@ -19,9 +19,9 @@
   "author": "claukers",
   "license": "ISC",
   "dependencies": {
-    "@miqro/core": "../core",
-    "@miqro/parser": "../parser",
-    "@miqro/runner": "../runner"
+    "@miqro/core": "^4.0.1",
+    "@miqro/parser": "^2.0.1",
+    "@miqro/runner": "^2.0.1"
   },
   "devDependencies": {
     "@types/cookie": "0.4.1",
