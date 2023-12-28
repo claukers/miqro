@@ -1,13 +1,12 @@
 import { resolve } from "path";
 import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
-import { execSync } from "child_process";
 import { apiRouteTemplate, gitignoreTemplate, mainTemplates, packageTemplate, templates, testTemplates } from "./utils/templates.js";
 import { App, ConfigPathResolver, LoggerHandler, Proxy, ReadBuffer, Static, loadConfig, normalizePath } from "@miqro/core";
 import { getDOCJSON } from "./utils/doc/json.js";
 import { getMDDoc } from "./utils/doc/md.js";
 import { mainPath } from "@miqro/runner";
 import { setupWatch } from "./utils/watch.js";
-import { extractFlags, getUsage } from "./utils/exec.js";
+import { extractFlags, getUsage, execSync } from "./utils/exec.js";
 
 export const usage = "npx miqro <command> [args]";
 

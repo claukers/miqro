@@ -135,8 +135,8 @@ export const packageTemplate = {
     "start": "node --enable-source-maps build/main.js",
     "cluster": "NODE_OPTIONS=--enable-source-maps miqro cluster build/main.js",
     "pretest": "npm run build",
-    "test": "node --enable-source-maps --test test/",
-    "coverage": "node --enable-source-maps --experimental-test-coverage --test test/"
+    "test": "node --enable-source-maps --test test/**/*.test.js",
+    "coverage": "node --enable-source-maps --experimental-test-coverage --test test/**/*.test.js"
   },
   "devDependencies": {
   },
@@ -154,8 +154,8 @@ export const packageTemplate = {
   "scripts": {
     "start": "node src/main.js",
     "cluster": "miqro cluster src/main.js",
-    "test": "node --test test/",
-    "coverage": "node --experimental-test-coverage --test test/"
+    "test": "node --test test/**/*.test.js",
+    "coverage": "node --experimental-test-coverage --test test/**/*.test.js"
   },
   "devDependencies": {
   },
