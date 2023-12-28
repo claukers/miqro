@@ -37,7 +37,7 @@ export async function getMDDoc(args: { showFilePath?: boolean; apiName?: string;
         const requestOutMD = parserToString(apiData.request);
         outMD += requestOutMD !== "" ? `### request\n\n${requestOutMD}` : "";
       }
-      if (apiData.response) {
+      if (apiData.response && typeof apiData.response !== "boolean") {
         const responseOutMD = parserToString(apiData.response);
         outMD += responseOutMD !== "" ? `### response\n\n${responseOutMD}` : "";
       }

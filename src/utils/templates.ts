@@ -1,5 +1,170 @@
 // noinspection SpellCheckingInspection
 
+export const testTemplates = {
+  js: (category: string) =>
+    `import { it } from "node:test";
+import { TestHelper } from "@miqro/test-http";
+import { Server, APIRouter } from "@miqro/core";
+import { resolve } from "path";
+import { strictEqual } from "assert";
+
+it("happy path health", async () => {
+  const response = await TestHelper(new Server().use(await APIRouter({
+    dirname: resolve("./build/api")
+  })), {
+    url: "/health"
+  });
+  strictEqual(response.status, 200);
+});
+`
+}
+
+export const apiRouteTemplate = {
+  ts: (noMethod = false) =>
+    noMethod ? `import { APIRoute } from "@miqro/core";
+
+export default {
+  method: "GET",
+  handler: async (req, res) => {
+    return {
+      text: \`Hello\`
+    }
+  }
+} as APIRoute;
+` : `import { APIRoute } from "@miqro/core";
+
+export default {
+  handler: async (req, res) => {
+    return {
+      text: \`Hello\`
+    }
+  }
+} as APIRoute;
+`,
+  js: (noMethod = false) =>
+    noMethod ? `module.exports = {
+  method: "GET
+  handler: async (req, res) => {
+    return {
+      text: \`Hello\`
+    }
+  }
+};
+` : `module.exports = {
+  handler: async (req, res) => {
+    return {
+      text: \`Hello\`
+    }
+  }
+};
+`
+}
+
+export const mainTemplates = {
+  ts: () =>
+    `import { APIRouter, Server, checkEnvVariables, getLogger } from "@miqro/core";
+import { resolve } from "path";
+
+/*
+To be start as a main file
+node file.js
+*/
+
+const [PORT] = checkEnvVariables(["PORT"], ["8080"]);
+
+const logger = getLogger("server");
+
+async function main() {
+  const server = new Server();
+  server.use(await APIRouter({
+    dirname: resolve("./build/api")
+  }), "/api");
+  await server.listen(PORT);
+  server.logPaths(logger);
+  logger.info("listening on " + PORT);
+}
+
+main().catch(e => logger.error(e));
+`,
+  js: () =>
+    `const { APIRouter, App, checkEnvVariables, getLogger } = require("@miqro/core");
+const { resolve } = require("path");
+
+/*
+To be start as a main file
+node file.js
+*/
+
+const [PORT] = checkEnvVariables(["PORT"], ["8080"]);
+
+const logger = getLogger("server");
+
+async function main() {
+  const server = new App();
+  server.use(await APIRouter({
+    dirname: resolve(__dirname, "api")
+  }), "/api");
+  await server.listen(PORT);
+  server.logPaths(logger);
+  logger.info("listening on " + PORT);
+}
+
+main().catch(e => logger.error(e));
+`
+}
+
+export const gitignoreTemplate = {
+  ts: () => `node_modules/
+dist/
+`,
+  js: () => `node_modules/`
+};
+
+export const packageTemplate = {
+  ts: (name: string) =>
+    `{
+  "name": "${name}",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "prebuild": "rm -Rf build/;",
+    "build": "tsc",
+    "prestart": "npm run build",
+    "start": "node --enable-source-maps build/main.js",
+    "cluster": "NODE_OPTIONS=--enable-source-maps miqro cluster build/main.js",
+    "pretest": "npm run build",
+    "test": "node --enable-source-maps --test test/",
+    "coverage": "node --enable-source-maps --experimental-test-coverage --test test/"
+  },
+  "devDependencies": {
+  },
+  "dependencies": {
+  },
+  "author": ""
+}`,
+  js: (name: string) =>
+    `{
+  "name": "${name}",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "start": "node src/main.js",
+    "cluster": "miqro cluster src/main.js",
+    "test": "node --test test/",
+    "coverage": "node --experimental-test-coverage --test test/"
+  },
+  "devDependencies": {
+  },
+  "dependencies": {
+  },
+  "author": ""
+}`
+}
+
 export const logEnvFile = `####################
 ## logging
 LOG_LEVEL=info

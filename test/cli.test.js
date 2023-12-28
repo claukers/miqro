@@ -1,4 +1,4 @@
-import { mainCMD, extractFlags } from "../build/utils/index.js";
+import { mainCMD, extractFlags } from "../build/utils/exec.js";
 import { strictEqual } from "assert";
 import { describe, it } from "node:test";
 
