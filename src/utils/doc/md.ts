@@ -8,7 +8,7 @@ import { getDOCJSON } from "./json.js";
 
 type ParserMode = "add_extra" | "no_extra" | "remove_extra"*/
 
-export async function getMDDoc(args: { showFilePath?: boolean; apiName?: string; dirname: string; subPath: string; }, logger?: Logger) {
+export async function getMDDoc(args: { ignore?: string[], showFilePath?: boolean; apiName?: string; dirname: string; subPath: string; }, logger?: Logger) {
 
   const jsonDOC = await getDOCJSON(args, logger);
 
