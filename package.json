@@ -9,7 +9,7 @@
     "miqro": "build/cli.js"
   },
   "scripts": {
-    "prepare": "npm run build",
+    "prepare2": "npm run build",
     "prebuild": "rm -Rf build;",
     "build": "tsc",
     "pretest": "npm run build",
@@ -19,7 +19,7 @@
   "author": "claukers",
   "license": "ISC",
   "dependencies": {
-    "@miqro/core": "^5.0.2",
+    "@miqro/core": "^5.0.9",
     "@miqro/parser": "^2.0.2",
     "@miqro/runner": "^2.0.1"
   },
