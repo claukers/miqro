@@ -20,26 +20,28 @@ export async function getMDDoc(args: { ignore?: string[], showFilePath?: boolean
     const pathData = jsonDOC[path];
     const methods = Object.keys(pathData);
     for (const method of methods) {
-      const apiData: RouteJSONDoc = pathData[method];
-      outMD += `## ${apiData.identifier}${args.showFilePath ? (apiData as any).___filePath : ""}\n\n`;
-      if (apiData.name) {
-        outMD += `${apiData.name}\n\n`;
-      }
-      if (apiData.description) {
-        outMD += `${apiData.description}\n\n`;
-      }
-      outMD += `[${method}] ${path}\n\n`;
-      if (apiData.policy) {
-        outMD += `### policy\n\n`;
-        outMD += policyToString(apiData.policy);
-      }
-      if (apiData.request) {
-        const requestOutMD = parserToString(apiData.request);
-        outMD += requestOutMD !== "" ? `### request\n\n${requestOutMD}` : "";
-      }
-      if (apiData.response && typeof apiData.response !== "boolean") {
-        const responseOutMD = parserToString(apiData.response);
-        outMD += responseOutMD !== "" ? `### response\n\n${responseOutMD}` : "";
+      const apiDataList: RouteJSONDoc[] = pathData[method];
+      for (const apiData of apiDataList) {
+        outMD += `## ${apiData.identifier}${args.showFilePath ? (apiData as any).___filePath : ""}\n\n`;
+        if (apiData.name) {
+          outMD += `${apiData.name}\n\n`;
+        }
+        if (apiData.description) {
+          outMD += `${apiData.description}\n\n`;
+        }
+        outMD += `[${method}] ${path}\n\n`;
+        if (apiData.policy) {
+          outMD += `### policy\n\n`;
+          outMD += policyToString(apiData.policy);
+        }
+        if (apiData.request) {
+          const requestOutMD = parserToString(apiData.request);
+          outMD += requestOutMD !== "" ? `### request\n\n${requestOutMD}` : "";
+        }
+        if (apiData.response && typeof apiData.response !== "boolean") {
+          const responseOutMD = parserToString(apiData.response);
+          outMD += responseOutMD !== "" ? `### response\n\n${responseOutMD}` : "";
+        }
       }
     }
   }
@@ -54,6 +56,7 @@ function policyToString(policy: GroupPolicy): string {
 }
 
 export function parserToString(parser: {
+  status?: number | number[],
   headers?: string | SchemaProperties | SchemaProperties[];
   headersMode?: ParserMode;
   query?: string | SchemaProperties | boolean | SchemaProperties[];
@@ -64,6 +67,9 @@ export function parserToString(parser: {
   bodyMode?: ParserMode;
 }): string {
   let outMD = "";
+  if (parser.status) {
+    outMD += `#### status\n\n${parser.status instanceof Array ? parser.status.join(",") : parser.status}\n\n`;
+  }
   if (parser.params && typeof parser.params !== "boolean") {
     outMD += `#### path params\n\n`;
     outMD += parserPartToString(parser.params, parser.paramsMode);
