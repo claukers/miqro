@@ -1,14 +1,15 @@
 import { resolve } from "path";
-import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
+import { existsSync, lstatSync, mkdirSync, statSync, writeFileSync } from "fs";
 import { apiRouteTemplate, gitignoreTemplate, mainTemplates, packageTemplate, templates, testTemplates } from "./utils/templates.js";
-import { App, ConfigPathResolver, LoggerHandler, Proxy, ReadBuffer, Static, loadConfig, normalizePath } from "@miqro/core";
+import { App, ConfigPathResolver, LoggerHandler, Proxy, ReadBuffer, Static, getLogger, loadConfig, normalizePath } from "@miqro/core";
 import { getDOCJSON } from "./utils/doc/json.js";
 import { getMDDoc } from "./utils/doc/md.js";
 import { mainPath } from "@miqro/runner";
 import { setupWatch } from "./utils/watch.js";
 import { extractFlags, getUsage, execSync } from "./utils/exec.js";
+import { Database, downMigration, downMigrationFolder, initMigrationsTable, upMigration, upMigrationFolder } from "@miqro/query";
 
-export const usage = "npx miqro <command> [args]";
+export const usage = "npx miqro <command> [args]\n";
 
 export const CMD_MAP = {
 
@@ -501,6 +502,78 @@ export const CMD_MAP = {
       await app.listen(PORT);
       console.log("serving " + directory + " on http://localhost:%s%s", PORT, path);
     }, description: `serve static files.`
+  },
+
+  ["migration:up"]: {
+    tabs: 3,
+    description: "'up' on migrations in order.",
+    cb: async () => {
+      const usageMessage = (message?: string) => `${message ? `${message}.\n` : ""}usage: npx miqro migration:up <db.js> <migrations-folder|migration-file>`;
+
+      if (process.argv.length < 5) {
+        throw new Error(usageMessage("invalid number of args"));
+      }
+
+      const dbJSPath = resolve(process.cwd(), process.argv[3]);
+      const migrationFolder = resolve(process.cwd(), process.argv[4]);
+
+      if (!existsSync(migrationFolder)) {
+        throw new Error(usageMessage(`invalid args. [${migrationFolder}] doesnt exists!`));
+      }
+
+      if (lstatSync(migrationFolder).isSymbolicLink()) {
+        throw new Error(usageMessage(`invalid args. [${migrationFolder}] simbolic links not supported.`));
+      }
+
+      if (!lstatSync(migrationFolder).isDirectory()) {
+        const db: Database = (await import(dbJSPath)).default as Database;
+        await db.connect();
+        await initMigrationsTable(db, getLogger("migrationUp"));
+        await upMigration(db, migrationFolder, getLogger("migrationUp"));
+        await db.disconnect();
+      } else {
+        const db: Database = (await import(dbJSPath)).default as Database;
+        await db.connect();
+        await upMigrationFolder(db, migrationFolder, getLogger("migrationUp"));
+        await db.disconnect();
+      }
+    }
+  },
+
+  ["migration:down"]: {
+    tabs: 3,
+    description: "'down' on migrations in reverse.",
+    cb: async () => {
+      const usageMessage = (message?: string) => `${message ? `${message}.\n` : ""}usage: npx miqro migration:down <db.js> <migrations-folder|migration-file>`;
+
+      if (process.argv.length < 5) {
+        throw new Error(usageMessage("invalid number of args"));
+      }
+
+      const dbJSPath = resolve(process.cwd(), process.argv[3]);
+      const migrationFolder = resolve(process.cwd(), process.argv[4]);
+
+      if (!existsSync(migrationFolder)) {
+        throw new Error(usageMessage(`invalid args. [${migrationFolder}] doesnt exists!`));
+      }
+
+      if (lstatSync(migrationFolder).isSymbolicLink()) {
+        throw new Error(usageMessage(`invalid args. [${migrationFolder}] simbolic links not supported.`));
+      }
+
+      if (!lstatSync(migrationFolder).isDirectory()) {
+        const db: Database = (await import(dbJSPath)).default as Database;
+        await db.connect();
+        await initMigrationsTable(db, getLogger("migrationDown"));
+        await downMigration(db, migrationFolder, getLogger("migrationDown"));
+        await db.disconnect();
+      } else {
+        const db: Database = (await import(dbJSPath)).default as Database;
+        await db.connect();
+        await downMigrationFolder(db, migrationFolder, getLogger("migrationDown"));
+        await db.disconnect();
+      }
+    }
   },
 
   ["help"]: {

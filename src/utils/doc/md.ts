@@ -16,36 +16,54 @@ export async function getMDDoc(args: { ignore?: string[], showFilePath?: boolean
 
   let outMD = "";
 
+  const tableIndexItems = [];
+
   for (const path of pathList) {
     const pathData = jsonDOC[path];
     const methods = Object.keys(pathData);
     for (const method of methods) {
-      const apiDataList: RouteJSONDoc[] = pathData[method];
-      for (const apiData of apiDataList) {
-        outMD += `## ${apiData.identifier}${args.showFilePath ? (apiData as any).___filePath : ""}\n\n`;
-        if (apiData.name) {
-          outMD += `${apiData.name}\n\n`;
-        }
-        if (apiData.description) {
-          outMD += `${apiData.description}\n\n`;
-        }
-        outMD += `[${method}] ${path}\n\n`;
-        if (apiData.policy) {
-          outMD += `### policy\n\n`;
-          outMD += policyToString(apiData.policy);
-        }
-        if (apiData.request) {
-          const requestOutMD = parserToString(apiData.request);
-          outMD += requestOutMD !== "" ? `### request\n\n${requestOutMD}` : "";
-        }
-        if (apiData.response && typeof apiData.response !== "boolean") {
-          const responseOutMD = parserToString(apiData.response);
-          outMD += responseOutMD !== "" ? `### response\n\n${responseOutMD}` : "";
+      if (method) {
+        const apiDataList: RouteJSONDoc[] = pathData[method];
+        for (const apiData of apiDataList) {
+          tableIndexItems.push({
+            apiData
+          });
+          outMD += `## ${apiData.identifier}\n\n`;
+          outMD += `${args.showFilePath ? (apiData as any).___filePath + "\n\n" : ""}`;
+
+          if (apiData.name) {
+            outMD += `${apiData.name}\n\n`;
+          }
+          if (apiData.description) {
+            outMD += `${apiData.description}\n\n`;
+          }
+          outMD += `[${method}] ${path}\n\n`;
+          if (apiData.policy) {
+            outMD += `### policy\n\n`;
+            outMD += policyToString(apiData.policy);
+          }
+          if (apiData.request) {
+            const requestOutMD = parserToString(apiData.request);
+            outMD += requestOutMD !== "" ? `### request\n\n${requestOutMD}` : "";
+          }
+          if (apiData.response && typeof apiData.response !== "boolean") {
+            const responseOutMD = parserToString(apiData.response);
+            outMD += responseOutMD !== "" ? `### response\n\n${responseOutMD}` : "";
+          }
         }
       }
     }
   }
-  return outMD;
+
+  const indexTable = getIndexTable(tableIndexItems);
+
+  return `${indexTable}\n\n# endoints\n\n${outMD}`;
+}
+
+function getIndexTable(data: {
+  apiData: RouteJSONDoc;
+}[]): string {
+  return `# endpoint list\n\n${data.map(api => `[${api.apiData.identifier}](#${api.apiData.identifier.toLocaleLowerCase()})${api.apiData.name || api.apiData.description ? `\n\n\t${api.apiData.name ? api.apiData.name + " " : ""}${api.apiData.description ? api.apiData.description : ""}` : ""}`).join("\n\n")}`;
 }
 
 function policyToString(policy: GroupPolicy): string {

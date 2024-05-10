@@ -20,6 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "@miqro/core": "^5.0.10",
+    "@miqro/query": "../query",
     "@miqro/parser": "^2.0.3",
     "@miqro/runner": "^2.0.1"
   },
