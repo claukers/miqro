@@ -119,7 +119,7 @@ function parserPartToString(arg: string | SchemaProperties | false | SchemaPrope
     if (ret.maxTabulation > maxTabulation) {
       maxTabulation = ret.maxTabulation;
     }
-    outMD += `| name | type | description | ${getTabulation(ret.maxTabulation * 2)}\n`;
+    outMD += `| | | | ${getTabulation(ret.maxTabulation * 2)}\n`;
     outMD += `|--------|-------|-------|${getTabulation(ret.maxTabulation * 2, true)}\n`;
     outMD += `${ret.out}\n\n`;
   }
