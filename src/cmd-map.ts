@@ -7,7 +7,7 @@ import { getMDDoc } from "./utils/doc/md.js";
 import { mainPath } from "@miqro/runner";
 import { setupWatch } from "./utils/watch.js";
 import { extractFlags, getUsage, execSync } from "./utils/exec.js";
-import { Database, downMigration, downMigrationFolder, initMigrationsTable, upMigration, upMigrationFolder } from "@miqro/query";
+import { Database, migration } from "@miqro/query";
 
 export const usage = "npx miqro <command> [args]\n";
 
@@ -528,13 +528,13 @@ export const CMD_MAP = {
       if (!lstatSync(migrationFolder).isDirectory()) {
         const db: Database = (await import(dbJSPath)).default as Database;
         await db.connect();
-        await initMigrationsTable(db, getLogger("migrationUp"));
-        await upMigration(db, migrationFolder, getLogger("migrationUp"));
+        await migration.init(db, getLogger("migrationUp"));
+        await migration.up.file(db, migrationFolder, getLogger("migrationUp"));
         await db.disconnect();
       } else {
         const db: Database = (await import(dbJSPath)).default as Database;
         await db.connect();
-        await upMigrationFolder(db, migrationFolder, getLogger("migrationUp"));
+        await migration.up.folder(db, migrationFolder, getLogger("migrationUp"));
         await db.disconnect();
       }
     }
@@ -564,13 +564,13 @@ export const CMD_MAP = {
       if (!lstatSync(migrationFolder).isDirectory()) {
         const db: Database = (await import(dbJSPath)).default as Database;
         await db.connect();
-        await initMigrationsTable(db, getLogger("migrationDown"));
-        await downMigration(db, migrationFolder, getLogger("migrationDown"));
+        await migration.init(db, getLogger("migrationDown"));
+        await migration.down.file(db, migrationFolder, getLogger("migrationDown"));
         await db.disconnect();
       } else {
         const db: Database = (await import(dbJSPath)).default as Database;
         await db.connect();
-        await downMigrationFolder(db, migrationFolder, getLogger("migrationDown"));
+        await migration.down.folder(db, migrationFolder, getLogger("migrationDown"));
         await db.disconnect();
       }
     }
