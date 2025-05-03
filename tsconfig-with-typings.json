@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "noEmit": false,
+    "sourceMap": true,
+    "declaration": true,
+    "outDir": "./build/esm",
+    "strict": false,
+    "module": "nodenext",
+    "lib": ["es2021", "dom"],
+    "jsx": "react",
+    "jsxFactory": "JSX.createElement",
+    "jsxFragmentFactory": "JSX.Fragment",
+    "moduleResolution": "nodenext",
+    "typeRoots": [
+      "./.types",
+      ".types",
+      "./node_modules/",
+      "./node_modules/@types"
+    ]
+  },
+  "include": [
+      "src/**/*",
+      "editor/**/*"
+  ],
+  "exclude": [
+      "node_modules",
+      "src/types",
+      "sea",
+      "test",
+      ".types",
+      "node_modules/@miqro/jsx/build/esm/jsx.d.ts",
+      ".types/@miqro/jsx/esm/jsx.d.ts",
+  ]
+}

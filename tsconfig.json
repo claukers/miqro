@@ -1,26 +1,35 @@
 {
-  "typedocOptions": {
-    "entryPoints": ["src/index.ts"],
-    "out": "docs"
-  },
-  "compileOnSave": true,
   "compilerOptions": {
-    "lib": ["es2021"],
-    "module": "Node16",
-    "moduleResolution": "Node16",
-    "target": "es2021",
-    "outDir": "./build/",
-    "removeComments": false,
-    "noImplicitAny": true,
-    "sourceMap": false,
+    "target": "es2022",
+    "noEmit": false,
+    "sourceMap": true,
     "declaration": true,
-    "strict": true
+    "outDir": "./build/esm",
+    "strict": false,
+    "module": "NodeNext",
+    "lib": ["es2021", "dom"],
+    "jsx": "react",
+    "jsxFactory": "JSX.createElement",
+    "jsxFragmentFactory": "JSX.Fragment",
+    "moduleResolution": "nodenext"
+    /*"typeRoots": [
+      "./.types",
+      ".types",
+      "./node_modules/",
+      "./node_modules/@types"
+    ]*/
   },
   "include": [
-    "src/**/*"
+      "src/**/*",
+      "editor/**/*"
   ],
   "exclude": [
-    "node_modules/",
-    "test/",
+      "node_modules",
+      "sea",
+      "test",
+      ".types",
+      "node_modules/@miqro/jsx/build/esm/jsx.d.ts",
+      ".types/@miqro/jsx/esm/jsx.d.ts",
+      "src/types/"
   ]
 }

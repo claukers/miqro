@@ -1,0 +1,27 @@
+{
+  "main": "build/main.js",
+  "output": "build/sea-prep-darwin-arm64.blob",
+  "disableExperimentalSEAWarning": true,
+  "useCodeCache": false,
+  "useSnapshot": false,
+  "assets": {
+    "lib.cjs": "build/lib.cjs",
+    "version.tag": "sea/version.tag",
+    "node.version.tag": "sea/node.version.tag",
+    "esbuild.version.tag": "sea/esbuild.version.tag",
+    "esbuild-binary": "sea/deps/esbuild/darwin/arm64/esbuild",
+    "postject.base64.cjs": "build/postject.base64.cjs",
+    "sea.basic.config.json": "sea/basic-config.json",
+    "node.sh": "sea/node.sh",
+    "install-nodejs.sh": "sea/install-nodejs.sh",
+    "compile.base64.sh": "sea/basic-compile.base64.sh",
+    "sign-remove.sh": "sea/sign-remove.sh",
+    "sign-add.sh": "sea/sign-add.sh",
+    "app.sh": "sea/app.sh",
+    "jsx.dom.js": "build/jsx.dom.js",
+    "types.json": "sea/types.json",
+    "editor-assets/editor.bundle.js": "build/editor.bundle.js",
+    "editor-assets/style.css": "editor/http/admin/editor/style.css",
+    "editor-assets/font.ttf": "editor/http/admin/editor/font.ttf"
+  }
+}

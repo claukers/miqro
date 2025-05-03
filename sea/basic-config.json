@@ -1,0 +1,9 @@
+{
+  "main": "sea/app.bundle.cjs",
+  "output": "sea/app.bundle.blob",
+  "disableExperimentalSEAWarning": true,
+  "useCodeCache": false,
+  "useSnapshot": false,
+  "assets": {
+  }
+}
