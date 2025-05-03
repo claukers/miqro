@@ -28,8 +28,6 @@
     "start:editor:cluster": "node --enable-source-maps --disable-warning=ExperimentalWarning build/esm/src/cluster.js --service editor/"
   },
   "bin": {
-    "mako": "build/esm/src/main.js",
-    "mako-cluster": "build/esm/src/cluster.js",
     "miqro": "build/esm/src/main.js",
     "miqro-cluster": "build/esm/src/cluster.js"
   },
