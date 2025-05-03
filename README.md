@@ -32,7 +32,7 @@ but also can
 
 #### without Node.js installed as a NODE:SEA binary.
 
-download the standalone binary from the [releases](http://github.com/) page.
+download the standalone binary from the [releases](https://github.com/claukers/miqro/releases) page.
 
 #### npm dependency for Node.js project
 
