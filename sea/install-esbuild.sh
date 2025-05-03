@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 TARGET="${PWD}/sea/deps/esbuild"
-VERSION="0.25.2"
+VERSION="0.25.3"
 
 if [ -d "$TARGET" ]; then
   echo "$TARGET already exists exist."
