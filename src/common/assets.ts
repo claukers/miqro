@@ -42,8 +42,6 @@ export function getAsset(key: string): ArrayBuffer {
           return readFileSync(resolve(`./sea/esbuild`));
         } else {
           //return readFileSync(resolve(__package_dirname, `./node_modules/@esbuild/${platform}-${arch}/bin/esbuild`));
-          console.log("\n\t\t" + dirname(import.meta.resolve(`esbuild`).substring("file://".length)) + "\n");
-
           const esBinaryPath = resolve(dirname(import.meta.resolve(`esbuild`).substring("file://".length)), "..", "..", "@esbuild", `${platform}-${arch}`);
           return readFileSync(resolve(esBinaryPath, "bin", "esbuild"));
         }
