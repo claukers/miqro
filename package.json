@@ -20,7 +20,6 @@
     "postbuild:postject": "esbuild node_modules/postject/dist/cli.js --log-level=silent --bundle --platform=node --outfile=build/postject.cjs && node sea/base64.js build/postject.cjs > build/postject.base64.cjs",
     "postbuild:lib": "esbuild src/lib.ts --log-level=silent --bundle --platform=node --outfile=build/lib.cjs --external:sqlite3 --external:pg --external:esbuild --external:node:assert --external:node:util --external:node:path",
     "compile": "npm run build && sh sea/compile.sh",
-    "precompile": "sh sea/precompile.sh",
     "start:editor": "node --enable-source-maps --disable-warning=ExperimentalWarning build/esm/src/main.js --service editor/",
     "compile:editor": "node --enable-source-maps --disable-warning=ExperimentalWarning build/esm/src/main.js --compile --service editor/",
     "inflate:editor": "node --enable-source-maps --disable-warning=ExperimentalWarning build/esm/src/main.js --inflate --inflate-sea --service editor/",
