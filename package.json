@@ -5,7 +5,8 @@
   "type": "module",
   "main": "build/esm/src/lib.js",
   "types": "build/esm/src/lib.d.ts",
-  "private": true,
+  "author": "claukers",
+  "license": "ISC",
   "scripts": {
     "test": "node --enable-source-maps --test test/cases/*.test.js",
     "coverage": "node --enable-source-maps --experimental-test-coverage --test test/cases/*.test.js",
