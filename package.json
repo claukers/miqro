@@ -7,6 +7,8 @@
   "types": "build/esm/src/lib.d.ts",
   "private": true,
   "scripts": {
+    "release:package": "sh sea/release-tar.sh",
+    "prerelease:package": "npm run compile",
     "build": "tsc",
     "postbuild": "npm run postbuild:lib && npm run postbuild:postject && npm run postbuild:sh && npm run postbuild:jsxdom && npm run postbuild:editor && npm run postbuild:types",
     "postbuild:types": "sh sea/copy-types.sh && node sea/generate-global-types-asset-json.js",

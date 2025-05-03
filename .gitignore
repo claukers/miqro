@@ -1,3 +1,4 @@
+bin/*.tar.gz
 test/inflated
 test/tmp
 test/server.log
