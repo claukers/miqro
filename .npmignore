@@ -1,6 +1,15 @@
 .github
 .DS_Store
-bin/
+*.tar.gz
+bin/darwin-arm64
+bin/darwin-x64
+bin/linux-x64
+bin/linux-arm64
+bin/linux-armv7l
+bin/linux-ppc64le
+bin/linux-s390x
+bin/win-x64
+bin/win-arm64
 sea/config/
 sea/deps/
 sea/types/
