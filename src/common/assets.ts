@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module';
 import { Logger, MinimalLogger } from "@miqro/core";
 import { chmodSync, constants, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { getAsset as seaGetAsset, isSea } from "node:sea";
@@ -7,6 +8,7 @@ import { arch, cwd, platform } from "node:process";
 import { fileURLToPath } from 'node:url';
 import { initESBuild } from "./esbuild.js";
 import { initJSXJS } from "./jsx.js";
+const require = createRequire(import.meta.url);
 
 const __package_dirname = import.meta.url ? resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..") : null;
 
@@ -39,7 +41,8 @@ export function getAsset(key: string): ArrayBuffer {
         if (__package_dirname === null) {
           return readFileSync(resolve(`./sea/esbuild`));
         } else {
-          return readFileSync(resolve(__package_dirname, `./node_modules/@esbuild/${platform}-${arch}/bin/esbuild`));
+          const esBinaryPath = resolve(require.resolve(`esbuild`), "..", "..", "..", "@esbuild", `${platform}-${arch}`);
+          return readFileSync(resolve(esBinaryPath, "bin", "esbuild"));
         }
       } else {
         throw new Error("asset not registered!");
