@@ -26,21 +26,19 @@ but also can
 
 - can create a standalone ```NODE:SEA``` ```binary``` of your webapp for ```linux-x64```, ```linux-arm64```, ```darwin-x64``` and ```darwin-arm64```.
 
-## getting started
+## installation
 
-### installation
-
-#### without Node.js installed as a NODE:SEA binary.
+### without Node.js installed as a NODE:SEA binary.
 
 download the standalone binary from the [releases](https://github.com/claukers/miqro/releases) page.
 
-#### npm dependency for Node.js project
+### npm dependency for Node.js project
 
 or use it as a dependecy on your Node.js project.
 
 ```npm install miqro```
 
-## basic example static site generated with jsx
+## getting started basic example static site generated with jsx
 
 project structure
 
@@ -54,11 +52,11 @@ example/
     ...
 ```
 
-#### 1. create an empty folder to contain the example service and files
+### 1. create an empty folder to contain the example service and files
 
 ```mkdir -p example/http```
 
-#### 2. create a basic ```.html.tsx``` file.
+### 2. create a basic ```.html.tsx``` file.
 
 ```example/http/index.html.tsx```
 
@@ -78,7 +76,7 @@ to host a watch server with the example run the following command.
 
 then open a browser and go to ```http://localhost:8080/index.html``` to watch the changes you make into the file.
 
-#### 3. generate static files to host with a web server
+### 3. generate static files to host with a web server
 
 to generate the static files just run the command.
 
@@ -91,9 +89,9 @@ and can be served like this.
 ```python3 -m http.server 8080 build/example/http/static```
 
 
-# Documentation
+## Documentation
 
-## usage as a module
+### usage as a module
 
 first install as a dependency
 
@@ -127,7 +125,7 @@ await app.inflate({
 // await app.dispose();
 ```
 
-## usage as cli
+### usage as cli
 
 #### inflate static files with the cli
 
