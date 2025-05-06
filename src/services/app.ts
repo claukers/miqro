@@ -163,14 +163,21 @@ export class Miqro {
     setupExitHandlers(this);
   }
 
-  public dispose() {
+  public connect() {
+    if (process.send) {
+      process.on("message", this.listener);
+    }
+  }
+
+  public disconnect() {
     if (this.server !== null) {
       throw new Error("already running! call stop() first");
     }
     if (process.send) {
       process.removeListener("message", this.listener);
     }
-    this.cache.dispose();
+    this.cache.disconnect();
+    (this.adminInterface?.getCache() as ClusterCache)?.disconnect();
     this.webSocketManager.disconnectAll();
     this.dbManager.closeAll();
   }
@@ -389,11 +396,10 @@ export class Miqro {
     //this.logger?.debug("starting");
     this.logger?.debug("\t\t==start==");
 
-    this.dispose();
+    //this.disconnect();
     this.server = undefined;
-    if (process.send) {
-      process.on("message", this.listener);
-    }
+    this.connect();
+    await this.dbManager.connectAll();
     this.server = new App({
       onUpgrade: (req: ServerRequest, socket, head) => {
         req.server = this.serverInterface;
@@ -451,7 +457,7 @@ export class Miqro {
     }
     const server = this.server;
     this.server = null;
-    this.dispose();
+    this.disconnect();
     this.logger?.debug("\t\t==stop==");
     this.logger?.debug("clear running server routes");
     server.clear();

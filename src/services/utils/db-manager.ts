@@ -47,6 +47,19 @@ export class DBManager {
     }
   }
 
+  async connectAll() {
+    this.options?.logger?.debug("connection all db connections");
+    const tR = [];
+    for (const name of this.map.keys()) {
+      const db = this.map.get(name);
+      if (db && db.status === "disconnected") {
+        this.options?.logger?.debug("connecting db connection [%s]", name);
+        tR.push(db.connect());
+      }
+    }
+    await Promise.all(tR);
+  }
+
   async closeAll() {
     this.options?.logger?.debug("closing all db connections");
     for (const name of this.map.keys()) {

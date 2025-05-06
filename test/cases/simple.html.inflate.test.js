@@ -17,7 +17,6 @@ describe("simple html inflate", () => {
     try {
       if (app) {
         await app.stop();
-        app.dispose();
       }
       app = null;
     } catch (e) {

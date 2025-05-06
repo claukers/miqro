@@ -79,12 +79,16 @@ export class ClusterCache implements CacheInterface {
         this.logger?.error(e);
       }
     };
+    this.connect();
+  }
+
+  connect() {
     if (process.send) {
       process.on("message", this.listener);
     }
   }
 
-  dispose() {
+  disconnect() {
     process.removeListener("message", this.listener);
   }
 

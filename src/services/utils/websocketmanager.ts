@@ -20,8 +20,18 @@ export class WebSocketManager {
     this.name = options && options.name ? options.name : "WebSocketManager";
     this.avoidLogSocket = options && options.avoidLogSocket ? options.avoidLogSocket : false;
   }
+
+  public deleteWS(path: string) {
+    const ws = this.runningGlobalWSMap.get(path);
+    this.disconnectAllFrom(path);
+    ws.dispose();
+    this.runningGlobalWSMap.delete(path);
+  }
+
   public deleteAllWS() {
-    this.runningGlobalWSMap.clear();
+    for (const path of this.runningGlobalWSMap.keys()) {
+      this.deleteWS(path);
+    }
   }
 
   public getWS(path: string): ClusterWebSocketServer2 | undefined {
@@ -45,7 +55,7 @@ export class WebSocketManager {
   public replaceALLWSBuLOGSocket(list: WSConfig[]) {
     for (const path of this.runningGlobalWSMap.keys()) {
       if (path !== LOG_SOCKET_PATH || !this.avoidLogSocket) {
-        this.runningGlobalWSMap.delete(path);
+        this.deleteWS(path);
       }
     }
     for (const wsConfig of list) {
@@ -85,7 +95,7 @@ export class WebSocketManager {
             }
           }
         }
-        ws.dispose();
+        //ws.dispose();
       }
     } catch (e) {
       this.logger?.error("error disconnecting web socket clients");
