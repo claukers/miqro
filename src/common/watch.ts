@@ -77,4 +77,9 @@ export async function watchAndServer(app: Miqro) {
 
   watchLogger?.info("watching for changes on [%s]", app.options.services.join(","));
   reWatch();
+  return {
+    stopWatch: () => {
+      stopWatch();
+    }
+  };
 }

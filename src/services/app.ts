@@ -86,6 +86,7 @@ export class Miqro {
   public logger?: Logger;
   public loggerProvider: LogProvider;
   public static initAssetsPromise: Promise<any> | null = null;
+  public watcher?: { stopWatch: () => void; };
 
   constructor(options?: Partial<MiqroOptions>) {
     this.options = {
@@ -432,7 +433,7 @@ export class Miqro {
     await notifiyServerConfig(this.logger, this.serverInterface, this.adminInterface, this.inflated.serverConfigMap, "start");
 
     if (this.options.hotreload && (cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0")) {
-      await watchAndServer(this);
+      this.watcher = await watchAndServer(this);
     }
 
     this.logger?.debug("\t\t==start done==");
@@ -443,6 +444,10 @@ export class Miqro {
   public async stop() {
     if (!this.server || !this.inflated) {
       throw new Error("cannot stop server not running");
+    }
+    if (this.watcher) {
+      this.watcher.stopWatch();
+      this.watcher = null;
     }
     const server = this.server;
     this.server = null;
