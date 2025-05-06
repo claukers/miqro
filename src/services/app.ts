@@ -19,7 +19,6 @@ import { watchAndServer } from "../common/watch.js";
 import { LocalCache } from "./utils/cache.js";
 import { initGlobals } from "./globals.js";
 import { EditorAdminInterface } from "../../editor/common/admin-interface.js";
-import { getHotReloadScript } from "./hot-reload.js";
 import { LogProvider, LogProviderOptions } from "./utils/log.js";
 import { initAssets } from "../common/assets.js";
 import { setupExitHandlers } from "../common/exit.js";
