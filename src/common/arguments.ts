@@ -1,5 +1,5 @@
 import { checkEnvVariable } from "@miqro/core";
-import { existsSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import { cwd, env, platform, arch } from "node:process";
 
@@ -10,7 +10,7 @@ import { BIN_NAME, help, usage } from "./help.js";
 import { TEST_SOCKET } from "./paths.js";
 import { isSea } from "node:sea";
 import cluster from "node:cluster";
-import { getVersion } from "./assets.js";
+import { __package_dirname, getVersion } from "./assets.js";
 
 export function getPORT() {
   return checkEnvVariable("PORT", "8080");
@@ -84,8 +84,12 @@ export function parseArguments(): Arguments {
           console.log("version [%s]", VERSION);
           console.log("Node.js version [%s]", NODE_VERSION);
           console.log("esbuild version [%s]", ESBUILD_VERSION);
+          console.log("platform [%s-%s]", platform, arch);
+        } else {
+          const packageJSON = JSON.parse(readFileSync(resolve(__package_dirname, "package.json")).toString());
+          const VERSION = packageJSON.version;
+          console.log("version [%s]", VERSION);
         }
-        console.log("platform [%s-%s]", platform, arch);
         process.exit(EXIT_CODES.NORMAL_EXIT);
       case "-h":
       case "--help":

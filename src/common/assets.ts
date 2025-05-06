@@ -10,7 +10,7 @@ import { initESBuild } from "./esbuild.js";
 import { initJSXJS } from "./jsx.js";
 //const require = createRequire(import.meta.url);
 
-const __package_dirname = import.meta.url ? resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..") : null;
+export const __package_dirname = import.meta.url ? resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..") : null;
 
 const ASSETS_ROUTER = {
   "lib.cjs": "build/lib.cjs",

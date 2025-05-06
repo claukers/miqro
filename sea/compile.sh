@@ -14,6 +14,9 @@ TSC_BIN="sh sea/tsc.sh"
 sh sea/copy-types.sh
 $NODE_BIN sea/generate-global-types-asset-json.js
 
+#version.tag
+$NODE_BIN sea/version.tag.js
+
 rm -Rf bin;
 mkdir -p bin/;
 rm -Rf build;
@@ -23,12 +26,12 @@ mkdir -p build/;
 echo $TSC_BIN
 $TSC_BIN
 
-CURRENT_GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-CURRENT_GIT_SHORT_HASH=`git rev-parse --short HEAD`
-CURRENT_DATE=`date +"%y-%m-%d"`
-VERSION_TAG="${CURRENT_DATE}_${CURRENT_GIT_SHORT_HASH}_${CURRENT_GIT_BRANCH}"
+#CURRENT_GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+#CURRENT_GIT_SHORT_HASH=`git rev-parse --short HEAD`
+#CURRENT_DATE=`date +"%y-%m-%d"`
+#VERSION_TAG="${CURRENT_DATE}_${CURRENT_GIT_SHORT_HASH}_${CURRENT_GIT_BRANCH}"
 
-echo $VERSION_TAG > sea/version.tag
+#echo $VERSION_TAG > sea/version.tag
 
 # jsx.js
 cp node_modules/@miqro/jsx-dom/build/jsx-dom.esm.bundle.js build/jsx.dom.js

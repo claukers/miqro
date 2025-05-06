@@ -15,7 +15,8 @@
     "release:package": "sh sea/release-tar.sh",
     "prerelease:package": "npm run compile",
     "build": "tsc",
-    "postbuild": "npm run postbuild:lib && npm run postbuild:postject && npm run postbuild:sh && npm run postbuild:jsxdom && npm run postbuild:editor && npm run postbuild:types",
+    "postbuild": "npm run postbuild:lib && npm run postbuild:postject && npm run postbuild:sh && npm run postbuild:jsxdom && npm run postbuild:editor && npm run postbuild:types && npm run postbuild:versiontag",
+    "postbuild:versiontag": "node sea/version.tag.js",
     "postbuild:types": "sh sea/copy-types.sh && node sea/generate-global-types-asset-json.js",
     "postbuild:editor": "esbuild --log-level=silent --external:node:process --external:node:path --platform=neutral --bundle --loader:.js=jsx --jsx-factory=jsx.createElement --jsx-fragment=jsx.Fragment sea/editor-assets/editor.bundle.in.mjs --outfile=build/editor.bundle.js",
     "postbuild:jsxdom": "cp node_modules/@miqro/jsx-dom/build/jsx-dom.esm.bundle.js build/jsx.dom.js",
@@ -36,7 +37,8 @@
     "@types/cookie": "^0.6.0",
     "@types/node": "^22.10.2",
     "postject": "1.0.0-alpha.6",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "highlight.js": "11.11.1"
   },
   "dependencies": {
     "@miqro/core": "^5.0.13",
@@ -49,8 +51,7 @@
     "@miqro/test": "^0.2.9",
     "@miqro/test-http": "^0.1.2",
     "@types/showdown": "2.0.6",
-    "esbuild": "0.25.3",
-    "highlight.js": "11.11.1",
+    "esbuild": "0.25.4",
     "showdown": "2.1.0"
   }
 }
