@@ -1,5 +1,5 @@
 import cluster from "node:cluster";
-import { App, Router, Logger, LoggerHandler, ConsoleTransport, FileTransport, LogLevel, LoggerTransportWriteArgs } from "@miqro/core";
+import { App, Router, Logger, LoggerHandler } from "@miqro/core";
 import { migration } from "@miqro/query";
 import { WebSocketManager } from "./utils/websocketmanager.js";
 import { DBManager } from "./utils/db-manager.js";
@@ -8,7 +8,7 @@ import { InflateError } from "../common/jsx.js";
 import { DBConfig, MigrateOptions, ServerInterface, ServerRequest, WSConfig } from "../types.js";
 import { RouteFileMap } from "../inflate/setup-http.js";
 import { ServerConfigMap, setupServerConfig } from "../inflate/setup-server-config.js";
-import { BASEEDITOR_PATH, LOG_SOCKET_PATH, LOG_WRITE_EVENT } from "../../editor/common/constants.js";
+import { BASEEDITOR_PATH, LOG_SOCKET_PATH } from "../../editor/common/constants.js";
 import editorWSConfig from "../../editor/ws.js";
 import editorServerConfig from "../../editor/server.js";
 
@@ -26,9 +26,10 @@ import { setupExitHandlers } from "../common/exit.js";
 import { inflateDBConfig, inflateDBMigrations, MigrationModule } from "../inflate/setup-db.js";
 import { getServicePath } from "../common/paths.js";
 import { LogConfigMap } from "../inflate/setup-log.js";
-import { format } from "node:util";
 import { ServerInterfaceImpl } from "./utils/server-interface.js";
 import { getPORT } from "../common/arguments.js";
+import { createLogProviderOptions } from "./utils/log-transport.js";
+import { createAdminInterface } from "./utils/admin-interface.js";
 
 export interface MiqroOptions {
   name: string;
@@ -94,72 +95,7 @@ export class Miqro {
       services: [],
       ...(options ? options : {})
     };
-    const defaultConsole = ConsoleTransport();
-    const defaultFile = FileTransport();
-    const defaultWrite = async (args: LoggerTransportWriteArgs, level?: LogLevel) => {
-      try {
-        const serviceNamesWithLogConfigReplaceConsole = level === undefined && this.inflated ?
-          Object.keys(this.inflated.logConfigMap).filter(serviceName => this.inflated.logConfigMap[serviceName].replaceConsoleTransport) : [];
-        const serviceNamesWithLogConfigReplaceFile = level === undefined && this.inflated ?
-          Object.keys(this.inflated.logConfigMap).filter(serviceName => this.inflated.logConfigMap[serviceName].replaceFileTransport) : [];
-        await Promise.allSettled((level === undefined ?
-          [
-            level === undefined && serviceNamesWithLogConfigReplaceConsole.length === 0 ?
-              defaultConsole.write(args) : Promise.resolve(),
-            level === undefined && serviceNamesWithLogConfigReplaceFile.length === 0 ?
-              defaultFile.write(args) : Promise.resolve()
-          ] : []).concat(this.inflated ?
-            Object.keys(this.inflated.logConfigMap).map(serviceName => this.inflated.logConfigMap[serviceName]).filter(c => c.level === level).map(c => c.write(args)) : []
-          ));
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    this.loggerProvider = new LogProvider({
-      name: this.options.name,
-      formatter: ({ identifier, level, message, optionalParams }) => format(`${new Date().toISOString()} PID[${process.pid}] ` +
-        `${identifier ? `[${identifier}] ` : ""}` +
-        `${level !== "info" ? (level === "error" || level === "warn" ? `[${level.toUpperCase()}] ` : `[${level}] `) : ""}` +
-        `${message}`, ...optionalParams),
-      transports: [
-        ...(([undefined, "error", "warn", "info", "debug", "trace"] as LogLevel[]).map(level => {
-          return level ? {
-            level,
-            write: async (args) => {
-              await defaultWrite(args, level);
-            }
-          } : {
-            write: async (args) => {
-              await defaultWrite(args, undefined);
-            }
-          }
-        })), {
-          level: "trace",
-          write: async (args) => {
-            try {
-              if (this.options.editor) {
-                try {
-                  const ws = this.webSocketManager.getWS(LOG_SOCKET_PATH);
-                  if (ws) {
-                    //console.log("\n\n" + process.pid + " broadcasting " + LOG_SOCKET_PATH + "\n\n\n")
-                    await ws.broadcast(JSON.stringify({
-                      type: LOG_WRITE_EVENT,
-                      level: args.level,
-                      identifier: args.identifier,
-                      out: args.out
-                    }));
-                  }
-                } catch (e) {
-                  console.error(e);
-                }
-              }
-            } catch (e) {
-              console.error(e);
-            }
-          }
-        }],
-      ...(this.options.logProviderOptions ? this.options.logProviderOptions : {})
-    });
+    this.loggerProvider = new LogProvider(createLogProviderOptions(this));
     //if (!this.options.logger) {
     const SERVER_IDENTIFIER = cluster.isPrimary ?
       "" :
@@ -220,43 +156,8 @@ export class Miqro {
       port: this.options.port
     });
     this.serverRequestHandler = ServerRequestHandler(this.serverInterface);
-    const adminCache = new ClusterCache("EditorCache[" + this.options.name + "]");
 
-    this.adminInterface = {
-      getCache: () => adminCache,
-      stop: () => this.stop(),
-      restart: () => this.restart(),
-      reload: () => this.reload(),
-      getHotReloadHTML: getHotReloadScript,
-      getMigrations: () => {
-        if (this.inflated) {
-          const ret: MigrationModule[] = [];
-          for (const db of this.inflated.dbList) {
-            for (const m of db.migrations) {
-              ret.push(m);
-            }
-          }
-          return ret;
-        }
-        return [];
-      },
-      getServices: () => {
-        return this.options.services;
-      },
-      getRouteFileMap: () => {
-        return this.inflated ? this.inflated.fileMap : {};
-      },
-      getInflateErrors: () => {
-        return this.inflated ? this.inflated.errors : [];
-      }/*,
-      inflateJSX: async function inflateJSX(path, minify: boolean = true) {
-        return realInflateJSX(path, {
-          embemedJSX: true,
-          minify,
-          useExport: true
-        });
-      }*/
-    };
+    this.adminInterface = createAdminInterface(this);
 
     setupExitHandlers(this);
 
