@@ -323,22 +323,22 @@ export function parseArguments(): Arguments {
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.test && (flags.editor)) {
+  if (flags.test && (flags.hotreload || flags.editor || flags.compile || flags.inflate)) {
     console.error("bad arguments. cannot use --editor with --test");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.migrateUp && (flags.editor || flags.compile || flags.test || flags.migrateDown || flags.inflate)) {
+  if (flags.migrateUp && (flags.hotreload || flags.editor || flags.compile || flags.test || flags.migrateDown || flags.inflate)) {
     console.error("bad arguments. cannot use with --migrate-up");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.migrateDown && (flags.editor || flags.compile || flags.test || flags.migrateUp || flags.inflate)) {
+  if (flags.migrateDown && (flags.hotreload || flags.editor || flags.compile || flags.test || flags.migrateUp || flags.inflate)) {
     console.error("bad arguments. cannot use with --migrate-down");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.generateDoc && (flags.editor || flags.compile || flags.test || flags.migrateUp || flags.inflate || flags.migrateDown)) {
+  if (flags.generateDoc && (flags.hotreload || flags.editor || flags.compile || flags.test || flags.migrateUp || flags.inflate || flags.migrateDown)) {
     console.error("bad arguments. cannot use with --generate-doc");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
