@@ -22,11 +22,11 @@ export default {
 
         <script type="module" src="/admin/editor/editor.js" />
         <editor-component
-          disableLog="true"
-          disablePreview="true"
-          disableReload="true"
+          disablelog="true"
+          disablepreview="true"
+          disablereload="true"
           class="main-container"
-          reloadString={`${req?.uuid}`}
+          reloadstring={`${req?.uuid}`}
           migrations={`${HTMLEncode(JSON.stringify(migrations))}`}
           services={`${HTMLEncode(JSON.stringify(services))}`}
           errors={`${HTMLEncode(JSON.stringify(errors))}`}
