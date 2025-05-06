@@ -389,8 +389,8 @@ export class Miqro {
     //this.logger?.debug("starting");
     this.logger?.debug("\t\t==start==");
 
-    this.server = undefined;
     this.dispose();
+    this.server = undefined;
     if (process.send) {
       process.on("message", this.listener);
     }
@@ -449,9 +449,9 @@ export class Miqro {
       this.watcher.stopWatch();
       this.watcher = null;
     }
-    this.dispose();
     const server = this.server;
     this.server = null;
+    this.dispose();
     this.logger?.debug("\t\t==stop==");
     this.logger?.debug("clear running server routes");
     server.clear();
