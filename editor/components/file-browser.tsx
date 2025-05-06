@@ -44,27 +44,33 @@ export function FileBrowser(props: FileBrowserProps) {
             ev.preventDefault();
             props.togglePanel("left");
           }}>{"<<"}</button>
-        <button
-          class="file-editor-button btn"
-          style={`width: 30%;${props.disableLog ? "display: none;" : ""}`}
-          onclick={ev => {
-            ev.preventDefault();
-            props.togglePanel("bottom");
-          }}>log</button>
-        <button
-          class="file-editor-button btn active"
-          style={`width: 30%;${props.disableReload ? "display: none;" : ""}`}
-          onclick={ev => {
-            ev.preventDefault();
-            props.scanFiles();
-          }}>scan</button>
-        <button
-          class="file-editor-button btn warning"
-          style={`width: 30%;${props.disableReload ? "display: none;" : ""}`}
-          onclick={ev => {
-            ev.preventDefault();
-            props.reloadServer();
-          }}>reload</button>
+        {props.disableLog ? <></> :
+          <button
+            id="log-btn"
+            class="file-editor-button btn"
+            style={`width: 30%;${props.disableLog ? "display: none;" : ""}`}
+            onclick={ev => {
+              ev.preventDefault();
+              props.togglePanel("bottom");
+            }}>log</button>}
+        {props.disableReload ? <></> :
+          <button
+            id="scan-btn"
+            class="file-editor-button btn active"
+            style={`width: 30%;${props.disableReload ? "display: none;" : ""}`}
+            onclick={ev => {
+              ev.preventDefault();
+              props.scanFiles();
+            }}>scan</button>}
+        {props.disableReload ? <></> :
+          <button
+            id="reload-btn"
+            class="file-editor-button btn warning"
+            style={`width: 30%;${props.disableReload ? "display: none;" : ""}`}
+            onclick={ev => {
+              ev.preventDefault();
+              props.reloadServer();
+            }}>reload</button>}
       </div>
       <div class="row">
         <input
@@ -79,28 +85,34 @@ export function FileBrowser(props: FileBrowserProps) {
           placeholder={"..filter.."} />
       </div>
       <div class="row">
+        {props.disablePreview ? <></> :
+          <button
+            id="preview-btn"
+            class="file-editor-button btn"
+            style={`width: 30%;${props.disablePreview ? "display: none;" : ""}`}
+            onclick={ev => {
+              ev.preventDefault();
+              props.togglePanel("right");
+            }}>preview</button>}
         <button
-          class="file-editor-button btn"
-          style={`width: 30%;${props.disablePreview ? "display: none;" : ""}`}
-          onclick={ev => {
-            ev.preventDefault();
-            props.togglePanel("right");
-          }}>preview</button>
-        <button
+          id="new-btn"
           class="file-editor-button btn info"
           style="width: 20%;"
           onclick={ev => {
             ev.preventDefault();
             props.showNewFile();
           }}>new</button>
+        {props.disableReload ? <></> :
+          <button
+            id="scan-btn"
+            class="file-editor-button btn active"
+            style={`width: 30%;${!props.disableReload ? "display: none;" : ""}`}
+            onclick={ev => {
+              ev.preventDefault();
+              props.scanFiles();
+            }}>scan</button>}
         <button
-          class="file-editor-button btn active"
-          style={`width: 30%;${!props.disableReload ? "display: none;" : ""}`}
-          onclick={ev => {
-            ev.preventDefault();
-            props.scanFiles();
-          }}>scan</button>
-        <button
+          id="saveall-btn"
           class="file-editor-button btn success"
           style="width: 25%;"
           onclick={ev => {
@@ -109,6 +121,7 @@ export function FileBrowser(props: FileBrowserProps) {
 
           }}>save</button>
         <button
+          id="closeall-btn"
           class="file-editor-button btn danger"
           style="width: 25%;"
           onclick={ev => {

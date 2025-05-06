@@ -43,6 +43,7 @@ export function FileEditorToolbar(props: FileEditorToolbar) {
           props.togglePanel("left");
         }}>{">>"}</button>
       <button
+        id="save-btn"
         disabled={!props.changed}
         class={`btn success`}
         onclick={ev => {
@@ -50,6 +51,7 @@ export function FileEditorToolbar(props: FileEditorToolbar) {
           props.saveFile();
         }}>save</button>
       {props.disableReload ? <></> : <button
+        id="savereload-btn"
         disabled={!props.changed}
         class={`btn info`}
         style="margin-left: var(--file-browser-separation);"
@@ -58,6 +60,7 @@ export function FileEditorToolbar(props: FileEditorToolbar) {
           props.saveFile(true);
         }}>save/reload</button>}
       <button
+        id="revert-btn"
         disabled={!props.changed}
         style="margin-left: var(--file-browser-separation);"
         class={`btn warning`}
@@ -66,6 +69,7 @@ export function FileEditorToolbar(props: FileEditorToolbar) {
           props.revertFile();
         }}>revert</button>
       <button
+        id="close-btn"
         class={`btn danger`}
         style="margin-left: var(--file-browser-separation);"
         onclick={ev => {
