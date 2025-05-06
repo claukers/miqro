@@ -167,6 +167,8 @@ export class Miqro {
     if (process.send) {
       process.on("message", this.listener);
     }
+    this.cache.connect();
+    (this.adminInterface?.getCache() as ClusterCache)?.connect();
   }
 
   public disconnect() {
