@@ -105,5 +105,5 @@ export interface ServerRequest extends Request {
 export interface ServerResponse extends Response {
 }
 
-export { App, LoggerHandler, Router } from "@miqro/core/lib.js";
-export { migration } from "@miqro/query/lib.js";
+export { App, LoggerHandler, Router, APIRoute } from "@miqro/core/lib.js";
+export { migration, Migration } from "@miqro/query/lib.js";

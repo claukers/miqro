@@ -34,7 +34,7 @@ export default async (req: ServerRequest | null, res: ServerResponse | null) => 
     sufix: ".api.ts",
     displayName: ".api.ts file",
     language: "typescript",
-    template: () => `import { ServerRequest, ServerResponse, APIRoute } from "miqro"
+    template: () => `import { ServerRequest, ServerResponse, APIRoute } from "miqro";
 
 export default {
   path: "/health",
@@ -85,7 +85,7 @@ export default {
     sufix: ".ts",
     displayName: "migration file",
     language: "typescript",
-    template: () => `import { Migration } from "@miqro/query";
+    template: () => `import { Migration } from "miqro";
 
 export default {
     up: async (db, logger) => {

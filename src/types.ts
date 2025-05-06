@@ -41,6 +41,9 @@ declare global {
   }
 }
 
+export { APIRoute } from "@miqro/core";
+export { Migration } from "@miqro/query";
+
 export interface ServerGlobal {
   encodeHTML: (str: string) => string;
   inflateMDtoHTML: (str: string) => string;
