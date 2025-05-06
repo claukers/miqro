@@ -161,10 +161,6 @@ export class Miqro {
     this.adminInterface = createAdminInterface(this);
 
     setupExitHandlers(this);
-
-    if (process.send) {
-      process.on("message", this.listener);
-    }
   }
 
   public dispose() {
@@ -394,6 +390,10 @@ export class Miqro {
     this.logger?.debug("\t\t==start==");
 
     this.server = undefined;
+    this.dispose();
+    if (process.send) {
+      process.on("message", this.listener);
+    }
     this.server = new App({
       onUpgrade: (req: ServerRequest, socket, head) => {
         req.server = this.serverInterface;
@@ -449,6 +449,7 @@ export class Miqro {
       this.watcher.stopWatch();
       this.watcher = null;
     }
+    this.dispose();
     const server = this.server;
     this.server = null;
     this.logger?.debug("\t\t==stop==");
