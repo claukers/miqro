@@ -28,7 +28,10 @@ function InflateError2Map(errors: {
 }
 
 export function Editor(props: { disablelog?: boolean; disablepreview?: boolean; disablereload?: boolean; migrations: string; services: string; reloadstring: string; files: string; initialcurrent: string; classname?: string; errors: string }) {
-  const logSocket = useLogSocket();
+  //console.dir(props);
+  const logSocket = useLogSocket({
+    disableLog: (props as any).disablelog === "true" || props.disablelog === true ? true : false
+  });
 
   const [services, setservices] = jsx.useState<string[]>(JSON.parse(props.services));
   const [collapsed, setCollapsed] = jsx.useState<{
