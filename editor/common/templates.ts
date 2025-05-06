@@ -260,14 +260,14 @@ export default {
     template: () => `{
   "compilerOptions": {
     "target": "es2022",
-    "module": "es2022",
+    "noEmit": true,
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "lib": ["es2021", "dom"],
     "jsx": "react",
     "jsxFactory": "JSX.createElement",
     "jsxFragmentFactory": "JSX.Fragment",
     "typeRoots": [
-      "./node_modules/",
-      "./node_modules/@types",
       "./.types"
     ]
   }
