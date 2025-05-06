@@ -30,11 +30,12 @@ export default {
   },
   handler: async (req: AdminRequest, res) => {
     const errors = await req?.editor?.reload();
+    const parsedErrors = parseInflateErrors(errors);
     return res.json({
       message: "OK",
       reloadString: req.uuid,
       migrations: req?.editor?.getMigrations().map(m => m.name),
-      errors: parseInflateErrors(errors)
+      errors: parsedErrors ? parsedErrors : []
     });
   },
 } as APIRoute;

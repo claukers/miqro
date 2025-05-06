@@ -70,6 +70,7 @@ export interface MiqroClusterMessage {
 }
 
 export class Miqro {
+  public status: "stopped" | "starting" | "stopping" | "reloading" | "started" = "stopped";
   public options: MiqroOptions;
   public server?: App | null = null;
   public cache: ClusterCache;
@@ -165,6 +166,7 @@ export class Miqro {
 
   public connect() {
     if (process.send) {
+      process.removeListener("message", this.listener);
       process.on("message", this.listener);
     }
     this.cache.connect();
@@ -389,7 +391,7 @@ export class Miqro {
   }
 
   public async start() {
-    if (this.server !== null) {
+    if (this.server !== null || this.status !== "stopped") {
       throw new Error("cannot start app already running.");
     }
     if (!this.isInflated()) {
@@ -399,6 +401,7 @@ export class Miqro {
     this.logger?.debug("\t\t==start==");
 
     //this.disconnect();
+    this.status = "starting";
     this.server = undefined;
     this.connect();
     await this.dbManager.connectAll();
@@ -446,13 +449,15 @@ export class Miqro {
 
     this.logger?.debug("\t\t==start done==");
 
+    this.status = "started";
     return this.inflated.errors && this.inflated.errors.length > 0 ? this.inflated.errors : null;
   }
 
   public async stop() {
-    if (!this.server || !this.inflated) {
+    if (!this.server || !this.inflated || this.status !== "started") {
       throw new Error("cannot stop server not running");
     }
+    this.status = "stopping";
     if (this.watcher) {
       this.watcher.stopWatch();
       this.watcher = null;
@@ -470,14 +475,15 @@ export class Miqro {
     //server.ws.disconnectAll();
     this.logger?.debug("stopping");
     const p = server.close();
-    notifiyServerConfigSync(this, "stop");
     await p;
     await pD;
+    this.status = "stopped";
+    notifiyServerConfigSync(this, "stop");
     this.logger?.debug("\t\t==stop done==");
   }
 
   public async restart(avoidSend?: boolean) {
-    if (!this.server || !this.inflated) {
+    if (!this.server || !this.inflated || this.status !== "started") {
       throw new Error("cannot start server not running");
     }
     this.logger?.debug("\t\t==restart==");
@@ -496,9 +502,10 @@ export class Miqro {
   }
 
   public async reload(avoidSend?: boolean) {
-    if (!this.server || !this.inflated) {
+    if (!this.server || !this.inflated || this.status !== "started") {
       throw new Error("cannot reload server not running");
     }
+    this.status = "reloading";
     /*this.logger?.log("====================");
     this.logger?.log("=======reload=======");
     this.logger?.log("====================");*/
@@ -557,6 +564,7 @@ export class Miqro {
     this.logger?.debug("\t\t==reload done==");
     //this.logger?.log("=====================");
 
+    this.status = "started";
     return this.inflated.errors && this.inflated.errors.length > 0 ? this.inflated.errors : null;
 
   }
