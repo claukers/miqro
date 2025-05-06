@@ -126,16 +126,6 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
   }
 }
 
-export async function importAPIRoute(inFile: string, logger?: Logger) {
-  const mod = (await importJSXFile(inFile, logger)).default;
-  const module = typeof mod === "function" ? { handler: mod } : parser.parse(mod, APIRouteSchema, basename(inFile));
-  if (module !== undefined) {
-    return module as APIRoute;
-  } else {
-    throw new Error(`error with module [${inFile}] undefined`);
-  }
-}
-
 export const APIOptionsSchema: Schema<APIOptions> = {
   type: "object?",
   properties: {
@@ -155,7 +145,8 @@ export const APIOptionsSchema: Schema<APIOptions> = {
       properties: SessionHandlerOptionsSchema.properties
     },
     ...RouteOptionsSchema.properties
-  }
+  },
+  //mode:"add_extra"
 };
 
 export interface HTMLModule {
@@ -170,7 +161,8 @@ export const HTMLModuleSchema: Schema<HTMLModule> = {
       type: "function|object"
     },
     apiOptions: APIOptionsSchema
-  }
+  },
+  //mode:"add_extra"
 }
 
 export type JSONModuleValue = string | object;
@@ -187,7 +179,8 @@ export const JSONModuleSchema: Schema<JSONModule> = {
       type: "function|object|string"
     },
     apiOptions: APIOptionsSchema
-  }
+  },
+  //mode:"add_extra"
 }
 
 export const MigrationSchema: Schema<Migration> = {
@@ -195,7 +188,8 @@ export const MigrationSchema: Schema<Migration> = {
   properties: {
     up: "function",
     down: "function"
-  }
+  },
+  mode: "add_extra"
 }
 
 export const CORSOptionsSchema: Schema<CORSOptions> = {
@@ -205,7 +199,8 @@ export const CORSOptionsSchema: Schema<CORSOptions> = {
     validate: "function?",
     methods: "string?",
     preflightContinue: "boolean?"
-  }
+  },
+  //mode:"add_extra"
 }
 
 export const WSConfigSchema: Schema<WSConfig> = {
@@ -218,7 +213,8 @@ export const WSConfigSchema: Schema<WSConfig> = {
     onConnection: "function?",
     onMessage: "function?",
     onDisconnect: "function?"
-  }
+  },
+  //mode:"add_extra"
 };
 
 export const DBConfigSchema: Schema<DBConfig> = {
@@ -229,7 +225,8 @@ export const DBConfigSchema: Schema<DBConfig> = {
     storage: "string?",
     dialect: "string?",
     name: "string"
-  }
+  },
+  //mode:"add_extra"
 }
 
 export const ServerConfigSchema: Schema<ServerConfig> = {
@@ -240,7 +237,8 @@ export const ServerConfigSchema: Schema<ServerConfig> = {
     stop: "function?",
     start: "function?",
     load: "function?"
-  }
+  },
+  //mode:"add_extra"
 };
 
 export const LogConfigSchema: Schema<LogConfig> = {
@@ -253,17 +251,27 @@ export const LogConfigSchema: Schema<LogConfig> = {
     replaceConsoleTransport: "boolean?",
     replaceFileTransport: "boolean?",
     write: "function"
-  }
+  },
+  //mode:"add_extra"
 };
 
 export const AuthConfigSchema: Schema<AuthConfig> = {
   type: "object",
   properties: {
     ...SessionHandlerOptionsSchema.properties
-  }
+  },
+  //mode:"add_extra"
 }
 
-
+export async function importAPIRoute(inFile: string, logger?: Logger) {
+  const mod = (await importJSXFile(inFile, logger)).default;
+  const module = typeof mod === "function" ? { handler: mod } : parser.parse(mod, APIRouteSchema, basename(inFile));
+  if (module !== undefined) {
+    return module as APIRoute;
+  } else {
+    throw new Error(`error with module [${inFile}] undefined`);
+  }
+}
 
 export async function importMigrationModule(inFile: string, logger?: Logger) {
   const module = parser.parse((await importJSXFile(inFile, logger)).default, MigrationSchema, basename(inFile));
@@ -275,7 +283,9 @@ export async function importMigrationModule(inFile: string, logger?: Logger) {
 }
 
 export async function importHTMLModule(inFile: string, logger?: Logger) {
-  const module = parser.parse((await importJSXFile(inFile, logger)), HTMLModuleSchema, basename(inFile));
+  const module = (await importJSXFile(inFile, logger));
+  parser.parse(module.default, HTMLModuleSchema.properties.default, `${basename(inFile)}.default`);
+  parser.parse(module.apiOptions, APIOptionsSchema, `${basename(inFile)}.apiOptions`);
   if (module !== undefined) {
     return module;
   } else {
@@ -284,7 +294,9 @@ export async function importHTMLModule(inFile: string, logger?: Logger) {
 }
 
 export async function importJSONModule(inFile: string, logger?: Logger) {
-  const module = parser.parse((await importJSXFile(inFile, logger)), JSONModuleSchema, basename(inFile));
+  const module = (await importJSXFile(inFile, logger));
+  parser.parse(module.default, JSONModuleSchema.properties.default, `${basename(inFile)}.default`);
+  parser.parse(module.apiOptions, APIOptionsSchema, `${basename(inFile)}.apiOptions`);
   if (module !== undefined) {
     return module;
   } else {
