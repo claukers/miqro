@@ -7,7 +7,7 @@ export interface LogSocket {
   setMaxLogSize: (val: number | "unlimited") => void;
 }
 
-export function useLogSocket(): LogSocket {
+export function useLogSocket(options: { disableLog?: boolean; }): LogSocket {
 
   const [_, setmaxLogSize, getMaxlogsize] = jsx.useState<number | "unlimited">(1000000);
 
@@ -20,6 +20,9 @@ export function useLogSocket(): LogSocket {
 
     function setupSocket() {
       try {
+        if (options.disableLog) {
+          return;
+        }
         console.log("setting up log socket");
         const socket = new WebSocket("/admin/socket");
         socket.addEventListener("error", (err) => {
