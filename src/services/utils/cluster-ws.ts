@@ -135,7 +135,12 @@ export class ClusterWebSocketServer2 extends WebSocketServer {
       }
     };
 
+    this.connect();
+  }
+
+  public connect() {
     if (process.send) {
+      process.removeListener("message", this.listener);
       process.on("message", this.listener);
       process.send({
         type: ClusterWebSocketServer2MessageType,
@@ -146,7 +151,7 @@ export class ClusterWebSocketServer2 extends WebSocketServer {
     }
   }
 
-  dispose() {
+  public dispose() {
     process.removeListener("message", this.listener);
   }
 
