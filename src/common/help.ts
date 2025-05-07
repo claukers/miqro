@@ -18,7 +18,7 @@ export const help = `
 
 -v, --version\t\toutputs the version number
 -h, --help\t\toutputs this page.
---watch\t\tuse to enable the hot-reload functionality.
+--watch\t\t\tuse to enable the hot-reload functionality.
 --test\t\t\trun the tests for a service.
 --migrate-up\t\tmigrations up.
 --migrate-down\t\tmigrations down.
@@ -28,6 +28,7 @@ export const help = `
 --generate-doc\t\tgenerates a documentation for the api endpoints of the service.
 --generate-doc-out\tthe output file for the generated documentation. default value is API.md.
 --generate-doc-type\tthe format of the generated documentation. it can be JSON or MD. default value is MD.
+--generate-doc-all\toutputs all the server routes in the documentation output.
 --compile\t\tinflates the application and tries to create a NODE SEA binary.
 --inflate-sea\t\tinflates the application with sea compilation scripts.
 --install-tsconfig\tcreates a tsconfig.json configured to use with --install-types.

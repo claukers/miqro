@@ -567,7 +567,7 @@ CLUSTER_COUNT=10 miqro-cluster --service api/
 
 -v, --version		outputs the version number
 -h, --help		outputs this page.
---watch		use to enable the hot-reload functionality.
+--watch			use to enable the hot-reload functionality.
 --test			run the tests for a service.
 --migrate-up		migrations up.
 --migrate-down		migrations down.
@@ -577,6 +577,7 @@ CLUSTER_COUNT=10 miqro-cluster --service api/
 --generate-doc		generates a documentation for the api endpoints of the service.
 --generate-doc-out	the output file for the generated documentation. default value is API.md.
 --generate-doc-type	the format of the generated documentation. it can be JSON or MD. default value is MD.
+--generate-doc-all	outputs all the server routes in the documentation output.
 --compile		inflates the application and tries to create a NODE SEA binary.
 --inflate-sea		inflates the application with sea compilation scripts.
 --install-tsconfig	creates a tsconfig.json configured to use with --install-types.
