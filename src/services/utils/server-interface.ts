@@ -103,7 +103,7 @@ export class ServerInterfaceImpl implements ServerInterface {
   constructor(options: ServerInterfaceImplOptions) {
     this.cache = options.cache;
     this.localCache = options.localCache;
-    this.logger = options.logger;
+    this.logger = options.logger ? options.logger : options.loggerProvider ? options.loggerProvider.getLogger("server") : undefined;
     this.port = options.port;
 
     const dbManager = options.dbManager;

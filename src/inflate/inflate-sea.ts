@@ -81,6 +81,7 @@ async function main() {
     localCache,
     logProvider,
     wsManager: webSocketManager,
+    logger: logProvider.getLogger("server"),
     dbManager,
     port: PORT
   });
@@ -91,7 +92,7 @@ async function main() {
   const app = new App({
     onUpgrade: webSocketManager.onUpgrade
   });
-  ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].map(config=>config.preload(serverInterface)));\n` : ""}
+  ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].filter(config=>config.preload).map(config=>config.preload(serverInterface)));\n` : ""}
   app.use(ServerRequestHandler(serverInterface));
   app.use(LoggerHandler());
   ${services.map(service => {
@@ -105,11 +106,11 @@ async function main() {
   ${services.map(service => `
   app.use(await (await import("./${join(service, "api-router.js")}")).setupRouter());
   app.use(await (await import("./${join(service, "static-router.js")}")).setupRouter())`).join("\n")}
-  ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].map(config=>config.load(serverInterface)));\n` : ""}
+  ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].filter(config=>config.load).map(config=>config.load(serverInterface)));\n` : ""}
   
 
   await app.listen(PORT);
-  ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].map(config=>config.start(serverInterface)));` : ""}
+  ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].filter(config=>config.start).map(config=>config.start(serverInterface)));` : ""}
 }
 main().catch(e=>console.error(e));
 `
