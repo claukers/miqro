@@ -23,6 +23,7 @@ export interface Arguments {
   inflate: boolean;
   generateDoc: boolean;
   generateDocOut: string;
+  generateDocAll: boolean;
   generateDocType: "JSON" | "MD";
   migrateUp: boolean;
   migrateDown: boolean;
@@ -46,6 +47,7 @@ export function parseArguments(): Arguments {
     installTSConfig: boolean | null;
     inflate: boolean | null;
     generateDoc: boolean | null;
+    generateDocAll: boolean | null;
     generateDocOut?: string | null;
     generateDocType?: string | null;
     test: boolean;
@@ -67,6 +69,7 @@ export function parseArguments(): Arguments {
     test: null,
     inflate: null,
     generateDoc: null,
+    generateDocAll: null,
     generateDocOut: null,
     generateDocType: null,
     editor: null,
@@ -119,6 +122,14 @@ export function parseArguments(): Arguments {
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
         flags.generateDoc = true;
+        continue;
+      case "--generate-doc-all":
+        if (flags.generateDocAll !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.generateDocAll = true;
         continue;
       case "--generate-doc-out":
         if (flags.generateDocOut !== null) {
@@ -343,7 +354,7 @@ export function parseArguments(): Arguments {
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if ((flags.generateDocOut || flags.generateDocType) && !flags.generateDoc) {
+  if ((flags.generateDocAll || flags.generateDocOut || flags.generateDocType) && !flags.generateDoc) {
     console.error("bad arguments. cannot use without --generate-doc");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
@@ -351,6 +362,7 @@ export function parseArguments(): Arguments {
   const generateDocType = flags.generateDocType ? flags.generateDocType as any : "MD";
 
   return {
+    generateDocAll: flags.generateDocAll ? true : false,
     hotreload: flags.hotreload ? true : false,
     installTypes: flags.installTypes ? true : false,
     installTSConfig: flags.installTSConfig ? true : false,

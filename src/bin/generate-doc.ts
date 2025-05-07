@@ -16,28 +16,31 @@ export async function generateDocs(args: Arguments, logger: Logger, result: Infl
   const fileMapAPIRouteList = Object.keys(fileMap).map(f => fileMap[f]).filter(fMap => fMap.previewMethod === "api").map(fMap => fMap.routes);
 
   const jsonDoc = router.getJSONDoc();
-  Object.keys(jsonDoc).forEach(path => {
-    const methods = Object.keys(jsonDoc[path]);
-    methods.forEach(method => {
-      const data = jsonDoc[path][method];
-      //console.log("[%s] [%s]", path, method);
 
-      if (fileMapAPIRouteList.filter(f => {
-        for (const r of f) {
-          if (r.method === String(method).toUpperCase() && r.path === path) {
-            return true;
+  if (!args.generateDocAll) {
+    Object.keys(jsonDoc).forEach(path => {
+      const methods = Object.keys(jsonDoc[path]);
+      methods.forEach(method => {
+        const data = jsonDoc[path][method];
+        //console.log("[%s] [%s]", path, method);
+
+        if (fileMapAPIRouteList.filter(f => {
+          for (const r of f) {
+            if (r.method === String(method).toUpperCase() && r.path === path) {
+              return true;
+            }
           }
+          return false;
+        }).length === 0) {
+          //console.log("DELETE [%s] [%s]", path, method);
+          delete jsonDoc[path][method];
+        } else {
+          //console.log("KEEP [%s] [%s]", path, method);
         }
-        return false;
-      }).length === 0) {
-        //console.log("DELETE [%s] [%s]", path, method);
-        delete jsonDoc[path][method];
-      } else {
-        //console.log("KEEP [%s] [%s]", path, method);
-      }
 
+      });
     });
-  });
+  }
 
   switch (args.generateDocType) {
     case "JSON":
