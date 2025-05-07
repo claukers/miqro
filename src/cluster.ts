@@ -10,10 +10,14 @@ const __package_dirname = import.meta.url ? resolve(dirname(fileURLToPath(import
 
 //const usage = "CLUSTER_COUNT=os.cpus().length [CLUSTER_AUTO_BROADCAST=true|false] [CLUSTER_DISABLE_RESTART=true|false]";
 
-parseArguments();
+const args = parseArguments();
 
-const CMD = `CLUSTER_AUTO_BROADCAST=true ${process.argv[0]} ${mainPath()} ${resolve(__package_dirname, "main.js")} ${process.argv.slice(2).join(" ")}`;
+if (args.inflate || args.test || args.compile || args.installTSConfig || args.installTypes || args.migrateDown || args.migrateUp) {
+  await import("./main.js");
+} else {
+  const CMD = `CLUSTER_AUTO_BROADCAST=true ${process.argv[0]} ${mainPath()} ${resolve(__package_dirname, "main.js")} ${process.argv.slice(2).join(" ")}`;
 
-console.log(CMD);
+  console.log(CMD);
 
-execSync(CMD, { stdio: 'inherit' });
+  execSync(CMD, { stdio: 'inherit' });
+}
