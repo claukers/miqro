@@ -94,6 +94,8 @@ export interface ServerInterface {
   localCache: CacheInterface;
   logger: Logger;
   isPrimaryWorker: () => boolean;
+  getWorkerNumber: () => number;
+  getWorkerCount: () => number;
   openBrowser: (path: string) => void;
   getLogger: (identifier: string, options?: { level?: any; transports?: any[]; formatter?: any; }) => Logger;
 }

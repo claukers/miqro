@@ -144,6 +144,12 @@ export class ServerInterfaceImpl implements ServerInterface {
       }
     });
   }
+  public getWorkerNumber(): number {
+    return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === undefined ? 0 : parseInt(process.env["CLUSTER_NODE_NUMBER"], 10);
+  }
+  public getWorkerCount(): number {
+    return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === undefined || process.env["CLUSTER_COUNT"] === undefined ? 1 : parseInt(process.env["CLUSTER_COUNT"], 10);
+  }
   public isPrimaryWorker(): boolean {
     return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0";
   }
