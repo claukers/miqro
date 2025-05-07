@@ -1,4 +1,4 @@
-import { APIRoute, Handler, Router, RouterHandlerOptions, SessionHandler } from "@miqro/core";
+import { APIRoute, Handler, HandlerWithOptions, Router, RouterHandlerOptions, SessionHandler } from "@miqro/core";
 import { getAsset } from "../common/assets.js";
 
 import { BASEEDITOR_PATH } from "../../editor/common/constants.js";
@@ -17,8 +17,10 @@ import { CONTENT_TYPE_MAP } from "../common/content-type.js";
 
 export async function createEditorRouter(adminInterface: EditorAdminInterface): Promise<Router> {
   const router = new Router();
+  const innerRouter = new Router();
+  
 
-  router.use(async (req: AdminRequest, res) => {
+  innerRouter.use(async (req: AdminRequest, res) => {
     res.setHeader("x-uuid", req.uuid);
     req.editor = adminInterface;
   });
@@ -39,21 +41,23 @@ export async function createEditorRouter(adminInterface: EditorAdminInterface): 
 
   const { EditorIndex } = await import("../../editor/common/editor-index.js");
 
-  router.post(`${BASEEDITOR_PATH}/api/fs/write`, getHandler(authHandler, writeAPI));
+  innerRouter.use(authHandler);
 
-  router.post(`${BASEEDITOR_PATH}/api/fs/rename`, getHandler(authHandler, renameAPI));
+  innerRouter.post(`/api/fs/write`, getHandler(/*authHandler, */writeAPI));
 
-  router.post(`${BASEEDITOR_PATH}/api/fs/read`, getHandler(authHandler, readAPI));
+  innerRouter.post(`/api/fs/rename`, getHandler(/*authHandler, */renameAPI));
 
-  router.post(`${BASEEDITOR_PATH}/api/fs/delete`, getHandler(authHandler, deleteAPI));
+  innerRouter.post(`/api/fs/read`, getHandler(/*authHandler, */readAPI));
 
-  router.get(`${BASEEDITOR_PATH}/api/fs/scan`, getHandler(authHandler, scanAPI));
+  innerRouter.post(`/api/fs/delete`, getHandler(/*authHandler, */deleteAPI));
 
-  router.post(`${BASEEDITOR_PATH}/api/server/restart`, getHandler(authHandler, restartAPI));
+  innerRouter.get(`/api/fs/scan`, getHandler(/*authHandler, */scanAPI));
 
-  router.post(`${BASEEDITOR_PATH}/api/server/reload`, getHandler(authHandler, reloadAPI));
+  innerRouter.post(`/api/server/restart`, getHandler(/*authHandler, */restartAPI));
 
-  router.get(`${BASEEDITOR_PATH}/font.ttf`, async (_req, res) => {
+  innerRouter.post(`/api/server/reload`, getHandler(/*authHandler, */reloadAPI));
+
+  innerRouter.get(`/font.ttf`, async (_req, res) => {
     return await res.asyncEnd({
       status: 200,
       headers: {
@@ -63,13 +67,16 @@ export async function createEditorRouter(adminInterface: EditorAdminInterface): 
     })
   });
 
-  router.get(BASEEDITOR_PATH, [authHandler, EditorIndex(editorCSS, editorJS, false)]);
+  innerRouter.get("/", EditorIndex(editorCSS, editorJS, false));
 
 
 
-  router.use(async (req: AdminRequest, res) => {
+  innerRouter.use(async (req: AdminRequest, res) => {
     delete req.editor;
   });
+
+  router.use(innerRouter, BASEEDITOR_PATH);
+  console.dir(router.getJSONDoc());
 
   return router;
 }
@@ -84,10 +91,13 @@ function getHandlerOptions(router: APIRoute): RouterHandlerOptions {
   };
 }
 
-function getHandler(auth: Handler, router: APIRoute): Router {
-  const ret = new Router();
+function getHandler(/*auth: Handler, */router: APIRoute): HandlerWithOptions {
+  /*const ret = new Router();
   ret.use(auth);
   ret.use(router.handler, undefined, undefined, getHandlerOptions(router));
-  return ret;
-
+  return ret;*/
+  return {
+    ...getHandlerOptions(router),
+    handler: router.handler as Handler
+  }
 }

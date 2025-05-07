@@ -10,7 +10,7 @@ import { EditorAdminInterface } from "./common/admin-interface.js";
 const ADMIN_EDITOR_BROWSER_OPEN_KEY = "ADMIN_EDITOR_BROWSER_OPEN_KEY$$";
 
 export default {
-  preload: async (serverInterface: ServerInterface, adminInterface: EditorAdminInterface) => {
+  preload: (serverInterface: ServerInterface, adminInterface: EditorAdminInterface) => {
     //console.dir(server);
     if (serverInterface?.isPrimaryWorker()) {
       const cache = (adminInterface ? adminInterface.getCache() : serverInterface.cache);
