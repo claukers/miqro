@@ -18,7 +18,6 @@ import { CONTENT_TYPE_MAP } from "../common/content-type.js";
 export async function createEditorRouter(adminInterface: EditorAdminInterface): Promise<Router> {
   const router = new Router();
   const innerRouter = new Router();
-  
 
   innerRouter.use(async (req: AdminRequest, res) => {
     res.setHeader("x-uuid", req.uuid);
@@ -76,7 +75,6 @@ export async function createEditorRouter(adminInterface: EditorAdminInterface): 
   });
 
   router.use(innerRouter, BASEEDITOR_PATH);
-  console.dir(router.getJSONDoc());
 
   return router;
 }
