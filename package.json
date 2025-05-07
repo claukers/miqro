@@ -34,23 +34,22 @@
     "miqro-cluster": "build/esm/src/cluster.js"
   },
   "devDependencies": {
-    "@types/cookie": "^0.6.0",
     "@types/node": "^22.10.2",
+    "@types/showdown": "2.0.6",
     "postject": "1.0.0-alpha.6",
     "typescript": "^5.7.2",
     "highlight.js": "11.11.1"
   },
   "dependencies": {
-    "@miqro/core": "^5.0.13",
+    "@miqro/core": "^5.0.14",
     "@miqro/jsx": "^1.0.0",
     "@miqro/jsx-dom": "^1.0.3",
-    "@miqro/jsx-node": "^1.0.4",
+    "@miqro/jsx-node": "^1.0.5",
     "@miqro/parser": "^2.0.4",
     "@miqro/query": "^0.0.4",
     "@miqro/runner": "^2.0.1",
     "@miqro/test": "^0.2.9",
     "@miqro/test-http": "^0.1.2",
-    "@types/showdown": "2.0.6",
     "esbuild": "0.25.4",
     "showdown": "2.1.0"
   }

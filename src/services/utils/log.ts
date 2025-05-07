@@ -40,9 +40,9 @@ export class LogProvider {
     } catch (e) {
       urlParsingError = e;
     }
-    const pathToEnv = path.replace(/\//ig, "_").toUpperCase();
+    const pathToEnv = path.replace(/\//ig, "_").replace(/\./ig, "_").replace(/-/ig, "_").toUpperCase();
     const WORKER_IDENTIFIER = process.env["CLUSTER_NODE_NUMBER"] ? `WORKER_${process.env["CLUSTER_NODE_NUMBER"]}_` : "";
-    const identifier = `${pathToEnv === "_" ? "" : `${pathToEnv.substring(1)}`}${method.toUpperCase()}`;
+    const identifier = `${pathToEnv === "_" ? "" : `${pathToEnv.substring(1)}`}${pathToEnv.charAt(pathToEnv.length - 1) !== "_" ? "_" : ""}${method.toUpperCase()}`;
     const upgrade = req.headers.connection?.indexOf("Upgrade") !== -1;
 
     const logger = this.getLogger(
