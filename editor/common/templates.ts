@@ -319,7 +319,7 @@ window.addEventListener("load", (event) => {
 const TAG = "my-tag";
 
 function MyComponent(props, children) {
-  const [count, setcount] = useState(0);
+  const [count, setcount] = jsx.useState(0);
   useEffect(()=>{
     const timeout = setTimeout(()=>{
       setcount(count+1);
@@ -361,7 +361,7 @@ export function SSRComponent(props, children) {
 const TAG = "my-tag";
 
 function MyComponent(props, children) {
-  const [count, setcount] = useState(0);
+  const [count, setcount] = jsx.useState(0);
   useEffect(()=>{
     const timeout = setTimeout(()=>{
       setcount(count+1);
