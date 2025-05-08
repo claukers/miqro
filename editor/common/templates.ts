@@ -320,7 +320,7 @@ const TAG = "my-tag";
 
 function MyComponent(props, children) {
   const [count, setcount] = jsx.useState(0);
-  useEffect(()=>{
+  jsx.useEffect(()=>{
     const timeout = setTimeout(()=>{
       setcount(count+1);
     }, 1000);
@@ -362,7 +362,7 @@ const TAG = "my-tag";
 
 function MyComponent(props, children) {
   const [count, setcount] = jsx.useState(0);
-  useEffect(()=>{
+  jsx.useEffect(()=>{
     const timeout = setTimeout(()=>{
       setcount(count+1);
     }, 1000);
