@@ -1,5 +1,3 @@
-import { checkEnvVariable } from "@miqro/core";
-
 export const EXIT_CODES = {
   BAD_ARGUMENTS: 10,
   NORMAL_EXIT: 0,
@@ -9,9 +7,11 @@ export const EXIT_CODES = {
   TEST_FAILED: 30,
 }
 
-export const CLEAR_JSX_CACHE = checkEnvVariable("CLEAR_JSX_CACHE", "1") === "1";
+export const CLEAR_JSX_CACHE = (process.env["CLEAR_JSX_CACHE"] !== undefined ? process.env["CLEAR_JSX_CACHE"] : "1") === "1";
 
 export const EDITOR_CONFIG_KEY = "$$editor$$";
+
+export const HOT_RELOAD_PATH = "/hot-reload";
 
 //export const SERVER_IDENTIFIER = cluster.isPrimary ? "SERVER" : process.env["CLUSTER_NODE_NUMBER"] ? `WORKER_${process.env["CLUSTER_NODE_NUMBER"]}` : "WORKER";
 

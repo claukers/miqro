@@ -14,7 +14,7 @@ import editorServerConfig from "../../editor/server.js";
 
 import { ClusterCache } from "./utils/cluster-cache.js";
 import { createEditorRouter } from "./editor.js";
-import { EDITOR_CONFIG_KEY } from "../common/constants.js";
+import { EDITOR_CONFIG_KEY, HOT_RELOAD_PATH } from "../common/constants.js";
 import { watchAndServer } from "../common/watch.js";
 import { LocalCache } from "./utils/cache.js";
 import { initGlobals } from "./globals.js";
@@ -325,9 +325,9 @@ export class Miqro {
       }
 
       if (this.options?.hotreload/* && !options?.inflateTests*/) {
-        this.logger?.debug("setting up websocket on [/hot-reload]");
+        this.logger?.debug("setting up websocket on [%s]", HOT_RELOAD_PATH);
         wsConfigList.push({
-          path: "/hot-reload/"
+          path: HOT_RELOAD_PATH
         });
       }
 

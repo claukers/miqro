@@ -1,11 +1,13 @@
 //import { checkEnvVariable } from "@miqro/core";
 
+import { HOT_RELOAD_PATH } from "../common/constants.js";
+
 export function getHotReloadScript() {
   const HOT_RELOAD_JS_SCRIPT = `
 // Create WebSocket connection.
 
 function getSocket() {
-    return new WebSocket("/hot-reload");
+    return new WebSocket("${HOT_RELOAD_PATH}");
 }
 
 const socket = getSocket();
