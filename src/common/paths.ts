@@ -76,12 +76,23 @@ export function getStaticFilesPath(servicePath: string) {
   return false;
 }
 
+export function getMiddlewareConfigPath(servicePath: string) {
+  const middlewarePath = resolve(servicePath, "middleware.ts");
+  const middlewarePathJS = resolve(servicePath, "middleware.js");
+  if (existsSync(middlewarePath) && !statSync(middlewarePath).isDirectory()) {
+    return middlewarePath;
+  } else if (existsSync(middlewarePathJS) && !statSync(middlewarePathJS).isDirectory()) {
+    return middlewarePathJS;
+  }
+  return false;
+}
+
 export function getAuthConfigPath(servicePath: string) {
   const authPath = resolve(servicePath, "auth.ts");
   const authPathJS = resolve(servicePath, "auth.js");
   if (existsSync(authPath) && !statSync(authPath).isDirectory()) {
     return authPath;
-  } else if (existsSync(authPath) && !statSync(authPath).isDirectory()) {
+  } else if (existsSync(authPathJS) && !statSync(authPathJS).isDirectory()) {
     return authPathJS;
   }
   return false;
@@ -104,7 +115,7 @@ export function getMigrationsPath(servicePath: string) {
 }
 
 export function getESBuildBinaryPath() {
-  if(platform === "win32") {
+  if (platform === "win32") {
     return resolve(JSX_TMP_DIR, String(process.pid), "esbuild.exe");
   } else {
     return resolve(JSX_TMP_DIR, String(process.pid), "esbuild");

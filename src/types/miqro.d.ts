@@ -1,6 +1,6 @@
 import "./globals.js";
 import { Database, Migration } from "@miqro/query/lib.js";
-import { CORSOptions, LogLevel, LoggerTransportWriteArgs, Request, Response, WebSocketServer, Logger, WebSocketServerOptions, SessionHandlerOptions, RouteOptions, Handler } from "@miqro/core/lib.js";
+import { HandlerWithOptions, CORSOptions, LogLevel, LoggerTransportWriteArgs, Request, Response, WebSocketServer, Logger, WebSocketServerOptions, SessionHandlerOptions, RouteOptions, Handler } from "@miqro/core/lib.js";
 import { ParserInterface } from "@miqro/parser/lib.js";
 
 /*export * from "@miqro/core/lib.js";
@@ -8,6 +8,11 @@ export * from "@miqro/query/lib.js";*/
 
 export interface AuthConfig extends SessionHandlerOptions {
 
+}
+
+export interface MiddlewareConfig {
+  middleware: Array<HandlerWithOptions | Handler>;
+  post: Array<HandlerWithOptions | Handler>;
 }
 
 export interface CORSConfig extends CORSOptions {

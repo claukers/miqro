@@ -10,12 +10,12 @@ import { cwd } from "node:process";
 
 import { esBuild } from "./esbuild.js";
 import { assertGlobalTampered, browserJSXGlobals } from "../services/globals.js";
-import { APIOptions, ServerConfig, WSConfig, AuthConfig, DBConfig, LogConfig } from "../types.js";
+import { APIOptions, ServerConfig, WSConfig, AuthConfig, DBConfig, LogConfig, MiddlewareConfig } from "../types.js";
 import { getJSXJSPath, JSX_TMP_DIR } from "./paths.js";
 import { CLEAR_JSX_CACHE } from "./constants.js";
 import { getAsset, initAsset, validateAsset } from "./assets.js";
 import { calculateChecksumFromBuffer } from "./checksum.js";
-import { RouteOptionsSchema } from "@miqro/core/build/types.js";
+import { HandlerWithOptionsSchema, RouteOptionsSchema } from "@miqro/core/build/types.js";
 import { Migration } from "@miqro/query";
 
 let jsxJSBuffer: null | Buffer = null; // Buffer.from(getAsset("jsx.dom.js"));
@@ -263,6 +263,28 @@ export const AuthConfigSchema: Schema<AuthConfig> = {
   //mode:"add_extra"
 }
 
+export const MiddlewareConfigSchema: Schema<MiddlewareConfig>  = {
+  type: "object",
+  properties: {
+    middleware: {
+      type: "Array",
+      arrayType: "object|function",
+      required: false,
+      properties: {
+        ...HandlerWithOptionsSchema.properties
+      }
+    },
+    post: {
+      type: "Array",
+      arrayType: "object|function",
+      required: false,
+      properties: {
+        ...HandlerWithOptionsSchema.properties
+      }
+    }
+  },
+}
+
 export async function importAPIRoute(inFile: string, logger?: Logger) {
   const mod = (await importJSXFile(inFile, logger)).default;
   const module = typeof mod === "function" ? { handler: mod } : parser.parse(mod, APIRouteSchema, basename(inFile));
@@ -306,6 +328,15 @@ export async function importJSONModule(inFile: string, logger?: Logger) {
 
 export async function importAuthModule(inFile: string, logger?: Logger) {
   const module = parser.parse((await importJSXFile(inFile, logger)).default, AuthConfigSchema, basename(inFile));
+  if (module !== undefined) {
+    return module;
+  } else {
+    throw new Error(`error with module [${inFile}] undefined`);
+  }
+}
+
+export async function importMiddlewareConfigModule(inFile: string, logger?: Logger) {
+  const module = parser.parse((await importJSXFile(inFile, logger)).default, MiddlewareConfigSchema, basename(inFile));
   if (module !== undefined) {
     return module;
   } else {

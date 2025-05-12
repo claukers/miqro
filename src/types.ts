@@ -1,5 +1,5 @@
 import { Database } from "@miqro/query";
-import { WebSocketServerOptions, SessionHandlerOptions, Logger, WebSocketServer, ReadBuffer, URLEncodedParser, JSONParser, TextParser, CORS, SessionHandler, RouteOptions, Handler, Request, Response, LogLevel, LoggerTransportWriteArgs, CORSOptions } from "@miqro/core";
+import { WebSocketServerOptions, SessionHandlerOptions, Logger, WebSocketServer, ReadBuffer, URLEncodedParser, JSONParser, TextParser, CORS, SessionHandler, RouteOptions, Handler, Request, Response, LogLevel, LoggerTransportWriteArgs, CORSOptions, HandlerWithOptions } from "@miqro/core";
 import { request } from "@miqro/request";
 import { ParserInterface } from "@miqro/parser";
 import { RuntimeHTMLElement, Runtime, RuntimeContainer, RuntimeURL, RuntimeOptions, RuntimeShadowRootInit } from "@miqro/jsx";
@@ -167,6 +167,11 @@ declare global {
 
 export interface AuthConfig extends SessionHandlerOptions {
 
+}
+
+export interface MiddlewareConfig {
+  middleware?: Array<HandlerWithOptions | Handler>;
+  post?: Array<HandlerWithOptions | Handler>;
 }
 
 export interface WSConfig extends WebSocketServerOptions {

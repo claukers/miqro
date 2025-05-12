@@ -1,4 +1,4 @@
-import { Router, newURL, Response, Request, RouterHandlerOptions, Logger, APIRoute, normalizePath } from "@miqro/core";
+import { Router, newURL, Response, Request, RouterHandlerOptions, Logger, APIRoute, normalizePath, HandlerWithOptions, Handler } from "@miqro/core";
 import { existsSync, mkdirSync, readFile, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve as pathResolve } from "node:path";
 
@@ -15,7 +15,8 @@ import { setupAUTH } from "./setup-auth.js";
 import { getRoutes } from "../services/utils/get-route.js";
 import { describeFilePath } from "../common/fs.js";
 import { inflateMD2HTML } from "./md.js";
-import { ServerInterface, ServerRequest } from "../types.js";
+import { MiddlewareConfig, ServerInterface, ServerRequest } from "../types.js";
+import { setupMiddleware } from "./setup-middleware.js";
 
 export interface RouteFileMap {
   [filePath: string]: {
@@ -45,11 +46,13 @@ export interface StaticFileMap {
 export async function setupHTTPRouter(server: ServerInterface, logger: Logger, hotreload: boolean, servicePath: string, service: string, routeFileMap: RouteFileMap, staticFileMap: StaticFileMap | null, inflateDir: string | undefined | false, inflateSea: boolean, errors: InflateError[]) {
   const mainRouter = new Router();
   const apiRouterPath = getHTTPRouterPath(servicePath); //resolve(process.cwd(), service, "http");
+  let middlewareConfig: MiddlewareConfig | null = null;
   if (apiRouterPath) {
 
     await setupCORS(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
 
     await setupAUTH(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
+    middlewareConfig = await setupMiddleware(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
     logger.trace("setting up http routes from [%s]", service);
     const { router: httpRouter } = await createRouterFromDirectory(server, hotreload, service, logger, apiRouterPath, errors, routeFileMap, staticFileMap, inflateDir, inflateSea);
 
@@ -62,6 +65,13 @@ export async function setupHTTPRouter(server: ServerInterface, logger: Logger, h
     const staticRouter = createStaticRouterFromDirectory(service, logger, staticFilesPath, inflateDir, routeFileMap, staticFileMap);
     mainRouter.use(staticRouter);
   }
+
+  if (middlewareConfig && middlewareConfig.post) {
+    for (const m of middlewareConfig.post) {
+      mainRouter.use(m);
+    }
+  }
+
   return mainRouter;
 }
 
@@ -603,7 +613,7 @@ interface ScannedFile {
 }
 
 export function scanFiles(path: string, ret: ScannedFile[] = []): ScannedFile[] {
-  const files = readdirSync(path);
+  const files = readdirSync(path).sort();
   for (const file of files) {
     const filePath = pathResolve(path, file);
     if (statSync(filePath).isDirectory()) {
