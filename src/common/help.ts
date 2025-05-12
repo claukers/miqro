@@ -34,6 +34,7 @@ export const help = `
 --install-tsconfig\tcreates a tsconfig.json configured to use with --install-types.
 --install-types\t\tcreates and updates the .types/ folder use together with --install-tsconfig.
 --disable-miqrojson\tdisables the load of miqro.json file.
+--config\toverrides the default miqro.json path with a new one.
 
 ==environment variables==
 

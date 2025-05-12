@@ -1,5 +1,5 @@
 import { checkEnvVariable } from "@miqro/core";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { cp, existsSync, readFileSync, statSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { cwd, env, platform, arch } from "node:process";
 
@@ -16,7 +16,7 @@ import { Parser, Schema } from "@miqro/parser";
 const parser = new Parser();
 
 interface MiqroJSON {
-  services: string[];
+  services?: string[];
 }
 
 const MiqroJSONSchema: Schema<MiqroJSON> = {
@@ -47,6 +47,7 @@ export interface Arguments {
   inflate: boolean;
   generateDoc: boolean;
   generateDocOut: string;
+  miqroJSONPath: string | false;
   disableMiqroJSON: boolean;
   generateDocAll: boolean;
   generateDocType: "JSON" | "MD";
@@ -74,6 +75,7 @@ export function parseArguments(): Arguments {
     inflate: boolean | null;
     generateDoc: boolean | null;
     generateDocAll: boolean | null;
+    miqroJSONPath: string | null;
     disableMiqroJSON: boolean | null;
     generateDocOut?: string | null;
     generateDocType?: string | null;
@@ -87,6 +89,7 @@ export function parseArguments(): Arguments {
     hotreload?: boolean | null;
   } = {
     hotreload: null,
+    miqroJSONPath: null,
     disableMiqroJSON: null,
     installTypes: null,
     installTSConfig: null,
@@ -134,6 +137,21 @@ export function parseArguments(): Arguments {
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
         flags.disableMiqroJSON = true;
+        continue;
+      case "--config":
+        if (flags.miqroJSONPath !== null || flags.miqroJSONPath !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        const cPath = String(args[i + 1]).toUpperCase() as any;
+        if (typeof cPath !== "string") {
+          console.error("bad arguments. --config must be a string.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.miqroJSONPath = cPath;
+        i++;
         continue;
       case "--install-tsconfig":
         if (flags.inflate !== null || flags.installTSConfig !== null) {
@@ -318,9 +336,10 @@ export function parseArguments(): Arguments {
   flags.test = flags.test ? flags.test : false;
   flags.inflateDir = flags.inflateDir ? flags.inflateDir : undefined;
 
+  const miqroJSONPath = flags.miqroJSONPath ? resolve(flags.miqroJSONPath) : getMiqroJSONPath();
+
   // try to load .miqrorc
   if (services.length === 0 && !flags.disableMiqroJSON) {
-    const miqroJSONPath = getMiqroJSONPath();
     if (miqroJSONPath) {
       const miqroRC = importMiqroJSON(miqroJSONPath);
       for (const service of miqroRC.services) {
@@ -412,6 +431,7 @@ export function parseArguments(): Arguments {
     generateDocAll: flags.generateDocAll ? true : false,
     hotreload: flags.hotreload ? true : false,
     disableMiqroJSON: flags.disableMiqroJSON !== null ? flags.disableMiqroJSON : false,
+    miqroJSONPath: miqroJSONPath ? miqroJSONPath : false,
     installTypes: flags.installTypes ? true : false,
     installTSConfig: flags.installTSConfig ? true : false,
     inflate: flags.inflate,
