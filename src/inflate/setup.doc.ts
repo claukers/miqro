@@ -20,8 +20,8 @@ export async function setupDoc(logger: Logger, servicePath: string, service: str
         for (const path of paths) {
           const config = docModule.publish[path];
 
+          const body = await getDocOutput(mainRouter, fileMap, config.all, config.type);
           mainRouter.get(path, async (_, res) => {
-            const body = await getDocOutput(mainRouter, fileMap, config.all, config.type);
             switch (config.type) {
               case "MD": {
                 const contentType = CONTENT_TYPE_MAP[".md"];
@@ -45,13 +45,12 @@ export async function setupDoc(logger: Logger, servicePath: string, service: str
           });
 
           if (inflateDir) {
-            const inflateBody = await getDocOutput(mainRouter, fileMap, config.all, config.type);
             const inflatePath = join(inflateDir, service, "static", path);
             mkdirSync(dirname(inflatePath), {
               recursive: true
             });
             logger.log("writing [%s]", relative(cwd(), inflatePath));
-            writeFileSync(inflatePath, inflateBody);
+            writeFileSync(inflatePath, body);
           }
         }
       }
