@@ -195,7 +195,7 @@ export default {
   // auto publish API documentation
   publish: {
     "/api/doc.html": {
-      type: "HTML",
+      type: "HTML", // can be "MD" | "JSON" | "HTML"
       //all: true, // enable to show .html and other static resources
     }
   }
