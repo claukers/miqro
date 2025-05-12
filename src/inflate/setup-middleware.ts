@@ -12,7 +12,7 @@ export async function setupMiddleware(logger: Logger, servicePath: string, servi
   if (middlewarePath) {
     try {
       const middewareModule = await importMiddlewareConfigModule(middlewarePath, logger);
-      logger.debug("setting up authentication from [%s]", join(service, basename(middlewarePath)));
+      logger.debug("setting up middleware from [%s]", join(service, basename(middlewarePath)));
       if (middewareModule && middewareModule.middleware) {
         for (const m of middewareModule.middleware) {
           mainRouter.use(m);
