@@ -21,7 +21,7 @@
     "jsx.dom.js": "build/jsx.dom.js",
     "types.json": "sea/types.json",
     "editor-assets/editor.bundle.js": "build/editor.bundle.js",
-    "editor-assets/style.css": "editor/http/admin/editor/style.css",
-    "editor-assets/font.ttf": "editor/http/admin/editor/font.ttf"
+    "editor-assets/style.css": "build/style.css",
+    "editor-assets/font.ttf": "build/font.ttf"
   }
 }

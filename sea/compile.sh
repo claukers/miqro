@@ -33,6 +33,12 @@ $TSC_BIN
 
 #echo $VERSION_TAG > sea/version.tag
 
+# font.ttf
+cp sea/editor-assets/font.ttf build/font.ttf
+
+# style.css
+cp sea/editor-assets/style.css build/style.css
+
 # jsx.js
 cp node_modules/@miqro/jsx-dom/build/jsx-dom.esm.bundle.js build/jsx.dom.js
 
