@@ -175,7 +175,7 @@ export interface MiddlewareConfig {
 }
 
 export interface ErrorConfig {
-  catch: Array<ErrorHandler>;
+  catch?: Array<ErrorHandler>;
 }
 
 export interface WSConfig extends WebSocketServerOptions {

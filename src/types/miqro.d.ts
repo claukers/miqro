@@ -20,7 +20,7 @@ export interface CORSConfig extends CORSOptions {
 }
 
 export interface ErrorConfig {
-  catch: Array<ErrorHandler>;
+  catch?: Array<ErrorHandler>;
 }
 
 export interface WSConfig extends WebSocketServerOptions {
