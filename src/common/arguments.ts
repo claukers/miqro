@@ -17,16 +17,22 @@ const parser = new Parser();
 
 interface MiqroJSON {
   services?: string[];
+  port?: string | number;
+  inflateDir?: string;
+  name?: string;
 }
 
 const MiqroJSONSchema: Schema<MiqroJSON> = {
   type: "object",
   properties: {
-    services: "string[]?"
+    name: "string?",
+    services: "string[]?",
+    port: "number?|string?",
+    inflateDir: "string?"
   }
 }
 
-function importMiqroJSON(inFile: string) {
+export function importMiqroJSON(inFile: string) {
   const mod = JSON.parse(readFileSync(inFile).toString());
   const module = parser.parse(mod, MiqroJSONSchema, basename(inFile));
   if (module !== undefined) {
@@ -41,9 +47,11 @@ export function getPORT() {
 }
 
 export interface Arguments {
+  name: string;
   installTypes: boolean;
   installTSConfig: boolean;
   test: boolean;
+  port: string;
   inflate: boolean;
   generateDoc: boolean;
   generateDocOut: string;
@@ -70,9 +78,11 @@ export function parseArguments(): Arguments {
 
   const args = cluster.isPrimary ? process.argv.slice(2, process.argv.length) : process.argv.slice(3, process.argv.length);
   const flags: {
+    name: string | null;
     installTypes: boolean | null;
     installTSConfig: boolean | null;
     inflate: boolean | null;
+    port: string | null;
     generateDoc: boolean | null;
     generateDocAll: boolean | null;
     miqroJSONPath: string | null;
@@ -88,10 +98,12 @@ export function parseArguments(): Arguments {
     inflateDir?: string | null;
     hotreload?: boolean | null;
   } = {
+    name: null,
     hotreload: null,
     miqroJSONPath: null,
     disableMiqroJSON: null,
     installTypes: null,
+    port: null,
     installTSConfig: null,
     migrateUp: null,
     migrateDown: null,
@@ -131,7 +143,7 @@ export function parseArguments(): Arguments {
         console.log(help);
         process.exit(EXIT_CODES.NORMAL_EXIT);
       case "--disable-miqrojson":
-        if (flags.disableMiqroJSON !== null || flags.disableMiqroJSON !== null) {
+        if (flags.disableMiqroJSON !== null || flags.miqroJSONPath !== null) {
           console.error("bad arguments.");
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
@@ -139,7 +151,7 @@ export function parseArguments(): Arguments {
         flags.disableMiqroJSON = true;
         continue;
       case "--config":
-        if (flags.miqroJSONPath !== null || flags.miqroJSONPath !== null) {
+        if (flags.miqroJSONPath !== null || flags.disableMiqroJSON !== null) {
           console.error("bad arguments.");
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
@@ -168,6 +180,36 @@ export function parseArguments(): Arguments {
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
         flags.hotreload = true;
+        continue;
+      case "--port":
+        if (flags.port !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        const cPort = String(args[i + 1]).toUpperCase() as any;
+        if (typeof cPort !== "string") {
+          console.error("bad arguments. --port must be a string.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.port = cPort;
+        i++;
+        continue;
+      case "--name":
+        if (flags.name !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        const cName = String(args[i + 1]).toUpperCase() as any;
+        if (typeof cName !== "string") {
+          console.error("bad arguments. --port must be a string.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.name = cName;
+        i++;
         continue;
       case "--generate-doc":
         if (flags.generateDoc !== null) {
@@ -257,7 +299,6 @@ export function parseArguments(): Arguments {
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
-        env["HOT_RELOAD"] = env["HOT_RELOAD"] ? env["HOT_RELOAD"] : "0";
         flags.migrateUp = true;
         continue;
       case "--migrate-down":
@@ -266,7 +307,6 @@ export function parseArguments(): Arguments {
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
-        env["HOT_RELOAD"] = env["HOT_RELOAD"] ? env["HOT_RELOAD"] : "0";
         flags.migrateDown = true;
         continue;
       case "--inflate":
@@ -275,7 +315,6 @@ export function parseArguments(): Arguments {
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
-        env["HOT_RELOAD"] = env["HOT_RELOAD"] ? env["HOT_RELOAD"] : "0";
         flags.inflate = true;
         continue;
       case "--test":
@@ -284,7 +323,6 @@ export function parseArguments(): Arguments {
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
-        env["HOT_RELOAD"] = env["HOT_RELOAD"] ? env["HOT_RELOAD"] : "0";
         env["BROWSER"] = env["BROWSER"] ? env["BROWSER"] : "none";
         env["PORT"] = TEST_SOCKET;
         flags.test = true;
@@ -327,23 +365,36 @@ export function parseArguments(): Arguments {
     }
   }
 
-  if (process.env["CLUSTER_NODE_NUMBER"]) {
-    env["HOT_RELOAD"] = env["HOT_RELOAD"] ? env["HOT_RELOAD"] : "0";
-  }
-
   flags.inflate = flags.inflate ? flags.inflate : false;
   flags.editor = flags.editor ? flags.editor : false;
   flags.test = flags.test ? flags.test : false;
   flags.inflateDir = flags.inflateDir ? flags.inflateDir : undefined;
 
-  const miqroJSONPath = flags.miqroJSONPath ? resolve(flags.miqroJSONPath) : getMiqroJSONPath();
+  const miqroJSONPath = !flags.disableMiqroJSON ? flags.miqroJSONPath ? resolve(flags.miqroJSONPath) : getMiqroJSONPath() : false;
+  const miqroRC = miqroJSONPath ? importMiqroJSON(miqroJSONPath) : {};
 
   // try to load .miqrorc
-  if (services.length === 0 && !flags.disableMiqroJSON) {
-    if (miqroJSONPath) {
-      const miqroRC = importMiqroJSON(miqroJSONPath);
-      for (const service of miqroRC.services) {
-        services.push(service);
+  if (!flags.disableMiqroJSON) {
+    if (services.length === 0) {
+      if (miqroRC.services) {
+        for (const service of miqroRC.services) {
+          services.push(service);
+        }
+      }
+    }
+    if (!flags.port) {
+      if (miqroRC.port) {
+        flags.port = String(miqroRC.port);
+      }
+    }
+    if (!flags.inflateDir && flags.inflate) {
+      if (miqroRC.inflateDir) {
+        flags.inflateDir = miqroRC.inflateDir;
+      }
+    }
+    if (!flags.name) {
+      if (miqroRC.name) {
+        flags.name = miqroRC.name;
       }
     }
   }
@@ -428,6 +479,7 @@ export function parseArguments(): Arguments {
   const generateDocType = flags.generateDocType ? flags.generateDocType as any : "MD";
 
   return {
+    name: flags.name ? flags.name : undefined,
     generateDocAll: flags.generateDocAll ? true : false,
     hotreload: flags.hotreload ? true : false,
     disableMiqroJSON: flags.disableMiqroJSON !== null ? flags.disableMiqroJSON : false,
@@ -435,6 +487,7 @@ export function parseArguments(): Arguments {
     installTypes: flags.installTypes ? true : false,
     installTSConfig: flags.installTSConfig ? true : false,
     inflate: flags.inflate,
+    port: flags.port ? flags.port : getPORT(),
     migrateUp: flags.migrateUp ? true : false,
     migrateDown: flags.migrateDown ? true : false,
     test: flags.test ? true : false,

@@ -35,6 +35,8 @@ export const help = `
 --install-types\t\tcreates and updates the .types/ folder use together with --install-tsconfig.
 --disable-miqrojson\tdisables the load of miqro.json file.
 --config\toverrides the default miqro.json path with a new one.
+--port\toverrides the default port loading from environment variables.
+--name\toverrides the default name of the server.
 
 ==environment variables==
 

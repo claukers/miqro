@@ -20,7 +20,8 @@ export class LogProvider {
   public constructor(options?: LogProviderOptions) {
     this.options = {
       formatter: options && options.formatter ? options.formatter : DEFAULT_FORMATTER,
-      transports: options && options.transports ? options.transports : [ConsoleTransport()]
+      transports: options && options.transports ? options.transports : [ConsoleTransport()],
+      name: options.name
     };
     this.requestLoggerFactory = this.requestLoggerFactory.bind(this);
   }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Arguments, getPORT, parseArguments } from "./common/arguments.js";
+import { Arguments, parseArguments } from "./common/arguments.js";
 import { EXIT_CODES } from "./common/constants.js";
 import { testMain } from "./bin/test.js";
 import { compileSH } from "./bin/compile.js";
@@ -17,8 +17,8 @@ async function main(args: Arguments) {
   } else {
     const app = new Miqro({
       editor: args.editor,
-      name: "server",
-      port: args.test ? TEST_SOCKET : getPORT(),
+      name: args.name ? args.name : undefined,
+      port: args.test ? TEST_SOCKET : args.port,
       services: args.services,
       hotreload: args.test ? false : args.hotreload
     });

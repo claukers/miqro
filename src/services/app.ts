@@ -26,7 +26,7 @@ import { inflateDBConfig, inflateDBMigrations, MigrationModule } from "../inflat
 import { getServicePath } from "../common/paths.js";
 import { LogConfigMap } from "../inflate/setup-log.js";
 import { ServerInterfaceImpl } from "./utils/server-interface.js";
-import { getPORT } from "../common/arguments.js";
+import { getPORT, importMiqroJSON } from "../common/arguments.js";
 import { createLogProviderOptions } from "./utils/log-transport.js";
 import { createAdminInterface } from "./utils/admin-interface.js";
 
@@ -161,6 +161,21 @@ export class Miqro {
     this.adminInterface = createAdminInterface(this);
 
     setupExitHandlers(this);
+  }
+
+  public static async import(inFile: string, options?: Partial<MiqroOptions>, inflate?: Partial<InflateOptions>): Promise<Miqro> {
+    const miqroJSON = importMiqroJSON(inFile);
+    const app = new Miqro({
+      name: miqroJSON.name ? miqroJSON.name : undefined,
+      port: miqroJSON.port ? String(miqroJSON.port) : undefined,
+      services: miqroJSON.services ? miqroJSON.services : undefined,
+      ...(options ? options : {}),
+    });
+    await app.inflate({
+      inflateDir: miqroJSON.inflateDir ? String(miqroJSON.inflateDir) : undefined,
+      ...(inflate ? inflate : {}),
+    });
+    return app;
   }
 
   public connect() {
