@@ -10,7 +10,7 @@ import { cwd } from "node:process";
 
 import { esBuild } from "./esbuild.js";
 import { assertGlobalTampered, browserJSXGlobals } from "../services/globals.js";
-import { APIOptions, ServerConfig, WSConfig, AuthConfig, DBConfig, LogConfig, MiddlewareConfig } from "../types.js";
+import { APIOptions, ServerConfig, WSConfig, AuthConfig, DBConfig, LogConfig, MiddlewareConfig, ErrorConfig } from "../types.js";
 import { getJSXJSPath, JSX_TMP_DIR } from "./paths.js";
 import { CLEAR_JSX_CACHE } from "./constants.js";
 import { getAsset, initAsset, validateAsset } from "./assets.js";
@@ -263,12 +263,12 @@ export const AuthConfigSchema: Schema<AuthConfig> = {
   //mode:"add_extra"
 }
 
-export const MiddlewareConfigSchema: Schema<MiddlewareConfig>  = {
+export const MiddlewareConfigSchema: Schema<MiddlewareConfig> = {
   type: "object",
   properties: {
     middleware: {
       type: "Array",
-      arrayType: "object|function",
+      arrayType: "function|object",
       required: false,
       properties: {
         ...HandlerWithOptionsSchema.properties
@@ -276,11 +276,22 @@ export const MiddlewareConfigSchema: Schema<MiddlewareConfig>  = {
     },
     post: {
       type: "Array",
-      arrayType: "object|function",
+      arrayType: "function|object",
       required: false,
       properties: {
         ...HandlerWithOptionsSchema.properties
       }
+    }
+  },
+}
+
+export const ErrorConfigSchema: Schema<ErrorConfig> = {
+  type: "object",
+  properties: {
+    catch: {
+      type: "Array",
+      required: false,
+      arrayType: "function"
     }
   },
 }
@@ -336,6 +347,24 @@ export async function importAuthModule(inFile: string, logger?: Logger) {
 }
 
 export async function importMiddlewareConfigModule(inFile: string, logger?: Logger) {
+  const module = parser.parse((await importJSXFile(inFile, logger)).default, MiddlewareConfigSchema, basename(inFile));
+  if (module !== undefined) {
+    return module;
+  } else {
+    throw new Error(`error with module [${inFile}] undefined`);
+  }
+}
+
+export async function importErrorConfigModule(inFile: string, logger?: Logger) {
+  const module = parser.parse((await importJSXFile(inFile, logger)).default, ErrorConfigSchema, basename(inFile));
+  if (module !== undefined) {
+    return module;
+  } else {
+    throw new Error(`error with module [${inFile}] undefined`);
+  }
+}
+
+export async function importConfigConfigModule(inFile: string, logger?: Logger) {
   const module = parser.parse((await importJSXFile(inFile, logger)).default, MiddlewareConfigSchema, basename(inFile));
   if (module !== undefined) {
     return module;

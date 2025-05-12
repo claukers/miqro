@@ -87,6 +87,17 @@ export function getMiddlewareConfigPath(servicePath: string) {
   return false;
 }
 
+export function getErrorConfigPath(servicePath: string) {
+  const errorPath = resolve(servicePath, "catch.ts");
+  const errorPathJS = resolve(servicePath, "catch.js");
+  if (existsSync(errorPath) && !statSync(errorPath).isDirectory()) {
+    return errorPath;
+  } else if (existsSync(errorPathJS) && !statSync(errorPathJS).isDirectory()) {
+    return errorPathJS;
+  }
+  return false;
+}
+
 export function getAuthConfigPath(servicePath: string) {
   const authPath = resolve(servicePath, "auth.ts");
   const authPathJS = resolve(servicePath, "auth.js");

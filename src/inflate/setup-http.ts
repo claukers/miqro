@@ -17,6 +17,7 @@ import { describeFilePath } from "../common/fs.js";
 import { inflateMD2HTML } from "./md.js";
 import { MiddlewareConfig, ServerInterface, ServerRequest } from "../types.js";
 import { setupMiddleware } from "./setup-middleware.js";
+import { setupError } from "./setup-error.js";
 
 export interface RouteFileMap {
   [filePath: string]: {
@@ -48,6 +49,8 @@ export async function setupHTTPRouter(server: ServerInterface, logger: Logger, h
   const apiRouterPath = getHTTPRouterPath(servicePath); //resolve(process.cwd(), service, "http");
   let middlewareConfig: MiddlewareConfig | null = null;
   if (apiRouterPath) {
+
+    await setupError(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
 
     await setupCORS(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
 

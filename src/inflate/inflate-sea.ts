@@ -4,7 +4,7 @@ import { dirname, extname, join, relative, resolve } from "node:path";
 import { cwd, platform } from "node:process";
 
 import { RouteFileMap, StaticFileMap } from "./setup-http.js";
-import { getAuthConfigPath, getCORSConfigPath, getDBConfigPath, getMiddlewareConfigPath, getMigrationsPath, getServerConfigPath, getServicePath, getWSConfigPath } from "../common/paths.js";
+import { getAuthConfigPath, getCORSConfigPath, getDBConfigPath, getErrorConfigPath, getMiddlewareConfigPath, getMigrationsPath, getServerConfigPath, getServicePath, getWSConfigPath } from "../common/paths.js";
 import { getAsset } from "../common/assets.js";
 import { migration } from "@miqro/query";
 
@@ -113,6 +113,13 @@ export async function inflateServiceForSea(logger: Logger, inflateDir: string, s
   writeFile(logger, join(inflateDir, "sea", service, "router.js"), `import { appendAPIModule, Router } from "./../lib.cjs";\n
 export async function setupRouter() {
   const router = new Router();
+${getErrorConfigPath(servicePath) ? `
+  const errorConfig = (await import("../../${service}/catch.js")).default;
+  if(errorConfig && errorConfig.catch) {
+    for(const m of errorConfig.catch) {
+      router.catch(m);
+    }
+  }` : ""}
 ${getCORSConfigPath(servicePath) ? `app.use(server.middleware.cors((await import("../../${service}/cors.js")).default));` : ""}
 ${getAuthConfigPath(servicePath) ? `  app.use(server.middleware.session((await import("../../${service}/auth.js")).default));` : ""}
 ${getMiddlewareConfigPath(servicePath) ? `
