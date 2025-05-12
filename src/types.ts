@@ -178,6 +178,15 @@ export interface ErrorConfig {
   catch?: Array<ErrorHandler>;
 }
 
+export interface DocConfig {
+  publish: {
+    [path: string]: {
+      type?: "HTML" | "MD" | "JSON",
+      all?: boolean;
+    }
+  }
+}
+
 export interface WSConfig extends WebSocketServerOptions {
   path: string;
   disabled?: boolean;

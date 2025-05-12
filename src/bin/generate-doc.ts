@@ -1,23 +1,27 @@
-import { Logger } from "@miqro/core";
+import { Logger, Router } from "@miqro/core";
 import { Arguments } from "../common/arguments.js";
 import { writeFileSync } from "node:fs";
 import { getMDDoc } from "./doc-md.js";
 import { EXIT_CODES } from "../common/constants.js";
 import { InflatedResult } from "../services/app.js";
+import { RouteFileMap } from "../inflate/setup-http.js";
+import { inflateMD2HTML, inflateMDString2HTML } from "../inflate/md.js";
 
 export async function generateDocs(args: Arguments, logger: Logger, result: InflatedResult) {
-  /*
-  ** TODO FIX THIS MESS
-  */
+  logger.info("writing [%s]", args.generateDocOut);
+  writeFileSync(args.generateDocOut, await getDocOutput(result.router, result.fileMap, args.generateDocAll, args.generateDocType));
+}
 
-  const router = result.router;
-  const fileMap = result.fileMap;
+export async function getDocOutput(router: Router, fileMap: RouteFileMap, generateDocAll: boolean, generateDocType: "MD" | "JSON" | "HTML") {
+  /*
+    ** TODO FIX THIS MESS
+    */
 
   const fileMapAPIRouteList = Object.keys(fileMap).map(f => fileMap[f]).filter(fMap => fMap.previewMethod === "api").map(fMap => fMap.routes);
 
   const jsonDoc = router.getJSONDoc();
 
-  if (!args.generateDocAll) {
+  if (!generateDocAll) {
     Object.keys(jsonDoc).forEach(path => {
       const methods = Object.keys(jsonDoc[path]);
       methods.forEach(method => {
@@ -42,17 +46,19 @@ export async function generateDocs(args: Arguments, logger: Logger, result: Infl
     });
   }
 
-  switch (args.generateDocType) {
+  switch (generateDocType) {
     case "JSON":
-      logger.info("writing [%s]", args.generateDocOut);
-      writeFileSync(args.generateDocOut, JSON.stringify(jsonDoc, undefined, 4));
+      return JSON.stringify(jsonDoc, undefined, 2);
       break;
     case "MD":
-      logger.info("writing [%s]", args.generateDocOut);
-      writeFileSync(args.generateDocOut, await getMDDoc({ showFilePath: true, jsonDoc }));
+      return await getMDDoc({ showFilePath: true, jsonDoc });
+      break;
+    case "HTML":
+      const md = await getMDDoc({ showFilePath: true, jsonDoc });
+      const html = inflateMDString2HTML(md);
+      return html;
       break;
     default:
-      logger.error("--generate-doc-type invalid!");
       process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 }

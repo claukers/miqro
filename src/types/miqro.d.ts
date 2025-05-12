@@ -28,6 +28,15 @@ export interface WSConfig extends WebSocketServerOptions {
   disabled?: boolean;
 }
 
+export interface DocConfig {
+  publish: {
+    [path: string]: {
+      type?: "HTML" | "MD" | "JSON",
+      all?: boolean;
+    }
+  }
+}
+
 export interface ServerConfig {
   start?: (server: ServerInterface) => Promise<void> | void;
   preload?: (server: ServerInterface) => Promise<void> | void;

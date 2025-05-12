@@ -10,7 +10,7 @@ import { cwd } from "node:process";
 
 import { esBuild } from "./esbuild.js";
 import { assertGlobalTampered, browserJSXGlobals } from "../services/globals.js";
-import { APIOptions, ServerConfig, WSConfig, AuthConfig, DBConfig, LogConfig, MiddlewareConfig, ErrorConfig } from "../types.js";
+import { APIOptions, ServerConfig, WSConfig, AuthConfig, DBConfig, LogConfig, MiddlewareConfig, ErrorConfig, DocConfig } from "../types.js";
 import { getJSXJSPath, JSX_TMP_DIR } from "./paths.js";
 import { CLEAR_JSX_CACHE } from "./constants.js";
 import { getAsset, initAsset, validateAsset } from "./assets.js";
@@ -296,6 +296,23 @@ export const ErrorConfigSchema: Schema<ErrorConfig> = {
   },
 }
 
+export const DocConfigSchema: Schema<DocConfig> = {
+  type: "object",
+  properties: {
+    publish: {
+      type: "dict?",
+      dictType: "object",
+      properties: {
+        type: {
+          type: "enum?",
+          enumValues: ["HTML", "MD", "JSON"]
+        },
+        all: "boolean?"
+      }
+    }
+  }
+}
+
 export async function importAPIRoute(inFile: string, logger?: Logger) {
   const mod = (await importJSXFile(inFile, logger)).default;
   const module = typeof mod === "function" ? { handler: mod } : parser.parse(mod, APIRouteSchema, basename(inFile));
@@ -357,6 +374,15 @@ export async function importMiddlewareConfigModule(inFile: string, logger?: Logg
 
 export async function importErrorConfigModule(inFile: string, logger?: Logger) {
   const module = parser.parse((await importJSXFile(inFile, logger)).default, ErrorConfigSchema, basename(inFile));
+  if (module !== undefined) {
+    return module;
+  } else {
+    throw new Error(`error with module [${inFile}] undefined`);
+  }
+}
+
+export async function importDocConfigModule(inFile: string, logger?: Logger) {
+  const module = parser.parse((await importJSXFile(inFile, logger)).default, DocConfigSchema, basename(inFile));
   if (module !== undefined) {
     return module;
   } else {

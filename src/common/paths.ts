@@ -98,6 +98,17 @@ export function getErrorConfigPath(servicePath: string) {
   return false;
 }
 
+export function getDocConfigPath(servicePath: string) {
+  const docPath = resolve(servicePath, "doc.ts");
+  const docPathJS = resolve(servicePath, "doc.js");
+  if (existsSync(docPath) && !statSync(docPath).isDirectory()) {
+    return docPath;
+  } else if (existsSync(docPathJS) && !statSync(docPathJS).isDirectory()) {
+    return docPathJS;
+  }
+  return false;
+}
+
 export function getMiqroJSONPath() {
   const miqroRCPath = resolve(cwd(), "miqro.json");
   if (existsSync(miqroRCPath) && !statSync(miqroRCPath).isDirectory()) {

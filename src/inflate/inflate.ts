@@ -9,6 +9,7 @@ import { inflateWSConfig } from "./setup-ws.js";
 import { inflateAppForSea, inflateServiceForSea } from "./inflate-sea.js";
 import { ServerInterface, WSConfig } from "../types.js";
 import { LogConfigMap, setupLogConfig } from "./setup-log.js";
+import { setupDoc } from "./setup.doc.js";
 
 export interface InflateAppOptions {
   logger?: Logger;
@@ -72,6 +73,8 @@ export async function inflateApp({ serverInterface, logger, hotreload, services/
       ...routeFileMap,
       ...serviceRouteFileMap
     };
+
+    await setupDoc(logger, servicePath, service, router, routeFileMap, inflateDir, errors);
 
     await inflateWSConfig(logger, servicePath, service, wsConfigList, inflateSea ? inflateDir : undefined, errors);
 
