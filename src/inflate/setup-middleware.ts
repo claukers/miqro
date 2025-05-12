@@ -13,8 +13,10 @@ export async function setupMiddleware(logger: Logger, servicePath: string, servi
     try {
       const middewareModule = await importMiddlewareConfigModule(middlewarePath, logger);
       logger.debug("setting up authentication from [%s]", join(service, basename(middlewarePath)));
-      for (const m of middewareModule.middleware) {
-        mainRouter.use(m);
+      if (middewareModule && middewareModule.middleware) {
+        for (const m of middewareModule.middleware) {
+          mainRouter.use(m);
+        }
       }
       if (inflateDir && inflateSea) {
         const inflatePath = resolve(inflateDir, service, "middleware.js");

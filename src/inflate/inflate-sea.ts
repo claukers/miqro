@@ -117,8 +117,10 @@ ${getCORSConfigPath(servicePath) ? `app.use(server.middleware.cors((await import
 ${getAuthConfigPath(servicePath) ? `  app.use(server.middleware.session((await import("../../${service}/auth.js")).default));` : ""}
 ${getMiddlewareConfigPath(servicePath) ? `
   const middlewareConfig = (await import("../../${service}/middleware.js")).default;
-  for(const m of middlewareConfig.middleware) {
-    router.use(m);
+  if(middlewareConfig && middlewareConfig.middleware) {
+    for(const m of middlewareConfig.middleware) {
+      router.use(m);
+    }
   }` : ""}
 ${Object.keys(serviceRouteFileMap)
       .map(filePath => serviceRouteFileMap[filePath])
@@ -135,11 +137,13 @@ ${Object.keys(serviceRouteFileMap)
       .join("\n")}
   app.use(await (await import("./static-router.js")}")).setupRouter())
 
-  ${getMiddlewareConfigPath(servicePath) ? `
-    const middlewareConfig = (await import("../../${service}/middleware.js")).default;
+${getMiddlewareConfigPath(servicePath) ? `
+  const middlewareConfig = (await import("../../${service}/middleware.js")).default;
+  if(middlewareConfig && middlewareConfig.post) {
     for(const m of middlewareConfig.post) {
       router.use(m);
-    }` : ""}
+    }
+  }` : ""}
       
   return router;
 }`);
