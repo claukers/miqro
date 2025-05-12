@@ -4,7 +4,7 @@ import { dirname, extname, join, relative, resolve } from "node:path";
 import { cwd, platform } from "node:process";
 
 import { RouteFileMap, StaticFileMap } from "./setup-http.js";
-import { getAuthConfigPath, getCORSConfigPath, getDBConfigPath, getMigrationsPath, getServerConfigPath, getServicePath, getWSConfigPath } from "../common/paths.js";
+import { getAuthConfigPath, getCORSConfigPath, getDBConfigPath, getMiddlewareConfigPath, getMigrationsPath, getServerConfigPath, getServicePath, getWSConfigPath } from "../common/paths.js";
 import { getAsset } from "../common/assets.js";
 import { migration } from "@miqro/query";
 
@@ -95,20 +95,9 @@ async function main() {
   ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].filter(config=>config.preload).map(config=>config.preload(serverInterface)));\n` : ""}
   app.use(ServerRequestHandler(serverInterface));
   app.use(LoggerHandler());
-  ${services.map(service => {
-    const servicePath = getServicePath(service);
-    return `${getCORSConfigPath(servicePath) ? `app.use(server.middleware.cors((await import("../${service}/cors.js")).default));` : ""}`
-  })}
-  ${services.map(service => {
-    const servicePath = getServicePath(service);
-    return `${getAuthConfigPath(servicePath) ? `app.use(server.middleware.session((await import("../${service}/auth.js")).default));` : ""}`
-  })}
-  ${services.map(service => `
-  app.use(await (await import("./${join(service, "api-router.js")}")).setupRouter());
-  app.use(await (await import("./${join(service, "static-router.js")}")).setupRouter())`).join("\n")}
+  ${services.map(service => `app.use(await (await import("./${join(service, "router.js")}")).setupRouter());`).join("\n")}
   ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].filter(config=>config.load).map(config=>config.load(serverInterface)));\n` : ""}
   
-
   await app.listen(PORT);
   ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].filter(config=>config.start).map(config=>config.start(serverInterface)));` : ""}
 }
@@ -121,10 +110,16 @@ export async function inflateServiceForSea(logger: Logger, inflateDir: string, s
   const migrationsFolderPath = getMigrationsPath(servicePath);
 
   const serviceMigrations: string[] = migrationsFolderPath ? migration.getSortedMigrations(migrationsFolderPath) : [];
-  writeFile(logger, join(inflateDir, "sea", service, "api-router.js"), `import { appendAPIModule, Router } from "./../lib.cjs";\n
+  writeFile(logger, join(inflateDir, "sea", service, "router.js"), `import { appendAPIModule, Router } from "./../lib.cjs";\n
 export async function setupRouter() {
   const router = new Router();
-
+${getCORSConfigPath(servicePath) ? `app.use(server.middleware.cors((await import("../../${service}/cors.js")).default));` : ""}
+${getAuthConfigPath(servicePath) ? `  app.use(server.middleware.session((await import("../../${service}/auth.js")).default));` : ""}
+${getMiddlewareConfigPath(servicePath) ? `
+  const middlewareConfig = (await import("../../${service}/middleware.js")).default;
+  for(const m of middlewareConfig.middleware) {
+    router.use(m);
+  }` : ""}
 ${Object.keys(serviceRouteFileMap)
       .map(filePath => serviceRouteFileMap[filePath])
       .filter(data => data.previewMethod === "api")
@@ -138,7 +133,14 @@ ${Object.keys(serviceRouteFileMap)
         }
       }).filter(l => l)[0])
       .join("\n")}
+  app.use(await (await import("./static-router.js")}")).setupRouter())
 
+  ${getMiddlewareConfigPath(servicePath) ? `
+    const middlewareConfig = (await import("../../${service}/middleware.js")).default;
+    for(const m of middlewareConfig.post) {
+      router.use(m);
+    }` : ""}
+      
   return router;
 }`);
 
