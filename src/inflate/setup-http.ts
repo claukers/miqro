@@ -48,17 +48,16 @@ export async function setupHTTPRouter(server: ServerInterface, logger: Logger, h
   const mainRouter = new Router();
   const apiRouterPath = getHTTPRouterPath(servicePath); //resolve(process.cwd(), service, "http");
   let middlewareConfig: MiddlewareConfig | null = null;
+
+  await setupError(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
+
+  await setupCORS(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
+  await setupAUTH(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
+  middlewareConfig = await setupMiddleware(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
+
   if (apiRouterPath) {
-
-    await setupError(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
-
-    await setupCORS(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
-
-    await setupAUTH(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
-    middlewareConfig = await setupMiddleware(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
     logger.trace("setting up http routes from [%s]", service);
     const { router: httpRouter } = await createRouterFromDirectory(server, hotreload, service, logger, apiRouterPath, errors, routeFileMap, staticFileMap, inflateDir, inflateSea);
-
     mainRouter.use(httpRouter);
   }
 
