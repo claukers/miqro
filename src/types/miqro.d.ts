@@ -11,8 +11,8 @@ export interface AuthConfig extends SessionHandlerOptions {
 }
 
 export interface MiddlewareConfig {
-  middleware: Array<HandlerWithOptions | Handler>;
-  post: Array<HandlerWithOptions | Handler>;
+  middleware?: Array<HandlerWithOptions | Handler>;
+  post?: Array<HandlerWithOptions | Handler>;
 }
 
 export interface CORSConfig extends CORSOptions {
