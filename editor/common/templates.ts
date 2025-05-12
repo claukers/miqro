@@ -183,6 +183,24 @@ export default {
 } as AuthConfig;
 `
   },
+  DOCCONFIG: {
+    prefix: "",
+    sufix: ".ts",
+    filename: "doc",
+    displayName: "doc.ts file",
+    language: "typescript",
+    template: () => `import { DocConfig } from "miqro";
+
+export default {
+  // auto publish API documentation
+  publish: {
+    "/api/doc.html": {
+      type: "HTML",
+      //all: true, // enable to show .html and other static resources
+    }
+  }
+} as DocConfig;`
+  },
   WSCONFIG: {
     prefix: "",
     sufix: ".ts",
