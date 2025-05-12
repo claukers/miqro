@@ -1,0 +1,4 @@
+{
+  "services": ["./front", "./api"],
+  "port": 6969
+}

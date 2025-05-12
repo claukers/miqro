@@ -1,6 +1,6 @@
 import { checkEnvVariable } from "@miqro/core";
 import { cp, existsSync, readFileSync, statSync } from "node:fs";
-import { basename, resolve } from "node:path";
+import { basename, dirname, resolve } from "node:path";
 import { cwd, env, platform, arch } from "node:process";
 
 import { EXIT_CODES } from "./constants.js";
@@ -374,11 +374,11 @@ export function parseArguments(): Arguments {
   const miqroRC = miqroJSONPath ? importMiqroJSON(miqroJSONPath) : {};
 
   // try to load .miqrorc
-  if (!flags.disableMiqroJSON) {
+  if (!flags.disableMiqroJSON && miqroJSONPath) {
     if (services.length === 0) {
       if (miqroRC.services) {
         for (const service of miqroRC.services) {
-          services.push(service);
+          services.push(resolve(dirname(miqroJSONPath), service));
         }
       }
     }

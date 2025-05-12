@@ -29,6 +29,7 @@ import { ServerInterfaceImpl } from "./utils/server-interface.js";
 import { getPORT, importMiqroJSON } from "../common/arguments.js";
 import { createLogProviderOptions } from "./utils/log-transport.js";
 import { createAdminInterface } from "./utils/admin-interface.js";
+import { dirname, resolve } from "node:path";
 
 export interface MiqroOptions {
   name: string;
@@ -164,11 +165,12 @@ export class Miqro {
   }
 
   public static async import(inFile: string, options?: Partial<MiqroOptions>, inflate?: Partial<InflateOptions>): Promise<Miqro> {
-    const miqroJSON = importMiqroJSON(inFile);
+    const miqroJSON = importMiqroJSON(resolve(inFile));
+    const miqroJSONDir = dirname(resolve(inFile));
     const app = new Miqro({
       name: miqroJSON.name ? miqroJSON.name : undefined,
       port: miqroJSON.port ? String(miqroJSON.port) : undefined,
-      services: miqroJSON.services ? miqroJSON.services : undefined,
+      services: miqroJSON.services ? miqroJSON.services.map(s => resolve(miqroJSONDir, s)) : undefined,
       ...(options ? options : {}),
     });
     await app.inflate({
