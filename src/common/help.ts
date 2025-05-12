@@ -33,6 +33,7 @@ export const help = `
 --inflate-sea\t\tinflates the application with sea compilation scripts.
 --install-tsconfig\tcreates a tsconfig.json configured to use with --install-types.
 --install-types\t\tcreates and updates the .types/ folder use together with --install-tsconfig.
+--disable-miqrojson\tdisables the load of miqro.json file.
 
 ==environment variables==
 

@@ -2,7 +2,7 @@ import { Runtime } from "@miqro/jsx";
 import { createNodeRuntime } from "@miqro/jsx-node";
 import { basename, dirname, relative, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
-import { mkdirSync, rmdirSync, unlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { Request, Response, CORSOptions, Logger, APIRoute } from "@miqro/core";
 import { Parser, Schema } from "@miqro/parser";
 import { APIRouteSchema, SessionHandlerOptionsSchema } from "@miqro/core";

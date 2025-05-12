@@ -1,16 +1,40 @@
 import { checkEnvVariable } from "@miqro/core";
 import { existsSync, readFileSync, statSync } from "node:fs";
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import { cwd, env, platform, arch } from "node:process";
 
 import { EXIT_CODES } from "./constants.js";
 import { tmpdir } from "node:os";
 import { randomUUID } from "node:crypto";
 import { BIN_NAME, help, usage } from "./help.js";
-import { TEST_SOCKET } from "./paths.js";
+import { getMiqroJSONPath, TEST_SOCKET } from "./paths.js";
 import { isSea } from "node:sea";
 import cluster from "node:cluster";
 import { __package_dirname, getVersion } from "./assets.js";
+import { Parser, Schema } from "@miqro/parser";
+
+const parser = new Parser();
+
+interface MiqroJSON {
+  services: string[];
+}
+
+const MiqroJSONSchema: Schema<MiqroJSON> = {
+  type: "object",
+  properties: {
+    services: "string[]?"
+  }
+}
+
+function importMiqroJSON(inFile: string) {
+  const mod = JSON.parse(readFileSync(inFile).toString());
+  const module = parser.parse(mod, MiqroJSONSchema, basename(inFile));
+  if (module !== undefined) {
+    return module as MiqroJSON;
+  } else {
+    throw new Error(`error loading [${inFile}] undefined`);
+  }
+}
 
 export function getPORT() {
   return checkEnvVariable("PORT", "8080");
@@ -23,6 +47,7 @@ export interface Arguments {
   inflate: boolean;
   generateDoc: boolean;
   generateDocOut: string;
+  disableMiqroJSON: boolean;
   generateDocAll: boolean;
   generateDocType: "JSON" | "MD";
   migrateUp: boolean;
@@ -41,6 +66,7 @@ export interface Arguments {
 export function parseArguments(): Arguments {
   //env["LOG_FILE"] = env["LOG_FILE"] ? env["LOG_FILE"] : "./server.log";
 
+
   const args = cluster.isPrimary ? process.argv.slice(2, process.argv.length) : process.argv.slice(3, process.argv.length);
   const flags: {
     installTypes: boolean | null;
@@ -48,6 +74,7 @@ export function parseArguments(): Arguments {
     inflate: boolean | null;
     generateDoc: boolean | null;
     generateDocAll: boolean | null;
+    disableMiqroJSON: boolean | null;
     generateDocOut?: string | null;
     generateDocType?: string | null;
     test: boolean;
@@ -60,6 +87,7 @@ export function parseArguments(): Arguments {
     hotreload?: boolean | null;
   } = {
     hotreload: null,
+    disableMiqroJSON: null,
     installTypes: null,
     installTSConfig: null,
     migrateUp: null,
@@ -99,6 +127,14 @@ export function parseArguments(): Arguments {
         console.log(usage);
         console.log(help);
         process.exit(EXIT_CODES.NORMAL_EXIT);
+      case "--disable-miqrojson":
+        if (flags.disableMiqroJSON !== null || flags.disableMiqroJSON !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.disableMiqroJSON = true;
+        continue;
       case "--install-tsconfig":
         if (flags.inflate !== null || flags.installTSConfig !== null) {
           console.error("bad arguments.");
@@ -282,6 +318,17 @@ export function parseArguments(): Arguments {
   flags.test = flags.test ? flags.test : false;
   flags.inflateDir = flags.inflateDir ? flags.inflateDir : undefined;
 
+  // try to load .miqrorc
+  if (services.length === 0 && !flags.disableMiqroJSON) {
+    const miqroJSONPath = getMiqroJSONPath();
+    if (miqroJSONPath) {
+      const miqroRC = importMiqroJSON(miqroJSONPath);
+      for (const service of miqroRC.services) {
+        services.push(service);
+      }
+    }
+  }
+
   if (services.length === 0 && (!flags.installTSConfig && !flags.installTypes)) {
     flags.inflateDir = flags.inflateDir ? flags.inflateDir : undefined;
     console.error(`bad arguments. missing --service argument`);
@@ -364,6 +411,7 @@ export function parseArguments(): Arguments {
   return {
     generateDocAll: flags.generateDocAll ? true : false,
     hotreload: flags.hotreload ? true : false,
+    disableMiqroJSON: flags.disableMiqroJSON !== null ? flags.disableMiqroJSON : false,
     installTypes: flags.installTypes ? true : false,
     installTSConfig: flags.installTSConfig ? true : false,
     inflate: flags.inflate,
