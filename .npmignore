@@ -31,3 +31,13 @@ API.md
 API.json
 #tsconfig.json
 tsconfig-with-typings.json
+sea/editor-assets
+sea/*.js
+sea/compile.sh
+sea/copy-types.sh
+sea/copy-types.sh
+sea/release-tar.sh
+sea/tsc.sh
+editor/
+src/
+bin/

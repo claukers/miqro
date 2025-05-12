@@ -14,6 +14,7 @@
     "prepare": "npm run build",
     "release:package": "sh sea/release-tar.sh",
     "prerelease:package": "npm run compile",
+    "prebuild": "rm -Rf build/;",
     "build": "tsc",
     "postbuild": "npm run postbuild:lib && npm run postbuild:postject && npm run postbuild:sh && npm run postbuild:jsxdom && npm run postbuild:editor && npm run postbuild:editor-assets && npm run postbuild:types && npm run postbuild:versiontag",
     "postbuild:versiontag": "node sea/version.tag.js",
