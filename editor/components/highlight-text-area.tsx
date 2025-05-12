@@ -1,5 +1,5 @@
 //import hljs from "../lib/highlight/core.min.js"
-import hljs from 'highlight.js';
+import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import xml from "highlight.js/lib/languages/xml";
 import css from "highlight.js/lib/languages/css";
@@ -14,21 +14,6 @@ import bash from "highlight.js/lib/languages/bash";
 import python from "highlight.js/lib/languages/python";
 import text from "highlight.js/lib/languages/plaintext";
 import json from "highlight.js/lib/languages/json";
-
-/*import javascript from "../lib/highlight/languages/javascript.js";
-import xml from "../lib/highlight/languages/xml.js";
-import css from "../lib/highlight/languages/css.js";
-import scss from "../lib/highlight/languages/scss.js";
-import markdown from "../lib/highlight/languages/markdown.js";
-import dockerfile from "../lib/highlight/languages/dockerfile.js";
-import yaml from "../lib/highlight/languages/yaml.js";
-import typescript from "../lib/highlight/languages/typescript.js";
-import c from "../lib/highlight/languages/c.js";
-import cpp from "../lib/highlight/languages/cpp.js";
-import bash from "../lib/highlight/languages/bash.js";
-import python from "../lib/highlight/languages/python.js";
-import text from "../lib/highlight/languages/plaintext.js";
-import json from "../lib/highlight/languages/json.js";*/
 
 // Then register the languages you need
 hljs.registerLanguage('text', text);
