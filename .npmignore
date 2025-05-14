@@ -39,6 +39,6 @@ sea/copy-types.sh
 sea/copy-types.sh
 sea/release-tar.sh
 sea/tsc.sh
-editor/
-src/
+#editor/
+#src/
 bin/miqro
