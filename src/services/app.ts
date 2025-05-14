@@ -29,7 +29,8 @@ import { ServerInterfaceImpl } from "./utils/server-interface.js";
 import { getPORT, importMiqroJSON } from "../common/arguments.js";
 import { createLogProviderOptions } from "./utils/log-transport.js";
 import { createAdminInterface } from "./utils/admin-interface.js";
-import { dirname, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
+import { cwd } from "node:process";
 
 export interface MiqroOptions {
   name: string;
@@ -170,7 +171,7 @@ export class Miqro {
     const app = new Miqro({
       name: miqroJSON.name ? miqroJSON.name : undefined,
       port: miqroJSON.port ? String(miqroJSON.port) : undefined,
-      services: miqroJSON.services ? miqroJSON.services.map(s => resolve(miqroJSONDir, s)) : undefined,
+      services: miqroJSON.services ? miqroJSON.services.map(s => join(relative(cwd(), miqroJSONDir), s)) : undefined,
       ...(options ? options : {}),
     });
     await app.inflate({
