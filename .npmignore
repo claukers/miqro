@@ -27,6 +27,7 @@ inflated/
 build/*.blob
 build/main.js
 build/postject.cjs
+#build/postject.base64.cjs
 API.md
 API.json
 #tsconfig.json
