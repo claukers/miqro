@@ -41,4 +41,4 @@ sea/release-tar.sh
 sea/tsc.sh
 editor/
 src/
-bin/
+bin/miqro
