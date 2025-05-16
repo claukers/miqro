@@ -17,20 +17,18 @@ export async function inflateDBConfig(logger: Logger, service: string, dbConfigL
   if (dbConfigPath) {
     try {
       //logger.debug("loading DBConfig for service[%s]", service);
-      const configModule = await importDBConfigModule(dbConfigPath, logger);
-      const configList = configModule instanceof Array ? configModule : configModule ? [configModule] : [];
-      for (const config of configList) {
-        if (config && dbConfigList && dbConfigList.filter(c => c.name === config.name).length > 0) {
-          throw new Error(`ws path [${config.name}] already defined! error from [${dbConfigPath}]`);
-        } else if (config) {
-          //logger.debug("DBConfig [%s] loaded from service [%s]", config.name, service);
-          if (dbConfigList) {
-            dbConfigList.push(config);
-          }
+      const config = await importDBConfigModule(dbConfigPath, logger);
+      if (config && dbConfigList && dbConfigList.filter(c => c.name === config.name).length > 0) {
+        throw new Error(`ws path [${config.name}] already defined! error from [${dbConfigPath}]`);
+      } else if (config) {
+        //logger.debug("DBConfig [%s] loaded from service [%s]", config.name, service);
+        if (dbConfigList) {
+          dbConfigList.push(config);
         }
       }
 
-      if (configModule) {
+
+      if (config) {
         if (inflateDir) {
           const inflatePath = resolve(inflateDir, service, "db.js");
           mkdirSync(dirname(inflatePath), {
@@ -48,7 +46,7 @@ export async function inflateDBConfig(logger: Logger, service: string, dbConfigL
         //const db = await dbManager.setupDB(service, config);
 
         //return db;
-        return configList;
+        return config;
       }
     } catch (e) {
       errors.push({

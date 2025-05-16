@@ -13,16 +13,13 @@ export async function inflateWSConfig(logger: Logger, servicePath: string, servi
   if (wsPath) {
     try {
       logger.debug("importing websocket socket for service [%s]", service);
-      const wsConfigModule = await importWSConfigModule(wsPath, logger);
-      const wsConfigModuleList = wsConfigModule instanceof Array ? wsConfigModule : wsConfigModule ? [wsConfigModule] : [];
-      for (const wsConfig of wsConfigModuleList) {
-        if (wsConfig && wsConfigList.filter(c => c.path === wsConfig.path).length > 0) {
-          throw new Error(`ws path [${wsConfig.path}] already defined! from [${wsPath}]`);
-        } else if (wsConfigList) {
-          logger.debug("importing websocket on path [%s] from [%s]", wsConfig.path, join(service, "ws.ts"));
-          wsConfigList.push(wsConfig);
-          //wsMap[wsConfig.path] = { name: service, options: wsConfig };
-        }
+      const wsConfig = await importWSConfigModule(wsPath, logger);
+      if (wsConfig && wsConfigList.filter(c => c.path === wsConfig.path).length > 0) {
+        throw new Error(`ws path [${wsConfig.path}] already defined! from [${wsPath}]`);
+      } else if (wsConfigList) {
+        logger.debug("importing websocket on path [%s] from [%s]", wsConfig.path, join(service, "ws.ts"));
+        wsConfigList.push(wsConfig);
+        //wsMap[wsConfig.path] = { name: service, options: wsConfig };
       }
 
       if (inflateDir) {
