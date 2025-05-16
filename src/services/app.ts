@@ -249,16 +249,20 @@ export class Miqro {
       dbConfig: DBConfig;
       migrations: MigrationModule[];
     }[] = [];
-    const dbConfigList: DBConfig[] = [];
+    const dbConfigListALL: DBConfig[] = [];
     for (const service of this.options.services) {
-      const dbConfig = await inflateDBConfig(this.logger, service, dbConfigList, options?.inflateSea ? options?.inflateDir : undefined, errors);
-      if (dbConfig) {
-        const migrations = await inflateDBMigrations(this.logger, service, dbConfig.name, options?.inflateSea ? options?.inflateDir : undefined, errors);
-        dbList.push({
-          service,
-          dbConfig,
-          migrations: migrations ? migrations : []
-        });
+      const dbConfigList = await inflateDBConfig(this.logger, service, dbConfigListALL, options?.inflateSea ? options?.inflateDir : undefined, errors);
+      if (dbConfigList) {
+        for (const dbConfig of dbConfigList) {
+          if (dbConfig) {
+            const migrations = await inflateDBMigrations(this.logger, service, dbConfig.name, options?.inflateSea ? options?.inflateDir : undefined, errors);
+            dbList.push({
+              service,
+              dbConfig,
+              migrations: migrations ? migrations : []
+            });
+          }
+        }
       }
     }
     return { dbList, errors };

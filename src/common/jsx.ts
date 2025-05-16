@@ -203,8 +203,9 @@ export const CORSOptionsSchema: Schema<CORSOptions> = {
   //mode:"add_extra"
 }
 
-export const WSConfigSchema: Schema<WSConfig> = {
-  type: "object",
+export const WSConfigSchema: Schema<WSConfig | WSConfig[]> = {
+  type: "array|object",
+  arrayType: "object",
   properties: {
     path: "string",
     disabled: "boolean?",
@@ -217,8 +218,9 @@ export const WSConfigSchema: Schema<WSConfig> = {
   //mode:"add_extra"
 };
 
-export const DBConfigSchema: Schema<DBConfig> = {
-  type: "object",
+export const DBConfigSchema: Schema<DBConfig | DBConfig[]> = {
+  type: "array|object",
+  arrayType: "object",
   properties: {
     url: "string?",
     disabled: "boolean?",

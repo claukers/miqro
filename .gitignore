@@ -30,3 +30,4 @@ app/
 .admin_key
 API.md
 API.json
+*.sqlite3

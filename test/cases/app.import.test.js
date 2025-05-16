@@ -43,4 +43,48 @@ describe("simple html inflate", () => {
       throw e;
     }
   });
+
+  it("case 1 DB0 and /socket", async () => {
+    try {
+      const app = await Miqro.import("./test/cases/import-case/case1/miqro.json");
+      await app.start();
+      const db0 = app.dbManager.getDB("DB0");
+      strictEqual(typeof db0.connect, "function");
+      const ws1 = app.webSocketManager.getWS("/socket");
+      strictEqual(typeof ws1.writeTo, "function");
+      await app.stop();
+    } catch (e) {
+      console.error(e);
+      await app.stop();
+      throw e;
+    }
+  });
+
+  it("case 2 two db defined and two ws", async () => {
+    const app = await Miqro.import("./test/cases/import-case/case2/miqro.json");
+    try {
+      await app.start();
+
+      const db1 = app.dbManager.getDB("DB1");
+
+      const db2 = app.dbManager.getDB("DB2");
+
+      strictEqual(typeof db1.connect, "function");
+      strictEqual(typeof db2.connect, "function");
+
+      const ws1 = app.webSocketManager.getWS("/socket1");
+      console.dir(app.webSocketManager.map);
+
+      const ws2 = app.webSocketManager.getWS("/socket2");
+
+      strictEqual(typeof ws1.writeTo, "function");
+      strictEqual(typeof ws2.writeTo, "function");
+      await app.stop();
+
+    } catch (e) {
+      console.error(e);
+      await app.stop();
+      throw e;
+    }
+  });
 });
