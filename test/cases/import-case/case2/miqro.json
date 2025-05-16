@@ -1,4 +1,4 @@
 {
-  "services": ["./api"],
+  "services": ["./api", "/api2"],
   "port": 6969
 }
