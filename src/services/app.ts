@@ -40,7 +40,7 @@ export interface MiqroOptions {
   editor: boolean;
   port: string;
   browser?: string | boolean;
-  logFile?: string;
+  logFile?: string | boolean;
   hotreload?: boolean;
 }
 

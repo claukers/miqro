@@ -291,6 +291,21 @@ export default {
   }
 }
 `},
+  MIQROJSON: {
+    prefix: "",
+    sufix: ".json",
+    filename: "miqro",
+    displayName: "miqro.json file",
+    language: "json",
+    template: () => `{
+  "services": ["src/"],
+  "inflateDir": "build/",
+  "name": "server",
+  "browser": true,
+  "logFile": false,
+  "port": "3000"
+}
+`},
   MINIFIEDJSX: {
     prefix: "http",
     sufix: ".min.tsx",

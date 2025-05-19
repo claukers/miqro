@@ -18,5 +18,12 @@ export async function installTypings(args: Arguments, logger: MinimalLogger) {
     logger.error("tsconfig.json already exists!");
     process.exit(EXIT_CODES.ABNORMAL);
   }
+  if (args.installMiqroJSON && !existsSync("miqro.json")) {
+    logger.info("writing miqro.json");
+    writeFileSync("miqro.json", TEMPLATES["MIQROJSON"].template("", ""));
+  } else if (args.installMiqroJSON) {
+    logger.error("miqro.json already exists!");
+    process.exit(EXIT_CODES.ABNORMAL);
+  }
   process.exit(EXIT_CODES.NORMAL_EXIT);
 }

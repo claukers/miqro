@@ -1,11 +1,17 @@
-import { ConsoleTransport, FileTransport, LoggerTransportWriteArgs, LogLevel, WriteArgs } from "@miqro/core";
+import { ConsoleTransport, FileTransport, LoggerTransport, LoggerTransportWriteArgs, LogLevel, WriteArgs } from "@miqro/core";
 import { format } from "node:util";
 import { LOG_SOCKET_PATH, LOG_WRITE_EVENT } from "../../../editor/common/constants.js";
 import { Miqro } from "../app.js";
 
 export function createLogProviderOptions(app: Miqro) {
   const defaultConsole = ConsoleTransport();
-  const defaultFile = app.options.logFile ? FileTransport(app.options.logFile) : FileTransport();
+  //console.log("app.options.logFile [%s]", app.options.logFile);
+  const defaultFile: LoggerTransport | undefined =
+    app.options.logFile !== true && app.options.logFile !== false && String(app.options.logFile).toUpperCase() !== "TRUE" && String(app.options.logFile).toUpperCase() !== "FALSE" &&
+      app.options.logFile ? FileTransport(app.options.logFile) :
+      String(app.options.logFile).toUpperCase() === "TRUE" || app.options.logFile === true || app.options.logFile === undefined ?
+        FileTransport() :
+        undefined;
   const defaultWrite = async (args: LoggerTransportWriteArgs, level?: LogLevel) => {
     try {
       const serviceNamesWithLogConfigReplaceConsole = level === undefined && app.inflated ?
@@ -14,9 +20,9 @@ export function createLogProviderOptions(app: Miqro) {
         Object.keys(app.inflated.logConfigMap).filter(serviceName => app.inflated.logConfigMap[serviceName].replaceFileTransport) : [];
       await Promise.allSettled((level === undefined ?
         [
-          level === undefined && serviceNamesWithLogConfigReplaceConsole.length === 0 ?
+          level === undefined && serviceNamesWithLogConfigReplaceConsole.length === 0 && defaultConsole ?
             defaultConsole.write(args) : Promise.resolve(),
-          level === undefined && serviceNamesWithLogConfigReplaceFile.length === 0 ?
+          level === undefined && serviceNamesWithLogConfigReplaceFile.length === 0 && defaultFile ?
             defaultFile.write(args) : Promise.resolve()
         ] : []).concat(app.inflated ?
           Object.keys(app.inflated.logConfigMap).map(serviceName => app.inflated.logConfigMap[serviceName]).filter(c => c.level === level).map(c => c.write(args)) : []

@@ -21,7 +21,7 @@ interface MiqroJSON {
   inflateDir?: string;
   name?: string;
   browser?: string | boolean;
-  logFile?: string;
+  logFile?: string | boolean;
   editor?: boolean;
 }
 
@@ -33,7 +33,7 @@ const MiqroJSONSchema: Schema<MiqroJSON> = {
     port: "number?|string?",
     inflateDir: "string?",
     browser: "boolean?|string?",
-    logFile: "string?",
+    logFile: "boolean?|string?",
     editor: "boolean?"
   }
 }
@@ -55,8 +55,9 @@ export function getPORT() {
 export interface Arguments {
   name?: string;
   browser?: string | boolean;
-  logFile?: string;
+  logFile?: string | boolean;
   installTypes: boolean;
+  installMiqroJSON: boolean;
   installTSConfig: boolean;
   test: boolean;
   port: string;
@@ -86,10 +87,11 @@ export function parseArguments(): Arguments {
 
   const args = cluster.isPrimary ? process.argv.slice(2, process.argv.length) : process.argv.slice(3, process.argv.length);
   const flags: {
-    logFile: string | null;
+    logFile: string | boolean | null;
     browser: string | boolean | null;
     name: string | null;
     installTypes: boolean | null;
+    installMiqroJSON: boolean | null;
     installTSConfig: boolean | null;
     inflate: boolean | null;
     port: string | null;
@@ -113,6 +115,7 @@ export function parseArguments(): Arguments {
     logFile: null,
     hotreload: null,
     miqroJSONPath: null,
+    installMiqroJSON: null,
     disableMiqroJSON: null,
     installTypes: null,
     port: null,
@@ -327,6 +330,14 @@ export function parseArguments(): Arguments {
         }
         flags.editor = true;
         continue;
+      case "--install-miqrojson":
+        if (flags.installMiqroJSON !== null) {
+          console.error("bad arguments. --install-miqrojson already set.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.installMiqroJSON = true;
+        continue;
       case "--inflate-sea":
         if (flags.inflateSEA !== null) {
           console.error("bad arguments. --inflate-sea already set.");
@@ -408,7 +419,7 @@ export function parseArguments(): Arguments {
   }
 
   flags.inflate = flags.inflate ? flags.inflate : false;
-  
+
   flags.test = flags.test ? flags.test : false;
   flags.inflateDir = flags.inflateDir ? flags.inflateDir : undefined;
 
@@ -440,7 +451,7 @@ export function parseArguments(): Arguments {
       }
     }
     if (flags.logFile === null) {
-      if (miqroRC.logFile) {
+      if (miqroRC.logFile !== undefined) {
         flags.logFile = miqroRC.logFile;
       }
     }
@@ -458,7 +469,7 @@ export function parseArguments(): Arguments {
 
   flags.editor = flags.editor ? flags.editor : false;
 
-  if (services.length === 0 && (!flags.installTSConfig && !flags.installTypes)) {
+  if (services.length === 0 && (!flags.installTSConfig && !flags.installTypes && !flags.installMiqroJSON)) {
     flags.inflateDir = flags.inflateDir ? flags.inflateDir : undefined;
     console.error(`bad arguments. missing --service argument`);
     console.error(usage);
@@ -495,8 +506,8 @@ export function parseArguments(): Arguments {
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.inflate && (flags.installTypes || flags.installTSConfig)) {
-    console.error("bad arguments. cannot use --inflate with --install-types");
+  if (flags.inflate && (flags.installTypes || flags.installTSConfig || flags.installMiqroJSON)) {
+    console.error("bad arguments. cannot use --inflate with --install-types, --install-tsconfig or --install-miqrojson");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
@@ -505,8 +516,8 @@ export function parseArguments(): Arguments {
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.editor && (flags.installTypes || flags.installTSConfig)) {
-    console.error("bad arguments. cannot use --editor with --install-types");
+  if (flags.editor && (flags.installTypes || flags.installTSConfig || flags.installMiqroJSON)) {
+    console.error("bad arguments. cannot use --editor with--install-types, --install-tsconfig or --install-miqrojson");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
@@ -540,12 +551,13 @@ export function parseArguments(): Arguments {
   return {
     name: flags.name ? flags.name : undefined,
     browser: flags.browser !== null ? flags.browser : undefined,
-    logFile: flags.logFile ? flags.logFile : undefined,
+    logFile: flags.logFile !== null ? flags.logFile : undefined,
     generateDocAll: flags.generateDocAll ? true : false,
     hotreload: flags.hotreload ? true : false,
     disableMiqroJSON: flags.disableMiqroJSON !== null ? flags.disableMiqroJSON : false,
     miqroJSONPath: miqroJSONPath ? miqroJSONPath : false,
     installTypes: flags.installTypes ? true : false,
+    installMiqroJSON: flags.installMiqroJSON ? true : false,
     installTSConfig: flags.installTSConfig ? true : false,
     inflate: flags.inflate,
     port: flags.port ? flags.port : getPORT(),

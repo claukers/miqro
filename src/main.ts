@@ -11,7 +11,7 @@ import { TEST_SOCKET } from "./common/paths.js";
 import { Logger } from "@miqro/core";
 
 async function main(args: Arguments) {
-  if (args.installTypes || args.installTSConfig) {
+  if (args.installTypes || args.installTSConfig || args.installMiqroJSON) {
     await installTypings(args, new Logger(""));
     process.exit(EXIT_CODES.NORMAL_EXIT);
   } else {
