@@ -22,6 +22,7 @@ interface MiqroJSON {
   name?: string;
   browser?: string | boolean;
   logFile?: string;
+  editor?: boolean;
 }
 
 const MiqroJSONSchema: Schema<MiqroJSON> = {
@@ -32,7 +33,8 @@ const MiqroJSONSchema: Schema<MiqroJSON> = {
     port: "number?|string?",
     inflateDir: "string?",
     browser: "boolean?|string?",
-    logFile: "string?"
+    logFile: "string?",
+    editor: "boolean?"
   }
 }
 
@@ -406,7 +408,7 @@ export function parseArguments(): Arguments {
   }
 
   flags.inflate = flags.inflate ? flags.inflate : false;
-  flags.editor = flags.editor ? flags.editor : false;
+  
   flags.test = flags.test ? flags.test : false;
   flags.inflateDir = flags.inflateDir ? flags.inflateDir : undefined;
 
@@ -422,7 +424,7 @@ export function parseArguments(): Arguments {
         }
       }
     }
-    if (!flags.port) {
+    if (flags.port === null) {
       if (miqroRC.port) {
         flags.port = String(miqroRC.port);
       }
@@ -432,22 +434,29 @@ export function parseArguments(): Arguments {
         flags.inflateDir = miqroRC.inflateDir;
       }
     }
-    if (!flags.name) {
+    if (flags.name === null) {
       if (miqroRC.name) {
         flags.name = miqroRC.name;
       }
     }
-    if (!flags.logFile) {
+    if (flags.logFile === null) {
       if (miqroRC.logFile) {
         flags.logFile = miqroRC.logFile;
       }
     }
-    if (!flags.browser) {
+    if (flags.browser === null) {
       if (miqroRC.browser !== undefined) {
         flags.browser = miqroRC.browser;
       }
     }
+    if (flags.editor === null) {
+      if (miqroRC.editor !== undefined) {
+        flags.editor = miqroRC.editor;
+      }
+    }
   }
+
+  flags.editor = flags.editor ? flags.editor : false;
 
   if (services.length === 0 && (!flags.installTSConfig && !flags.installTypes)) {
     flags.inflateDir = flags.inflateDir ? flags.inflateDir : undefined;
