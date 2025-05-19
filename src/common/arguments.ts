@@ -20,6 +20,8 @@ interface MiqroJSON {
   port?: string | number;
   inflateDir?: string;
   name?: string;
+  browser?: string | boolean;
+  logFile?: string;
 }
 
 const MiqroJSONSchema: Schema<MiqroJSON> = {
@@ -28,7 +30,9 @@ const MiqroJSONSchema: Schema<MiqroJSON> = {
     name: "string?",
     services: "string[]?",
     port: "number?|string?",
-    inflateDir: "string?"
+    inflateDir: "string?",
+    browser: "boolean?|string?",
+    logFile: "string?"
   }
 }
 
@@ -47,7 +51,9 @@ export function getPORT() {
 }
 
 export interface Arguments {
-  name: string;
+  name?: string;
+  browser?: string | boolean;
+  logFile?: string;
   installTypes: boolean;
   installTSConfig: boolean;
   test: boolean;
@@ -78,6 +84,8 @@ export function parseArguments(): Arguments {
 
   const args = cluster.isPrimary ? process.argv.slice(2, process.argv.length) : process.argv.slice(3, process.argv.length);
   const flags: {
+    logFile: string | null;
+    browser: string | boolean | null;
     name: string | null;
     installTypes: boolean | null;
     installTSConfig: boolean | null;
@@ -99,6 +107,8 @@ export function parseArguments(): Arguments {
     hotreload?: boolean | null;
   } = {
     name: null,
+    browser: null,
+    logFile: null,
     hotreload: null,
     miqroJSONPath: null,
     disableMiqroJSON: null,
@@ -187,7 +197,7 @@ export function parseArguments(): Arguments {
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
-        const cPort = String(args[i + 1]).toUpperCase() as any;
+        const cPort = String(args[i + 1]) as any;
         if (typeof cPort !== "string") {
           console.error("bad arguments. --port must be a string.");
           console.error(usage);
@@ -209,6 +219,36 @@ export function parseArguments(): Arguments {
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
         flags.name = cName;
+        i++;
+        continue;
+      case "--log-file":
+        if (flags.logFile !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        const cLofFile = String(args[i + 1]) as any;
+        if (typeof cLofFile !== "string") {
+          console.error("bad arguments. --port must be a string.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.logFile = cLofFile;
+        i++;
+        continue;
+      case "--browser":
+        if (flags.browser !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        const cBrowser = String(args[i + 1]) as any;
+        if (typeof cBrowser !== "string") {
+          console.error("bad arguments. --port must be a string.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.browser = cBrowser;
         i++;
         continue;
       case "--generate-doc":
@@ -397,6 +437,16 @@ export function parseArguments(): Arguments {
         flags.name = miqroRC.name;
       }
     }
+    if (!flags.logFile) {
+      if (miqroRC.logFile) {
+        flags.logFile = miqroRC.logFile;
+      }
+    }
+    if (!flags.browser) {
+      if (miqroRC.browser !== undefined) {
+        flags.browser = miqroRC.browser;
+      }
+    }
   }
 
   if (services.length === 0 && (!flags.installTSConfig && !flags.installTypes)) {
@@ -480,6 +530,8 @@ export function parseArguments(): Arguments {
 
   return {
     name: flags.name ? flags.name : undefined,
+    browser: flags.browser !== null ? flags.browser : undefined,
+    logFile: flags.logFile ? flags.logFile : undefined,
     generateDocAll: flags.generateDocAll ? true : false,
     hotreload: flags.hotreload ? true : false,
     disableMiqroJSON: flags.disableMiqroJSON !== null ? flags.disableMiqroJSON : false,

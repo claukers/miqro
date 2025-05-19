@@ -39,6 +39,8 @@ export interface MiqroOptions {
   services: string[];
   editor: boolean;
   port: string;
+  browser?: string | boolean;
+  logFile?: string;
   hotreload?: boolean;
 }
 

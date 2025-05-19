@@ -5,7 +5,7 @@ import { Miqro } from "../app.js";
 
 export function createLogProviderOptions(app: Miqro) {
   const defaultConsole = ConsoleTransport();
-  const defaultFile = FileTransport();
+  const defaultFile = app.options.logFile ? FileTransport(app.options.logFile) : FileTransport();
   const defaultWrite = async (args: LoggerTransportWriteArgs, level?: LogLevel) => {
     try {
       const serviceNamesWithLogConfigReplaceConsole = level === undefined && app.inflated ?

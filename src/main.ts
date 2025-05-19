@@ -20,6 +20,8 @@ async function main(args: Arguments) {
       name: args.name ? args.name : undefined,
       port: args.test ? TEST_SOCKET : args.port,
       services: args.services,
+      browser: args.browser,
+      logFile: args.logFile,
       hotreload: args.test ? false : args.hotreload
     });
     // check arguments

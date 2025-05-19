@@ -99,6 +99,7 @@ export class ServerInterfaceImpl implements ServerInterface {
     disconnectAll(path: string): void;
   };
   public loggerProvider?: LogProvider;
+  openBrowser: (path: string) => void;
 
   constructor(options: ServerInterfaceImplOptions) {
     this.cache = options.cache;
@@ -110,6 +111,24 @@ export class ServerInterfaceImpl implements ServerInterface {
     const wsManager = options.wsManager;
     this.loggerProvider = options.loggerProvider;
     const app = options.app;
+
+    this.openBrowser = (path: string) => {
+      const PORT = this.port;
+      const URL = `http://localhost${PORT ? `:${PORT}` : ""}${path}`;
+      const DEFAULT_OPEN = process.platform === "win32" ? "explorer" : process.platform === "darwin" ? "open" : "xdg-open";
+      const OPEN = app.options.browser !== undefined && String(app.options.browser).toUpperCase() !== "TRUE" && String(app.options.browser).toUpperCase() !== "1" ?
+        String(app.options.browser).toUpperCase() !== "0" && String(app.options.browser).toUpperCase() !== "FALSE" && String(app.options.browser).toUpperCase() !== "NONE" && app.options.browser ?
+          app.options.browser : false :
+        process.env["BROWSER"] ?
+          process.env["BROWSER"] === "none" ? false : process.env["BROWSER"] : DEFAULT_OPEN;
+      if (OPEN) {
+        const openCMD = `${OPEN} "${URL}"`;
+        this.logger?.info("opening browser with [%s]", openCMD);
+        execSync(openCMD);
+      } else {
+        this.logger?.warn("ignoring browser [%s]", OPEN);
+      }
+    }
 
     this.db = Object.freeze({
       get: (name: string) => {
@@ -153,19 +172,7 @@ export class ServerInterfaceImpl implements ServerInterface {
   public isPrimaryWorker(): boolean {
     return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0";
   }
-  public openBrowser(path: string): void {
-    const PORT = this.port;
-    const URL = `http://localhost${PORT ? `:${PORT}` : ""}${path}`;
-    const DEFAULT_OPEN = process.platform === "win32" ? "explorer" : process.platform === "darwin" ? "open" : "xdg-open";
-    const OPEN = process.env["BROWSER"] ? process.env["BROWSER"] === "none" ? false : process.env["BROWSER"] : DEFAULT_OPEN;
-    if (OPEN) {
-      const openCMD = `${OPEN} "${URL}"`;
-      this.logger?.info("opening browser with [%s]", openCMD);
-      execSync(openCMD);
-    } else {
-      this.logger?.warn("ignoring browser [%s]", process.env["BROWSER"]);
-    }
-  }
+
   public getLogger(identifier: string, options?: { level?: any; transports?: any[]; formatter?: any; }): Logger {
     return this.loggerProvider?.getLogger(identifier, options);
   }
