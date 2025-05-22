@@ -139,6 +139,7 @@ export class Miqro {
     this.localCache = new LocalCache(`MiqroApplicationLocalCache[${this.options.name}]`, this.logger);
     this.webSocketManager = new WebSocketManager({
       logger: this.logger,
+      loggerProvider: this.loggerProvider,
       name: `MiqroApplicationWebsocketManager[${this.options.name}]`,
       avoidLogSocket: this.options.editor
     });

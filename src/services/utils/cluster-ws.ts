@@ -25,7 +25,7 @@ export class ClusterWebSocketServer2 extends WebSocketServer {
           this.options.maxConnections !== undefined &&
           this.clients.size + this.remoteClients.size >= this.options.maxConnections
         ) {
-          this.logger?.warn("[%s] [%s] max web socket connection reached! connection refused from [%s]", req.uuid, this.path, req.socket.remoteAddress);
+          this.logger?.warn("[%s] max web socket connection reached! connection refused from [%s]", req.uuid, req.socket.remoteAddress);
           return false;
         } else {
           return options.validate ? options.validate(req) : true;
@@ -42,7 +42,7 @@ export class ClusterWebSocketServer2 extends WebSocketServer {
             errorMessage: error.message
           } as ClusterWebSocketServer2Message);
         }
-        this.logger?.error("[%s] [%s] error from [%s] error [%s]", req.uuid, this.path, req.req.socket.remoteAddress, error);
+        this.logger?.error("[%s] error from [%s] error [%s]", req.uuid, req.req.socket.remoteAddress, error);
         this.logger?.error(error);
         if (options.onError) {
           options.onError(req, error);
@@ -58,7 +58,7 @@ export class ClusterWebSocketServer2 extends WebSocketServer {
             clientUUID: req.uuid
           } as ClusterWebSocketServer2Message);
         }
-        this.logger?.log("[%s] [%s] new web socket connection from [%s] to [%s]", req.uuid, this.path, req.req.socket.remoteAddress);
+        this.logger?.log("[%s] new web socket connection from [%s]", req.uuid, req.req.socket.remoteAddress);
         if (options.onConnection) {
           options.onConnection(req);
         }

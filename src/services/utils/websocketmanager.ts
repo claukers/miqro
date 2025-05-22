@@ -2,9 +2,11 @@ import { Logger } from "@miqro/core";
 import { LOG_SOCKET_PATH } from "../../../editor/common/constants.js";
 import { ClusterWebSocketServer2 } from "./cluster-ws.js";
 import { WSConfig } from "../../types.js";
+import { LogProvider } from "./log.js";
 
 export interface WebSocketManagerOptions {
   logger?: Logger | Console;
+  loggerProvider?: LogProvider;
   name?: string;
   avoidLogSocket?: boolean;
 }
@@ -14,10 +16,12 @@ export class WebSocketManager {
   public logger?: Logger | Console | null = null;
   public name: string;
   public avoidLogSocket: boolean;
+  public loggerProvider: LogProvider;
   constructor(options?: WebSocketManagerOptions) {
     this.onUpgrade = this.onUpgrade.bind(this);
     this.logger = options && options.logger ? options.logger : null;
     this.name = options && options.name ? options.name : "WebSocketManager";
+    this.loggerProvider = options.loggerProvider;
     this.avoidLogSocket = options && options.avoidLogSocket ? options.avoidLogSocket : false;
   }
 
@@ -46,7 +50,9 @@ export class WebSocketManager {
           throw new Error(`ws on path ${wsConfig.path} already setup!`);
         }
         this.logger?.debug("setting up websocket on [%s]", wsConfig.path);
-        const server = new ClusterWebSocketServer2(this.name + wsConfig.path, wsConfig.path, this.logger, wsConfig);
+        const identifier = wsConfig.path.replaceAll("/", "_").toUpperCase();
+        const logger = this.loggerProvider && identifier.length >= 0 ? this.loggerProvider.getLogger(identifier.substring(identifier.charAt(0) === "_" ? 1 : 0)) : this.logger;
+        const server = new ClusterWebSocketServer2(this.name + wsConfig.path, wsConfig.path, logger, wsConfig);
         this.runningGlobalWSMap.set(wsConfig.path, server);
       }
     }
@@ -65,7 +71,9 @@ export class WebSocketManager {
             throw new Error(`ws on path ${wsConfig.path} already setup!`);
           }
           this.logger?.debug("setting up websocket on [%s]", wsConfig.path);
-          const server = new ClusterWebSocketServer2(this.name + wsConfig.path, wsConfig.path, this.logger, wsConfig);
+          const identifier = wsConfig.path.replaceAll("/", "_").toUpperCase();
+          const logger = this.loggerProvider && identifier.length >= 0 ? this.loggerProvider.getLogger(identifier.substring(identifier.charAt(0) === "_" ? 1 : 0)) : this.logger;
+          const server = new ClusterWebSocketServer2(this.name + wsConfig.path, wsConfig.path, logger, wsConfig);
           this.runningGlobalWSMap.set(wsConfig.path, server);
         }
       }
