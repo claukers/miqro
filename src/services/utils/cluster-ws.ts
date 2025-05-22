@@ -17,7 +17,7 @@ export interface ClusterWebSocketServer2Message {
 export class ClusterWebSocketServer2 extends WebSocketServer {
   public remoteClients: Set<string> = new Set();
   listener: (data: any) => Promise<void>;
-  public constructor(protected name: string, options: WebSocketServerOptions) {
+  public constructor(protected name: string, public path: string, public logger: Logger | Console, options: WebSocketServerOptions) {
     super({
       ...options,
       validate: (req) => {
@@ -25,6 +25,7 @@ export class ClusterWebSocketServer2 extends WebSocketServer {
           this.options.maxConnections !== undefined &&
           this.clients.size + this.remoteClients.size >= this.options.maxConnections
         ) {
+          this.logger?.warn("[%s] [%s] max web socket connection reached! connection refused from [%s]", req.uuid, this.path, req.socket.remoteAddress);
           return false;
         } else {
           return options.validate ? options.validate(req) : true;
@@ -41,6 +42,8 @@ export class ClusterWebSocketServer2 extends WebSocketServer {
             errorMessage: error.message
           } as ClusterWebSocketServer2Message);
         }
+        this.logger?.error("[%s] [%s] error from [%s] error [%s]", req.uuid, this.path, req.req.socket.remoteAddress, error);
+        this.logger?.error(error);
         if (options.onError) {
           options.onError(req, error);
         }
@@ -55,6 +58,7 @@ export class ClusterWebSocketServer2 extends WebSocketServer {
             clientUUID: req.uuid
           } as ClusterWebSocketServer2Message);
         }
+        this.logger?.log("[%s] [%s] new web socket connection from [%s] to [%s]", req.uuid, this.path, req.req.socket.remoteAddress);
         if (options.onConnection) {
           options.onConnection(req);
         }
@@ -69,6 +73,7 @@ export class ClusterWebSocketServer2 extends WebSocketServer {
             clientUUID: req.uuid
           } as ClusterWebSocketServer2Message);
         }
+        this.logger?.log("[%s] [%s] web socket disconnection from [%s]", req.uuid, this.path, req.req.socket.remoteAddress);
         if (options.onDisconnect) {
           options.onDisconnect(req);
         }

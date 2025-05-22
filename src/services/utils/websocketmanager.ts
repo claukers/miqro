@@ -46,7 +46,7 @@ export class WebSocketManager {
           throw new Error(`ws on path ${wsConfig.path} already setup!`);
         }
         this.logger?.debug("setting up websocket on [%s]", wsConfig.path);
-        const server = new ClusterWebSocketServer2(wsConfig.path, wsConfig);
+        const server = new ClusterWebSocketServer2(this.name + wsConfig.path, wsConfig.path, this.logger, wsConfig);
         this.runningGlobalWSMap.set(wsConfig.path, server);
       }
     }
@@ -65,7 +65,7 @@ export class WebSocketManager {
             throw new Error(`ws on path ${wsConfig.path} already setup!`);
           }
           this.logger?.debug("setting up websocket on [%s]", wsConfig.path);
-          const server = new ClusterWebSocketServer2(this.name + wsConfig.path, wsConfig);
+          const server = new ClusterWebSocketServer2(this.name + wsConfig.path, wsConfig.path, this.logger, wsConfig);
           this.runningGlobalWSMap.set(wsConfig.path, server);
         }
       }
