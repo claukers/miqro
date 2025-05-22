@@ -200,6 +200,14 @@ export function Editor(props: { disablelog?: boolean; disablepreview?: boolean; 
       const { files, services } = await r.json();
       setfiles(files);
       setservices(services);
+      for (const file of files) {
+        if (opened[file.filePath]) {
+          opened[file.filePath] = {
+            content: opened[file.filePath].content,
+            ...file
+          };
+        }
+      }
     }
   }
 
