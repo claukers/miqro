@@ -11,6 +11,7 @@ import { EXIT_CODES } from "../common/constants.js";
 import { ClusterCache, LocalCache, ServerGlobal } from "../lib.js";
 import { decodeJWT, decodeProtectedHeaderJWT, decryptJWT, encryptJWT, signJWT, verifyJWT } from "../common/jwt.js";
 import { createSecretKey } from "node:crypto";
+import { Parser } from "@miqro/parser";
 
 /*const globaljsx: any = Object.freeze({
   useContext,
@@ -88,6 +89,9 @@ const globalServer: ServerGlobal = Object.freeze<ServerGlobal>({
   encodeHTML: HTMLEncode,
   inflateMDtoHTML: inflateMD2HTML,
   createSecretKey,
+  newParser() {
+    return new Parser();
+  },
   newClusterCache(name, logger) {
     return new ClusterCache(name, logger);
   },

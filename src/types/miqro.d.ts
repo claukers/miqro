@@ -2,7 +2,7 @@ import "./globals.js";
 import { Database, Migration } from "@miqro/query/lib.js";
 import { ReadBuffer, URLEncodedParser, JSONParser, TextParser, CORS, SessionHandler } from "@miqro/core/lib.js";
 import { ErrorHandler, HandlerWithOptions, CORSOptions, LogLevel, LoggerTransportWriteArgs, Request, Response, WebSocketServer, Logger, WebSocketServerOptions, SessionHandlerOptions, RouteOptions, Handler } from "@miqro/core/lib.js";
-import { ParserInterface } from "@miqro/parser/lib.js";
+import { Parser, ParserInterface } from "@miqro/parser/lib.js";
 import { ProtectedHeaderParameters, EncryptOptions, SignOptions, JWTPayload, JWTDecryptOptions, JWTDecryptResult, JWTVerifyResult, JWTVerifyOptions } from "jose/types/index.js";
 import { KeyObject } from "node:crypto";
 
@@ -43,6 +43,7 @@ export interface ServerGlobal {
     cors: typeof CORS;
     session: typeof SessionHandler;
   };
+  newParser(): Parser;
   newClusterCache: (name: string, logger?: Logger) => CacheInterface;
   newLocalCache: (name: string, logger?: Logger) => CacheInterface;
   createSecretKey: (key: string, encoding: BufferEncoding) => KeyObject;

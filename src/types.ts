@@ -1,7 +1,7 @@
 import { Database } from "@miqro/query";
 import { WebSocketServerOptions, SessionHandlerOptions, Logger, WebSocketServer, ReadBuffer, URLEncodedParser, JSONParser, TextParser, CORS, SessionHandler, RouteOptions, Handler, Request, Response, LogLevel, LoggerTransportWriteArgs, CORSOptions, HandlerWithOptions, ErrorHandler } from "@miqro/core";
 import { request } from "@miqro/request";
-import { ParserInterface } from "@miqro/parser";
+import { Parser, ParserInterface } from "@miqro/parser";
 import { RuntimeHTMLElement, Runtime, RuntimeContainer, RuntimeURL, RuntimeOptions, RuntimeShadowRootInit } from "@miqro/jsx";
 import {
   RuntimeElementDefinitionOptions,
@@ -13,7 +13,6 @@ import {
 import * as jsxLib from "@miqro/jsx";
 import { EncryptOptions, JWTDecryptOptions, JWTDecryptResult, JWTPayload, JWTVerifyOptions, JWTVerifyResult, ProtectedHeaderParameters, SignOptions } from "jose";
 import { KeyObject } from "node:crypto";
-import { ClusterCache } from "./services/utils/cluster-cache.js";
 
 export interface EncryptJWTOptions {
   alg?: string;
@@ -77,6 +76,7 @@ export interface ServerGlobal {
     cors: typeof CORS;
     session: typeof SessionHandler;
   };
+  newParser(): Parser;
   newClusterCache: (name: string, logger?: Logger) => CacheInterface;
   newLocalCache: (name: string, logger?: Logger) => CacheInterface;
   createSecretKey: (key: string, encoding: BufferEncoding) => KeyObject;
