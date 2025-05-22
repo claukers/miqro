@@ -1,2 +1,2 @@
 import "../globals.js";
-export * from "cookie/index.d.ts";
+export * from "cookie/index.js";
