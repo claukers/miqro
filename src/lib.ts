@@ -13,7 +13,7 @@ export { initGlobals, assertGlobalTampered } from "./services/globals.js";
 export { appendAPIModule } from "./inflate/utils/sea-utils.js";
 
 //exported for --inflate-sea
-export { ServerInterfaceImpl, ServerInterfaceImplOptions } from "./services/utils/server-interface.js";
+export { createServerInterface, ServerInterfaceImplOptions } from "./services/utils/server-interface.js";
 export { App, LoggerHandler, Router } from "@miqro/core";
 export { migration } from "@miqro/query";
 

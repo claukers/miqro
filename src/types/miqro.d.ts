@@ -1,8 +1,10 @@
 import "./globals.js";
 import { Database, Migration } from "@miqro/query/lib.js";
+import { ReadBuffer, URLEncodedParser, JSONParser, TextParser, CORS, SessionHandler } from "@miqro/core/lib.js";
 import { ErrorHandler, HandlerWithOptions, CORSOptions, LogLevel, LoggerTransportWriteArgs, Request, Response, WebSocketServer, Logger, WebSocketServerOptions, SessionHandlerOptions, RouteOptions, Handler } from "@miqro/core/lib.js";
 import { ParserInterface } from "@miqro/parser/lib.js";
-import { EncryptOptions, SignOptions } from "jose/types/index.js";
+import { ProtectedHeaderParameters, EncryptOptions, SignOptions, JWTPayload, JWTDecryptOptions, JWTDecryptResult, JWTVerifyResult, JWTVerifyOptions } from "jose/types/index.js";
+import { KeyObject } from "node:crypto";
 
 /*export * from "@miqro/core/lib.js";
 export * from "@miqro/query/lib.js";*/
@@ -28,6 +30,73 @@ export interface JWTSignOptions {
   aud?: string;
   exp?: number | string | Date;
   options?: SignOptions;
+}
+
+export interface ServerGlobal {
+  encodeHTML: (str: string) => string;
+  inflateMDtoHTML: (str: string) => string;
+  middleware: {
+    buffer: typeof ReadBuffer;
+    url: typeof URLEncodedParser;
+    json: typeof JSONParser;
+    text: typeof TextParser;
+    cors: typeof CORS;
+    session: typeof SessionHandler;
+  };
+  newClusterCache: (name: string, logger?: Logger) => CacheInterface;
+  newLocalCache: (name: string, logger?: Logger) => CacheInterface;
+  createSecretKey: (key: string, encoding: BufferEncoding) => KeyObject;
+  getWorkerCount: () => number;
+  getWorkerNumber: () => number;
+  isPrimaryWorker: () => boolean;
+  jwt: {
+    /**
+   * creates a JWT encrypted token with jose
+   * 
+   * @param payload the payload to encrypt
+   * @param secret the secret example. const secret = createSecretKey(process.env.JWT_SECRET, 'utf-8');
+   * @param options options like expiratation date, issuer and audience
+   * @returns 
+   */
+    encrypt: (payload: JWTPayload, secret: KeyObject, options?: Partial<EncryptJWTOptions>) => Promise<string>
+    /**
+     * decrypts a JWT token with jose
+     * @param jwt the JWT token
+     * @param secret the secret example. const secret = createSecretKey(process.env.JWT_SECRET, 'utf-8');
+     * @param options options like issuer and audience
+     * @returns 
+     */
+    decrypt: <PayloadType = JWTPayload>(jwt: string, secret: KeyObject, options?: Partial<JWTDecryptOptions>) => Promise<JWTDecryptResult<PayloadType>>;
+    /**
+     * verify a JWT token with jose
+     * @param jwt the JWT token
+     * @param secret the secret example. const secret = createSecretKey(process.env.JWT_SECRET, 'utf-8');
+     * @param options options like issuer and audience
+     * @returns 
+     */
+    verify: <PayloadType = JWTPayload>(jwt: string, secret: KeyObject, options?: Partial<JWTVerifyOptions>) => Promise<JWTVerifyResult<PayloadType>>;
+    /**
+     * creates a signed JWT with jose
+     * 
+     * @param payload the payload to encrypt
+     * @param secret the secret example. const secret = createSecretKey(process.env.JWT_SECRET, 'utf-8');
+     * @param options options like expiratation date, issuer and audience
+     * @returns 
+     */
+    sign: (payload: JWTPayload, secret: KeyObject, options?: Partial<JWTSignOptions>) => Promise<string>;
+    /**
+     * decodes a protected header with jose
+     * @param token 
+     * @returns 
+     */
+    decodeProtectedHeader: (token: string | object) => ProtectedHeaderParameters;
+    /**
+     * decodes a jwt token
+     * @param jwt 
+     * @returns 
+     */
+    decode: <PayloadType = JWTPayload>(jwt: string) => PayloadType & JWTPayload;
+  }
 }
 
 export interface MiddlewareConfig {
@@ -117,7 +186,7 @@ export interface MigrateOptions {
   name?: string;
 }
 
-export interface ServerInterface {
+export interface ServerInterface extends ServerGlobal{
   // null values are if the feature has been disabled
   db: {
     get(name: string): Database | null;

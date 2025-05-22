@@ -13,6 +13,7 @@ import {
 import * as jsxLib from "@miqro/jsx";
 import { EncryptOptions, JWTDecryptOptions, JWTDecryptResult, JWTPayload, JWTVerifyOptions, JWTVerifyResult, ProtectedHeaderParameters, SignOptions } from "jose";
 import { KeyObject } from "node:crypto";
+import { ClusterCache } from "./services/utils/cluster-cache.js";
 
 export interface EncryptJWTOptions {
   alg?: string;
@@ -76,7 +77,12 @@ export interface ServerGlobal {
     cors: typeof CORS;
     session: typeof SessionHandler;
   };
+  newClusterCache: (name: string, logger?: Logger) => CacheInterface;
+  newLocalCache: (name: string, logger?: Logger) => CacheInterface;
   createSecretKey: (key: string, encoding: BufferEncoding) => KeyObject;
+  getWorkerCount: () => number;
+  getWorkerNumber: () => number;
+  isPrimaryWorker: () => boolean;
   jwt: {
     /**
    * creates a JWT encrypted token with jose
@@ -162,7 +168,7 @@ export interface LogConfig {
   write: (args: LoggerTransportWriteArgs) => Promise<void> | void;
 }
 
-export interface ServerInterface {
+export interface ServerInterface extends ServerGlobal {
   // null values are if the feature has been disabled
   db: {
     get(name: string): Database | null;
@@ -176,9 +182,6 @@ export interface ServerInterface {
   cache: CacheInterface;
   localCache: CacheInterface;
   logger?: Logger;
-  isPrimaryWorker: () => boolean;
-  getWorkerNumber: () => number;
-  getWorkerCount: () => number;
   openBrowser: (path: string) => void;
   getLogger: (identifier: string, options?: { level?: any; transports?: any[]; formatter?: any; }) => Logger;
 }

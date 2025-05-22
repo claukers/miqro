@@ -1,5 +1,6 @@
 //@ts-ignore
 import { ReadBuffer, URLEncodedParser, JSONParser, TextParser, CORS, SessionHandler } from "@miqro/core";
+import cluster from "node:cluster";
 import { strictEqual } from "node:assert";
 import { HTMLEncode } from "@miqro/jsx-node";
 import { createElement as realCreateElement, enableDebugLog, useRuntime, Link, Router, usePathname, Fragment, useEffect, useRef, useState, useQuery, useRefresh, useElement, createContext, useContext, Component, Props } from "@miqro/jsx";
@@ -7,7 +8,7 @@ import { createElement as realCreateElement, enableDebugLog, useRuntime, Link, R
 import { jsx2HTML } from "../common/jsx.js";
 import { inflateMD2HTML } from "../inflate/md.js";
 import { EXIT_CODES } from "../common/constants.js";
-import { ServerGlobal } from "../lib.js";
+import { ClusterCache, LocalCache, ServerGlobal } from "../lib.js";
 import { decodeJWT, decodeProtectedHeaderJWT, decryptJWT, encryptJWT, signJWT, verifyJWT } from "../common/jwt.js";
 import { createSecretKey } from "node:crypto";
 
@@ -87,6 +88,21 @@ const globalServer: ServerGlobal = Object.freeze<ServerGlobal>({
   encodeHTML: HTMLEncode,
   inflateMDtoHTML: inflateMD2HTML,
   createSecretKey,
+  newClusterCache(name, logger) {
+    return new ClusterCache(name, logger);
+  },
+  newLocalCache(name, logger) {
+    return new LocalCache(name, logger);
+  },
+  getWorkerNumber(): number {
+    return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === undefined ? 0 : parseInt(process.env["CLUSTER_NODE_NUMBER"], 10);
+  },
+  getWorkerCount(): number {
+    return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === undefined || process.env["CLUSTER_COUNT"] === undefined ? 1 : parseInt(process.env["CLUSTER_COUNT"], 10);
+  },
+  isPrimaryWorker(): boolean {
+    return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0";
+  },
   jwt: {
     decode(jwt) {
       return decodeJWT(jwt);

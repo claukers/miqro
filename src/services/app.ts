@@ -25,7 +25,7 @@ import { setupExitHandlers } from "../common/exit.js";
 import { inflateDBConfig, inflateDBMigrations, MigrationModule } from "../inflate/setup-db.js";
 import { getServicePath } from "../common/paths.js";
 import { LogConfigMap } from "../inflate/setup-log.js";
-import { ServerInterfaceImpl } from "./utils/server-interface.js";
+import { createServerInterface } from "./utils/server-interface.js";
 import { getPORT, importMiqroJSON } from "../common/arguments.js";
 import { createLogProviderOptions } from "./utils/log-transport.js";
 import { createAdminInterface } from "./utils/admin-interface.js";
@@ -150,16 +150,17 @@ export class Miqro {
       logger: this.logger
     });
 
-    this.serverInterface = new ServerInterfaceImpl({
+    this.serverInterface = createServerInterface({
       cache: this.cache,
-      localCache: this.localCache,
       dbManager: this.dbManager,
-      wsManager: this.webSocketManager,
+      localCache: this.localCache,
+      webSocketManager: this.webSocketManager,
       app: this,
       logger: this.logger,
       loggerProvider: this.loggerProvider,
       port: this.options.port
     });
+
     this.serverRequestHandler = ServerRequestHandler(this.serverInterface);
 
     this.adminInterface = createAdminInterface(this);

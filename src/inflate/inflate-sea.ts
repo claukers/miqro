@@ -66,22 +66,22 @@ export async function inflateAppForSea(logger: Logger, inflateDir: string, servi
 
   writeFile(logger, join(inflateDir, "sea", "package.json"), `{ "type": "module", "private": true }`);
 
-  writeFile(logger, join(inflateDir, "sea", "app.cjs"), `const { ServerInterfaceImpl, ServerRequestHandler, WebSocketManager, initGlobals, DBManager, App, LoggerHandler, LogProvider, LocalCache, ClusterCache } = require("./lib.cjs");
+  writeFile(logger, join(inflateDir, "sea", "app.cjs"), `const { createServerInterface, ServerRequestHandler, WebSocketManager, initGlobals, DBManager, App, LoggerHandler, LogProvider, LocalCache, ClusterCache } = require("./lib.cjs");
 
 async function main() {
   const PORT = process.env["PORT"] ? process.env["PORT"] : 8080; 
-  const logProvider = new LogProvider();
+  const loggerProvider = new LogProvider();
   const localCache = new LocalCache();
   const cache = new ClusterCache();
   const webSocketManager = new WebSocketManager();
   const dbManager = new DBManager();
   await initGlobals();
-  const serverInterface = new ServerInterfaceImpl({
+  const serverInterface = createServerInterface({
     cache,
     localCache,
-    logProvider,
+    loggerProvider,
     wsManager: webSocketManager,
-    logger: logProvider.getLogger("server"),
+    logger: loggerProvider.getLogger("server"),
     dbManager,
     port: PORT
   });

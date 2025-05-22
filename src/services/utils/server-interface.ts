@@ -7,137 +7,43 @@ import { Miqro } from "../app.js";
 import { WebSocketManager } from "./websocketmanager.js";
 import { execSync } from "node:child_process";
 import { LogProvider } from "./log.js";
-
-/*
-{
-      cache: this.cache,
-      localCache: this.localCache,
-      db: {
-        get: (name: string) => {
-          return this.dbManager.getDB(name);
-        },
-        getMigrations: () => {
-          if (this.inflated) {
-            const ret: NamedMigration[] = [];
-            for (const d of this.inflated.dbList) {
-              ret.push(...(d.migrations.map(m => {
-                return {
-                  name: m.name,
-                  service: m.service,
-                  dbName: m.dbName
-                }
-              })));
-            }
-            return ret;
-          }
-          return [];
-        },
-        migrate: (options) => {
-          return this.migrate(options);
-        },
-      },
-      ws: {
-        get: (path: string) => {
-          if (path === LOG_SOCKET_PATH) {
-            throw new Error("cannot use this path");
-          }
-          return this.webSocketManager.getWS(path);
-        },
-        disconnectAll: (path: string) => {
-          if (path === LOG_SOCKET_PATH) {
-            throw new Error("cannot use this path");
-          }
-          this.webSocketManager.disconnectAllFrom(path);
-        }
-      },
-      isPrimaryWorker: () => {
-        return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0";
-      },
-      openBrowser: (path: string) => {
-        const PORT = this.options.port;
-        const URL = `http://localhost:${PORT}${path}`;
-        const DEFAULT_OPEN = process.platform === "win32" ? "explorer" : process.platform === "darwin" ? "open" : "xdg-open";
-        const OPEN = process.env["BROWSER"] ? process.env["BROWSER"] === "none" ? false : process.env["BROWSER"] : DEFAULT_OPEN;
-        if (OPEN) {
-          const openCMD = `${OPEN} "${URL}"`;
-          this.logger?.info("opening browser with [%s]", openCMD);
-          execSync(openCMD);
-        } else {
-          this.logger?.warn("ignoring browser [%s]", process.env["BROWSER"]);
-        }
-      },
-      logger: this.logger,
-      getLogger: (identifier: string, options?: { level?: any; transports?: any[]; formatter?: any; }) => {
-        return this.loggerProvider.getLogger(identifier, options);
-      }
-    }*/
+import { initGlobals } from "../globals.js";
 
 export interface ServerInterfaceImplOptions {
   cache: CacheInterface;
   localCache: CacheInterface;
   dbManager: DBManager;
-  wsManager: WebSocketManager;
+  webSocketManager: WebSocketManager;
   logger?: Logger;
   app?: Miqro;
   port?: string;
   loggerProvider?: LogProvider;
 }
 
-export class ServerInterfaceImpl implements ServerInterface {
-  public cache: CacheInterface;
-  public localCache: CacheInterface;
-  public logger?: Logger;
-  public port?: string;
-
-  public db: {
-    get(name: string): Database | null;
-    getMigrations(): NamedMigration[];
-    migrate(options: MigrateOptions): Promise<void>;
-  };
-  public ws: {
-    get(path: string): WebSocketServer | undefined;
-    disconnectAll(path: string): void;
-  };
-  public loggerProvider?: LogProvider;
-  openBrowser: (path: string) => void;
-
-  constructor(options: ServerInterfaceImplOptions) {
-    this.cache = options.cache;
-    this.localCache = options.localCache;
-    this.logger = options.logger ? options.logger : options.loggerProvider ? options.loggerProvider.getLogger("server") : undefined;
-    this.port = options.port;
-
-    const dbManager = options.dbManager;
-    const wsManager = options.wsManager;
-    this.loggerProvider = options.loggerProvider;
-    const app = options.app;
-
-    this.openBrowser = (path: string) => {
-      const PORT = this.port;
-      const URL = `http://localhost${PORT ? `:${PORT}` : ""}${path}`;
-      const DEFAULT_OPEN = process.platform === "win32" ? "explorer" : process.platform === "darwin" ? "open" : "xdg-open";
-      const OPEN = app.options.browser !== undefined && String(app.options.browser).toUpperCase() !== "TRUE" && String(app.options.browser).toUpperCase() !== "1" ?
-        String(app.options.browser).toUpperCase() !== "0" && String(app.options.browser).toUpperCase() !== "FALSE" && String(app.options.browser).toUpperCase() !== "NONE" && app.options.browser ?
-          app.options.browser : false :
-        process.env["BROWSER"] ?
-          process.env["BROWSER"] === "none" ? false : process.env["BROWSER"] : DEFAULT_OPEN;
-      if (OPEN) {
-        const openCMD = `${OPEN} "${URL}"`;
-        this.logger?.info("opening browser with [%s]", openCMD);
-        execSync(openCMD);
-      } else {
-        this.logger?.warn("ignoring browser [%s]", OPEN);
-      }
-    }
-
-    this.db = Object.freeze({
-      get: (name: string) => {
-        return dbManager.getDB(name);
+export function createServerInterface(options: ServerInterfaceImplOptions): ServerInterface {
+  /*this.serverInterface = new ServerInterfaceImpl({
+        cache: this.cache,
+        localCache: this.localCache,
+        dbManager: this.dbManager,
+        wsManager: this.webSocketManager,
+        app: this,
+        logger: this.logger,
+        loggerProvider: this.loggerProvider,
+        port: this.options.port
+      });*/
+  initGlobals();
+  return Object.freeze<ServerInterface>({
+    cache: options.cache,
+    localCache: options.localCache,
+    logger: options.logger,
+    db: {
+      get(name) {
+        return options.dbManager.getDB(name);
       },
-      getMigrations: () => {
-        if (app?.inflated) {
+      getMigrations() {
+        if (options.app?.inflated) {
           const ret: NamedMigration[] = [];
-          for (const d of app?.inflated.dbList) {
+          for (const d of options.app?.inflated.dbList) {
             ret.push(...(d.migrations.map(m => {
               return {
                 name: m.name,
@@ -150,30 +56,38 @@ export class ServerInterfaceImpl implements ServerInterface {
         }
         return [];
       },
-      migrate: (options: MigrateOptions) => {
-        return app?.migrate(options);
-      }
-    });
-    this.ws = Object.freeze({
+      migrate(migrateOptions) {
+        return options?.app?.migrate(migrateOptions);
+      },
+    },
+    ws: {
       get: (name: string) => {
-        return wsManager?.getWS(name);
+        return options?.webSocketManager?.getWS(name);
       },
       disconnectAll: (path: string) => {
-        return wsManager?.disconnectAllButLOGSocket();
+        return options?.webSocketManager?.disconnectAllButLOGSocket();
       }
-    });
-  }
-  public getWorkerNumber(): number {
-    return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === undefined ? 0 : parseInt(process.env["CLUSTER_NODE_NUMBER"], 10);
-  }
-  public getWorkerCount(): number {
-    return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === undefined || process.env["CLUSTER_COUNT"] === undefined ? 1 : parseInt(process.env["CLUSTER_COUNT"], 10);
-  }
-  public isPrimaryWorker(): boolean {
-    return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0";
-  }
-
-  public getLogger(identifier: string, options?: { level?: any; transports?: any[]; formatter?: any; }): Logger {
-    return this.loggerProvider?.getLogger(identifier, options);
-  }
+    },
+    openBrowser(path) {
+      const PORT = options.port;
+      const URL = `http://localhost${PORT ? `:${PORT}` : ""}${path}`;
+      const DEFAULT_OPEN = process.platform === "win32" ? "explorer" : process.platform === "darwin" ? "open" : "xdg-open";
+      const OPEN = options?.app?.options.browser !== undefined && String(options?.app?.options.browser).toUpperCase() !== "TRUE" && String(options?.app?.options.browser).toUpperCase() !== "1" ?
+        String(options?.app.options.browser).toUpperCase() !== "0" && String(options?.app?.options.browser).toUpperCase() !== "FALSE" && String(options?.app?.options.browser).toUpperCase() !== "NONE" && options?.app?.options.browser ?
+          options?.app.options.browser : false :
+        process.env["BROWSER"] ?
+          process.env["BROWSER"] === "none" ? false : process.env["BROWSER"] : DEFAULT_OPEN;
+      if (OPEN) {
+        const openCMD = `${OPEN} "${URL}"`;
+        options?.logger?.info("opening browser with [%s]", openCMD);
+        execSync(openCMD);
+      } else {
+        options?.logger?.warn("ignoring browser [%s]", OPEN);
+      }
+    },
+    getLogger(identifier, loggerOptions) {
+      return options?.loggerProvider?.getLogger(identifier, loggerOptions);
+    },
+    ...server
+  });
 }
