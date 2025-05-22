@@ -21,16 +21,6 @@ export interface ServerInterfaceImplOptions {
 }
 
 export function createServerInterface(options: ServerInterfaceImplOptions): ServerInterface {
-  /*this.serverInterface = new ServerInterfaceImpl({
-        cache: this.cache,
-        localCache: this.localCache,
-        dbManager: this.dbManager,
-        wsManager: this.webSocketManager,
-        app: this,
-        logger: this.logger,
-        loggerProvider: this.loggerProvider,
-        port: this.options.port
-      });*/
   initGlobals();
   return Object.freeze<ServerInterface>({
     cache: options.cache,
