@@ -2,12 +2,32 @@ import "./globals.js";
 import { Database, Migration } from "@miqro/query/lib.js";
 import { ErrorHandler, HandlerWithOptions, CORSOptions, LogLevel, LoggerTransportWriteArgs, Request, Response, WebSocketServer, Logger, WebSocketServerOptions, SessionHandlerOptions, RouteOptions, Handler } from "@miqro/core/lib.js";
 import { ParserInterface } from "@miqro/parser/lib.js";
+import { EncryptOptions, SignOptions } from "jose/types/index.js";
 
 /*export * from "@miqro/core/lib.js";
 export * from "@miqro/query/lib.js";*/
 
 export interface AuthConfig extends SessionHandlerOptions {
 
+}
+
+export interface EncryptJWTOptions {
+  alg?: string;
+  enc?: string;
+  iat?: number | string | Date;
+  iss?: string;
+  aud?: string;
+  exp?: number | string | Date;
+  options?: EncryptOptions;
+}
+
+export interface JWTSignOptions {
+  alg?: string;
+  iat?: number | string | Date;
+  iss?: string;
+  aud?: string;
+  exp?: number | string | Date;
+  options?: SignOptions;
 }
 
 export interface MiddlewareConfig {

@@ -11,6 +11,27 @@ import {
   enableDebugLog
 } from "@miqro/jsx";
 import * as jsxLib from "@miqro/jsx";
+import { EncryptOptions, JWTDecryptOptions, JWTDecryptResult, JWTPayload, JWTVerifyOptions, JWTVerifyResult, ProtectedHeaderParameters, SignOptions } from "jose";
+import { KeyObject } from "node:crypto";
+
+export interface EncryptJWTOptions {
+  alg?: string;
+  enc?: string;
+  iat?: number | string | Date;
+  iss?: string;
+  aud?: string;
+  exp?: number | string | Date;
+  options?: EncryptOptions;
+}
+
+export interface JWTSignOptions {
+  alg?: string;
+  iat?: number | string | Date;
+  iss?: string;
+  aud?: string;
+  exp?: number | string | Date;
+  options?: SignOptions;
+}
 
 declare global {
   // jsx only for the default value of tsconfig.json
@@ -55,6 +76,54 @@ export interface ServerGlobal {
     cors: typeof CORS;
     session: typeof SessionHandler;
   };
+  jwt: {
+    /**
+   * creates a JWT encrypted token with jose
+   * 
+   * @param payload the payload to encrypt
+   * @param secret the secret example. const secret = createSecretKey(process.env.JWT_SECRET, 'utf-8');
+   * @param options options like expiratation date, issuer and audience
+   * @returns 
+   */
+    encrypt: (payload: JWTPayload, secret: KeyObject, options?: Partial<EncryptJWTOptions>) => Promise<string>
+    /**
+     * decrypts a JWT token with jose
+     * @param jwt the JWT token
+     * @param secret the secret example. const secret = createSecretKey(process.env.JWT_SECRET, 'utf-8');
+     * @param options options like issuer and audience
+     * @returns 
+     */
+    decrypt: <PayloadType = JWTPayload>(jwt: string, secret: KeyObject, options?: Partial<JWTDecryptOptions>) => Promise<JWTDecryptResult<PayloadType>>;
+    /**
+     * verify a JWT token with jose
+     * @param jwt the JWT token
+     * @param secret the secret example. const secret = createSecretKey(process.env.JWT_SECRET, 'utf-8');
+     * @param options options like issuer and audience
+     * @returns 
+     */
+    verify: <PayloadType = JWTPayload>(jwt: string, secret: KeyObject, options?: Partial<JWTVerifyOptions>) => Promise<JWTVerifyResult<PayloadType>>;
+    /**
+     * creates a signed JWT with jose
+     * 
+     * @param payload the payload to encrypt
+     * @param secret the secret example. const secret = createSecretKey(process.env.JWT_SECRET, 'utf-8');
+     * @param options options like expiratation date, issuer and audience
+     * @returns 
+     */
+    sign: (payload: JWTPayload, secret: KeyObject, options?: Partial<JWTSignOptions>) => Promise<string>;
+    /**
+     * decodes a protected header with jose
+     * @param token 
+     * @returns 
+     */
+    decodeProtectedHeader: (token: string | object) => ProtectedHeaderParameters;
+    /**
+     * decodes a jwt token
+     * @param jwt 
+     * @returns 
+     */
+    decode: <PayloadType = JWTPayload>(jwt: string) => PayloadType & JWTPayload;
+  }
 }
 
 export interface CacheInterface {

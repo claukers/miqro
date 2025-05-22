@@ -1,5 +1,11 @@
 rm -Rf sea/types;
 
+mkdir -p sea/types/cookie
+cp -R ./node_modules/cookie/dist/ ./sea/types/cookie
+
+mkdir -p sea/types/jose
+cp -R ./node_modules/jose/dist/types ./sea/types/jose
+
 mkdir -p sea/types/@miqro/query
 cp -R ./node_modules/@miqro/query/build/ ./sea/types/@miqro/query
 
@@ -18,6 +24,8 @@ cp -R ./node_modules/@miqro/jsx/build/ ./sea/types/@miqro/jsx
 mkdir -p sea/types/@miqro/test/dist
 cp -R ./node_modules/@miqro/test/dist/ ./sea/types/@miqro/test/dist
 
+rm ./sea/types/cookie/*.js
+rm ./sea/types/cookie/*.map
 rm ./sea/types/@miqro/**/*.js
 rm ./sea/types/@miqro/**/**/*.js
 rm ./sea/types/@miqro/**/**/**/*.js
@@ -44,3 +52,6 @@ cp src/types/globals.d.ts sea/types/globals.d.ts
 cp src/types/server.globals.d.ts sea/types/server.globals.d.ts
 cp src/types/browser.globals.d.ts sea/types/browser.globals.d.ts
 cp src/types/jsx.globals.d.ts sea/types/jsx.globals.d.ts
+
+cp src/types/jose.d.ts sea/types/jose.d.ts
+cp src/types/cookie.d.ts sea/types/cookie.d.ts

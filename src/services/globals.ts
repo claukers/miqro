@@ -8,6 +8,7 @@ import { jsx2HTML } from "../common/jsx.js";
 import { inflateMD2HTML } from "../inflate/md.js";
 import { EXIT_CODES } from "../common/constants.js";
 import { ServerGlobal } from "../lib.js";
+import { decodeJWT, decodeProtectedHeaderJWT, decryptJWT, encryptJWT, signJWT, verifyJWT } from "../common/jwt.js";
 
 /*const globaljsx: any = Object.freeze({
   useContext,
@@ -83,7 +84,27 @@ const globalServer: ServerGlobal = Object.freeze<ServerGlobal>({
     session: SessionHandler
   }),
   encodeHTML: HTMLEncode,
-  inflateMDtoHTML: inflateMD2HTML
+  inflateMDtoHTML: inflateMD2HTML,
+  jwt: {
+    decode(jwt) {
+      return decodeJWT(jwt);
+    },
+    decodeProtectedHeader(token) {
+      return decodeProtectedHeaderJWT(token);
+    },
+    decrypt(jwt, secret, options) {
+      return decryptJWT(jwt, secret, options);
+    },
+    encrypt(payload, secret, options) {
+      return encryptJWT(payload, secret, options);
+    },
+    sign(payload, secret, options) {
+      return signJWT(payload, secret, options);
+    },
+    verify(jwt, secret, options) {
+      return verifyJWT(jwt, secret, options);
+    }
+  }
 }) as ServerGlobal;
 
 export function browserJSXGlobals(inFile: string, jsxPath: string | false = false, useExport = true): string {
