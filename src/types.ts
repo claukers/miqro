@@ -76,6 +76,7 @@ export interface ServerGlobal {
     cors: typeof CORS;
     session: typeof SessionHandler;
   };
+  createSecretKey: (key: string, encoding: BufferEncoding) => KeyObject;
   jwt: {
     /**
    * creates a JWT encrypted token with jose

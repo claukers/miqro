@@ -35,6 +35,7 @@ declare global {
     }
     encodeHTML: (str: string) => string;
     inflateMDtoHTML: (str: string) => string;
+    createSecretKey: (key: string, encoding: BufferEncoding) => KeyObject;
     jwt: {
       /**
      * creates a JWT encrypted token with jose

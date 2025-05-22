@@ -9,6 +9,7 @@ import { inflateMD2HTML } from "../inflate/md.js";
 import { EXIT_CODES } from "../common/constants.js";
 import { ServerGlobal } from "../lib.js";
 import { decodeJWT, decodeProtectedHeaderJWT, decryptJWT, encryptJWT, signJWT, verifyJWT } from "../common/jwt.js";
+import { createSecretKey } from "node:crypto";
 
 /*const globaljsx: any = Object.freeze({
   useContext,
@@ -85,6 +86,7 @@ const globalServer: ServerGlobal = Object.freeze<ServerGlobal>({
   }),
   encodeHTML: HTMLEncode,
   inflateMDtoHTML: inflateMD2HTML,
+  createSecretKey,
   jwt: {
     decode(jwt) {
       return decodeJWT(jwt);

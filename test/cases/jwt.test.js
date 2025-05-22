@@ -1,7 +1,6 @@
-import { describe, it, beforeEach as before, afterEach as after } from "node:test";
+import { describe, it } from "node:test";
 import { strictEqual } from "assert";
 import { initGlobals } from "../../build/esm/src/lib.js";
-import { createSecretKey } from "node:crypto";
 
 describe("simple jwt jose integration tests", () => {
 
@@ -14,7 +13,7 @@ describe("simple jwt jose integration tests", () => {
       'cc7e0d44fd473002f1c42167459001140ec6389b7353f8088f4d9a95f2f596f2',
     )*/
 
-    const secret = createSecretKey("secretkey", 'utf-8');
+    const secret = server.createSecretKey("secretkey", 'utf-8');
     //console.dir(secret);
     const token = await server.jwt.sign(payload, secret);
     //console.dir(token);
@@ -36,7 +35,7 @@ describe("simple jwt jose integration tests", () => {
       'cc7e0d44fd473002f1c42167459001140ec6389b7353f8088f4d9a95f2f596f2',
     )*/
 
-    const secret = createSecretKey("secretkeysecretkeysecretkeysecre", 'utf-8');
+    const secret = server.createSecretKey("secretkeysecretkeysecretkeysecre", 'utf-8');
     //console.dir(secret);
     const encrypted = await server.jwt.encrypt(payload, secret);
     //console.dir(encrypted);
