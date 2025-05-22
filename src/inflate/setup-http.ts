@@ -27,6 +27,7 @@ export interface RouteFileMap {
       options?: RouterHandlerOptions;
       inflatePath?: string;
     }[];
+    filePath: string;
     service: string;
     previewMethod: "api" | "html" | null;
   }
@@ -93,6 +94,7 @@ function createStaticRoute(service: string, logger: Logger, router: Router, dir:
       path: normalizePath(path)
     }],
     service,
+    filePath: file.filePath,
     previewMethod: "html"
   };
 
@@ -185,6 +187,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
               routeFileMap[file.filePath] = {
                 routes,
                 service,
+                filePath: file.filePath,
                 previewMethod: "api"
               };
 
@@ -230,6 +233,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
               routeFileMap[file.filePath] = {
                 routes,
                 service,
+                filePath: file.filePath,
                 previewMethod: "html"
               };
 
@@ -297,6 +301,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
 
               routeFileMap[file.filePath] = {
                 routes,
+                filePath: file.filePath,
                 service,
                 previewMethod: "html"
               };
@@ -375,6 +380,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                     method: "GET",
                     path
                   }],
+                  filePath: file.filePath,
                   service,
                   previewMethod: "html"
                 };
@@ -428,6 +434,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                   path
                 }],
                 service,
+                filePath: file.filePath,
                 previewMethod: "html"
               };
 
@@ -487,6 +494,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                     method: "GET",
                     path
                   }],
+                  filePath: file.filePath,
                   service,
                   previewMethod: "html"
                 };
@@ -545,6 +553,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                     path
                   }],
                   service,
+                  filePath: file.filePath,
                   previewMethod: "html"
                 };
 

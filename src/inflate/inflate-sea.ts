@@ -1,6 +1,6 @@
 import { Logger } from "@miqro/core";
 import { chmodSync, constants, mkdirSync, writeFileSync } from "node:fs";
-import { dirname, extname, join, relative, resolve } from "node:path";
+import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import { cwd, platform } from "node:process";
 
 import { RouteFileMap, StaticFileMap } from "./setup-http.js";
@@ -133,9 +133,10 @@ ${Object.keys(serviceRouteFileMap)
       .map(filePath => serviceRouteFileMap[filePath])
       .filter(data => data.previewMethod === "api")
       .map(data => data.routes.map(r => {
-        const rPath = r.inflatePath;
+        const rPath = join(relative(cwd(), dirname(data.filePath)), basename(data.filePath));
         if (rPath) {
-          const apiInflatedPath = join("..", "..", service, "http", rPath + ".api.js");
+          const rPathExt = extname(rPath);
+          const apiInflatedPath = join("..", "..", rPath.substring(0, rPath.length - rPathExt.length) + ".js");
           return `  await appendAPIModule(router, "../../${service}/http", "./${apiInflatedPath}", (await import("./${apiInflatedPath}")).default);`;
         } else {
           return "";

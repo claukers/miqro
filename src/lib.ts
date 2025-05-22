@@ -10,9 +10,9 @@ export { DBManager } from "./services/utils/db-manager.js";
 export { LogProvider, LogProviderOptions } from "./services/utils/log.js";
 export { Miqro, MiqroOptions, ServerRequestHandler } from "./services/app.js";
 export { initGlobals, assertGlobalTampered } from "./services/globals.js";
-export { appendAPIModule } from "./inflate/utils/sea-utils.js";
 
 //exported for --inflate-sea
+export { appendAPIModule } from "./inflate/utils/sea-utils.js";
 export { createServerInterface, ServerInterfaceImplOptions } from "./services/utils/server-interface.js";
 export { App, LoggerHandler, Router } from "@miqro/core";
 export { migration } from "@miqro/query";
