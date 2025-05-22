@@ -104,7 +104,7 @@ export function FileEditor({ disableLog, disablePreview, disableReload, togglePa
         {apiPreview && apiPreview.length > 0 ? <APIPReview
           isPanelVisible={isPanelVisible}
           apiPreview={apiPreview} /> : <></>}
-        {previewPath ? <div
+        {previewPath && isPanelVisible("right") ? <div
           class={`file-editor-preview`}
           style={`${!isPanelVisible("right") ? "display: none;" : ""}`}>
           <div class="file-editor-preview-path"><a href={previewPath} target="_blank">open in new window</a></div>
