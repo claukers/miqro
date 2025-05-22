@@ -57,7 +57,7 @@ export async function verifyJWT<PayloadType = JWTPayload>(jwt: string, secret: K
 export async function signJWT(payload: JWTPayload, secret: KeyObject, options?: Partial<JWTSignOptions>): Promise<string> {
   const sign = new SignJWT(payload)
     .setProtectedHeader({
-      alg: options?.alg ? options?.alg : 'dir',
+      alg: options?.alg ? options?.alg : 'HS256',
     })
     .setIssuedAt(options?.iat)
     .setIssuer(options?.iss ? options?.iss : 'urn:example:issuer')
