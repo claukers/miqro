@@ -42,7 +42,7 @@ export class ClusterWebSocketServer2 extends WebSocketServer {
             errorMessage: error.message
           } as ClusterWebSocketServer2Message);
         }
-        this.logger?.error("[%s] error from [%s] error [%s]", req.uuid, req.req.socket.remoteAddress, error);
+        this.logger?.error("[%s] error from (%s) error [%s]", req.uuid, req.req.socket.remoteAddress, error);
         this.logger?.error(error);
         if (options.onError) {
           options.onError(req, error);
@@ -58,7 +58,7 @@ export class ClusterWebSocketServer2 extends WebSocketServer {
             clientUUID: req.uuid
           } as ClusterWebSocketServer2Message);
         }
-        this.logger?.log("[%s] new web socket connection from [%s]", req.uuid, req.req.socket.remoteAddress);
+        this.logger?.log("[%s] new web socket connection from (%s)", req.uuid, req.req.socket.remoteAddress);
         if (options.onConnection) {
           options.onConnection(req);
         }
@@ -73,7 +73,7 @@ export class ClusterWebSocketServer2 extends WebSocketServer {
             clientUUID: req.uuid
           } as ClusterWebSocketServer2Message);
         }
-        this.logger?.log("[%s] [%s] web socket disconnection from [%s]", req.uuid, this.path, req.req.socket.remoteAddress);
+        this.logger?.log("[%s] [%s] web socket disconnection from (%s)", req.uuid, this.path, req.req.socket.remoteAddress);
         if (options.onDisconnect) {
           options.onDisconnect(req);
         }
