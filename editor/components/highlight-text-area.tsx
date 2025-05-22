@@ -110,8 +110,9 @@ export function HighlightTextArea({ content, language, oncontentchange, tabChar,
         if (elementRef.current) {
           if (content !== elementRef.current.textContent) {
             //setlastContent(String(elementRef.current.textContent));
-            elementRef.current.innerHTML = runHighlight(elementRef.current.textContent, language);
+            //elementRef.current.innerHTML = runHighlight(elementRef.current.textContent, language);
           }
+          elementRef.current.innerHTML = runHighlight(elementRef.current.textContent, language);
         }
       }}
       onkeydown={ev => {
