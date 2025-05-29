@@ -21,7 +21,7 @@ describe("simple jwt jose integration tests", () => {
     //console.dir(result);
     strictEqual(result.payload.someData, "1");
 
-    const decoed = await server.jwt.decode(token, secret);
+    const decoed = await server.jwt.decode(token);
     //console.dir(decoed);
     strictEqual(decoed.someData, "1");
   });
