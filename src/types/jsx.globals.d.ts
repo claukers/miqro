@@ -4,6 +4,7 @@ declare global {
   // jsx only for the default value of tsconfig.json
   var React: {};
   var jsx: {
+    define: (tagName: string, component: jsxLib.Component, options?: jsxLib.RuntimeElementDefinitionOptions) => void;
     useRuntime: typeof jsxLib.useRuntime;
     usePathname: typeof jsxLib.usePathname;
     Link: typeof jsxLib.Link;
