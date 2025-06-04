@@ -26,6 +26,15 @@ export function createServerInterface(options: ServerInterfaceImplOptions): Serv
     cache: options.cache,
     localCache: options.localCache,
     logger: options.logger,
+    reload() {
+      return options?.app?.reload();
+    },
+    restart() {
+      return options?.app?.restart();
+    },
+    stop() {
+      return options?.app?.stop();
+    },
     db: {
       get(name) {
         return options.dbManager.getDB(name);

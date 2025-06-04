@@ -184,6 +184,15 @@ export interface ServerInterface extends ServerGlobal {
   logger?: Logger;
   openBrowser: (path: string) => void;
   getLogger: (identifier: string, options?: { level?: any; transports?: any[]; formatter?: any; }) => Logger;
+  stop: () => Promise<void>;
+  reload: () => Promise<null | {
+    filePath: string;
+    error: Error;
+  }[]>;
+  restart: () => Promise<null | {
+    filePath: string;
+    error: Error;
+  }[]>;
 }
 
 export interface ServerRequest extends Request {
