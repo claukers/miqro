@@ -43,7 +43,7 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "@miqro/core": "^5.0.14",
+    "@miqro/core": "^5.0.15",
     "@miqro/jsx": "^1.0.0",
     "@miqro/jsx-dom": "^1.0.3",
     "@miqro/jsx-node": "^1.0.5",
