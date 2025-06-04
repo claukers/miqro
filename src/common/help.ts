@@ -40,6 +40,9 @@ export const help = `
 --config\n\toverrides the default miqro.json path.
 --port\n\toverrides the default port from PORT.
 --name\n\toverrides the default name of the server.
+--https\n\tserves the server in https instead of http
+--https-key\n\tpoint to a server.key file for https.
+--https-cert\n\tpoint to a server.cert file for https.
 
 ==environment variables==
 

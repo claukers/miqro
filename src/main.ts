@@ -22,7 +22,9 @@ async function main(args: Arguments) {
       services: args.services,
       browser: args.browser,
       logFile: args.logFile,
-      hotreload: args.test ? false : args.hotreload
+      hotreload: args.test ? false : args.hotreload,
+      https: args.https,
+      serverOptions: args.serverOptions
     });
     // check arguments
     if (args.generateDoc) {

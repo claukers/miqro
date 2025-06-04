@@ -31,6 +31,8 @@ import { createLogProviderOptions } from "./utils/log-transport.js";
 import { createAdminInterface } from "./utils/admin-interface.js";
 import { dirname, join, relative, resolve } from "node:path";
 import { cwd } from "node:process";
+import { ServerOptions } from "node:https";
+import { ServerOptions as bla } from "node:http";
 
 export interface MiqroOptions {
   name: string;
@@ -42,6 +44,8 @@ export interface MiqroOptions {
   browser?: string | boolean;
   logFile?: string | boolean;
   hotreload?: boolean;
+  serverOptions?: ServerOptions<any, any>;
+  https?: boolean;
 }
 
 export interface InflateOptions {
@@ -431,7 +435,9 @@ export class Miqro {
         req.server = this.serverInterface;
         return this.webSocketManager.onUpgrade(req, socket, head);
       },
-      loggerFactory: this.loggerProvider.requestLoggerFactory
+      loggerFactory: this.loggerProvider.requestLoggerFactory,
+      serverOptions: this.options?.serverOptions,
+      https: this.options?.https
     });
 
     this.webSocketManager.replaceALLWS(this.inflated.wsConfigList);

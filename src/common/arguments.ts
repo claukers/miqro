@@ -12,6 +12,7 @@ import { isSea } from "node:sea";
 import cluster from "node:cluster";
 import { __package_dirname, getVersion } from "./assets.js";
 import { Parser, Schema } from "@miqro/parser";
+import { ServerOptions } from "node:https";
 
 const parser = new Parser();
 
@@ -23,6 +24,8 @@ interface MiqroJSON {
   browser?: string | boolean;
   logFile?: string | boolean;
   editor?: boolean;
+  https?: boolean;
+  serverOptions?: ServerOptions;
 }
 
 const MiqroJSONSchema: Schema<MiqroJSON> = {
@@ -34,7 +37,9 @@ const MiqroJSONSchema: Schema<MiqroJSON> = {
     inflateDir: "string?",
     browser: "boolean?|string?",
     logFile: "boolean?|string?",
-    editor: "boolean?"
+    editor: "boolean?",
+    https: "boolean?",
+    serverOptions: "any?"
   }
 }
 
@@ -76,6 +81,8 @@ export interface Arguments {
   services: string[];
   editor: boolean;
   hotreload: boolean;
+  https: boolean;
+  serverOptions: ServerOptions;
 }
 
 /**
@@ -87,6 +94,8 @@ export function parseArguments(): Arguments {
 
   const args = cluster.isPrimary ? process.argv.slice(2, process.argv.length) : process.argv.slice(3, process.argv.length);
   const flags: {
+    https: boolean | null;
+    serverOptions: ServerOptions;
     logFile: string | boolean | null;
     browser: string | boolean | null;
     name: string | null;
@@ -110,6 +119,8 @@ export function parseArguments(): Arguments {
     inflateDir?: string | null;
     hotreload?: boolean | null;
   } = {
+    https: null,
+    serverOptions: {},
     name: null,
     browser: null,
     logFile: null,
@@ -195,6 +206,44 @@ export function parseArguments(): Arguments {
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
         flags.hotreload = true;
+        continue;
+      case "--https":
+        if (flags.https !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.https = true;
+        continue;
+      case "--https-cert":
+        if (flags.serverOptions.cert) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        const httpsCertPath = String(args[i + 1]) as any;
+        if (typeof httpsCertPath !== "string") {
+          console.error("bad arguments. --port must be a string.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.serverOptions.cert = readFileSync(httpsCertPath);
+        i++;
+        continue;
+      case "--https-key":
+        if (flags.serverOptions.key) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        const httpsKeyPath = String(args[i + 1]) as any;
+        if (typeof httpsKeyPath !== "string") {
+          console.error("bad arguments. --port must be a string.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.serverOptions.key = readFileSync(httpsKeyPath);
+        i++;
         continue;
       case "--port":
         if (flags.port !== null) {
@@ -435,6 +484,21 @@ export function parseArguments(): Arguments {
         }
       }
     }
+    if (flags.https === null) {
+      if (miqroRC.https) {
+        flags.https = miqroRC.https;
+      }
+    }
+    if (!flags.serverOptions.key) {
+      if (miqroRC.serverOptions?.key) {
+        flags.serverOptions.key = miqroRC.serverOptions?.key;
+      }
+    }
+    if (!flags.serverOptions.cert) {
+      if (miqroRC.serverOptions?.cert) {
+        flags.serverOptions.cert = miqroRC.serverOptions?.cert;
+      }
+    }
     if (flags.port === null) {
       if (miqroRC.port) {
         flags.port = String(miqroRC.port);
@@ -571,6 +635,8 @@ export function parseArguments(): Arguments {
     generateDocOut: flags.generateDocOut ? resolve(process.cwd(), flags.generateDocOut) : generateDocType === "MD" ? resolve(process.cwd(), "API.md") : resolve(process.cwd(), "API.json"),
     generateDocType,
     services,
-    editor: flags.editor ? true : false
+    editor: flags.editor ? true : false,
+    https: flags.https ? true : false,
+    serverOptions: flags.serverOptions
   }
 }
