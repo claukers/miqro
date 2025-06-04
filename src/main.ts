@@ -23,8 +23,9 @@ async function main(args: Arguments) {
       browser: args.browser,
       logFile: args.logFile,
       hotreload: args.test ? false : args.hotreload,
-      https: args.https,
-      serverOptions: args.serverOptions
+      https: args.test ? false : args.https,
+      serverOptions: args.serverOptions,
+      httpRedirect: args.test ? undefined : args.httpsRedirect
     });
     // check arguments
     if (args.generateDoc) {

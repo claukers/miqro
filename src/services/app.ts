@@ -32,7 +32,6 @@ import { createAdminInterface } from "./utils/admin-interface.js";
 import { dirname, join, relative, resolve } from "node:path";
 import { cwd } from "node:process";
 import { ServerOptions } from "node:https";
-import { ServerOptions as bla } from "node:http";
 
 export interface MiqroOptions {
   name: string;
@@ -46,6 +45,7 @@ export interface MiqroOptions {
   hotreload?: boolean;
   serverOptions?: ServerOptions<any, any>;
   https?: boolean;
+  httpRedirect?: number;
 }
 
 export interface InflateOptions {
@@ -80,6 +80,7 @@ export class Miqro {
   public status: "stopped" | "starting" | "stopping" | "reloading" | "started" = "stopped";
   public options: MiqroOptions;
   public server?: App | null = null;
+  public httpsRedirectServer?: App | null = null;
   public cache: ClusterCache;
   public localCache: LocalCache;
   public webSocketManager: WebSocketManager;
@@ -428,6 +429,7 @@ export class Miqro {
     //this.disconnect();
     this.status = "starting";
     this.server = undefined;
+    this.httpsRedirectServer = undefined;
     this.connect();
     await this.dbManager.connectAll();
     this.server = new App({
@@ -439,6 +441,13 @@ export class Miqro {
       serverOptions: this.options?.serverOptions,
       https: this.options?.https
     });
+    if (this.options?.httpRedirect) {
+      this.httpsRedirectServer = new App();
+      this.httpsRedirectServer.use(async (req: ServerRequest, res) => {
+        const hostname = req.headers.host.split(":").length > 1 ? req.headers.host.split(":")[0] : req.headers.host;
+        return await res.redirect('https://' + hostname + ":" + this.options.port + req.url);
+      });
+    }
 
     this.webSocketManager.replaceALLWS(this.inflated.wsConfigList);
 
@@ -461,11 +470,20 @@ export class Miqro {
     this.logger?.trace("calling listen on [%s]", this.options.port);
 
     await this.server.listen(this.options.port);
+    if (this.options?.httpRedirect) {
+      await this.httpsRedirectServer.listen(this.options.httpRedirect);
+    }
+
+    if (this.options?.httpRedirect && this.logger && (cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0")) {
+      this.logger?.log("\t\t==listening on [http][%s] for [https][%s] redirection==", this.options?.httpRedirect, this.options.port);
+    } else if (this.options?.httpRedirect) {
+      this.logger?.debug("\t\t==listening on [http][%s] for [https][%s] redirection==", this.options?.httpRedirect, this.options.port);
+    }
 
     if (this.logger && (cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0")) {
-      this.logger?.log("\t\t==listening on [%s]==", this.options.port);
+      this.logger?.log("\t\t==listening on [%s][%s]==", this.options.https ? "https" : "http", this.options.port);
     } else {
-      this.logger?.debug("\t\t==listening on [%s]==", this.options.port);
+      this.logger?.debug("\t\t==listening on [%s][%s]==", this.options.https ? "https" : "http", this.options.port);
     }
 
     await notifiyServerConfig(this.logger, this.serverInterface, this.adminInterface, this.inflated.serverConfigMap, "start");
@@ -490,7 +508,9 @@ export class Miqro {
       this.watcher = null;
     }
     const server = this.server;
+    const httpsRedirectServer = this.httpsRedirectServer;
     this.server = null;
+    this.httpsRedirectServer = null;
     this.disconnect();
     this.logger?.debug("\t\t==stop==");
     this.logger?.debug("clear running server routes");
@@ -501,6 +521,9 @@ export class Miqro {
     notifiyServerConfigSync(this, "unload");
     //server.ws.disconnectAll();
     this.logger?.debug("stopping");
+    if (httpsRedirectServer) {
+      await httpsRedirectServer.close();
+    }
     const p = server.close();
     await p;
     await pD;

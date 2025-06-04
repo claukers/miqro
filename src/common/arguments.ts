@@ -26,6 +26,7 @@ interface MiqroJSON {
   editor?: boolean;
   https?: boolean;
   serverOptions?: ServerOptions;
+  httpsRedirect?: number;
 }
 
 const MiqroJSONSchema: Schema<MiqroJSON> = {
@@ -39,7 +40,8 @@ const MiqroJSONSchema: Schema<MiqroJSON> = {
     logFile: "boolean?|string?",
     editor: "boolean?",
     https: "boolean?",
-    serverOptions: "any?"
+    serverOptions: "any?",
+    httpsRedirect: "number?"
   }
 }
 
@@ -83,6 +85,7 @@ export interface Arguments {
   hotreload: boolean;
   https: boolean;
   serverOptions: ServerOptions;
+  httpsRedirect?: number;
 }
 
 /**
@@ -94,6 +97,7 @@ export function parseArguments(): Arguments {
 
   const args = cluster.isPrimary ? process.argv.slice(2, process.argv.length) : process.argv.slice(3, process.argv.length);
   const flags: {
+    httpsRedirect: number | null;
     https: boolean | null;
     serverOptions: ServerOptions;
     logFile: string | boolean | null;
@@ -119,6 +123,7 @@ export function parseArguments(): Arguments {
     inflateDir?: string | null;
     hotreload?: boolean | null;
   } = {
+    httpsRedirect: null,
     https: null,
     serverOptions: {},
     name: null,
@@ -215,15 +220,30 @@ export function parseArguments(): Arguments {
         }
         flags.https = true;
         continue;
+      case "--https-redirect":
+        if (flags.httpsRedirect !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        const httpsRedirectPort = parseInt(String(args[i + 1]) as any, 10);
+        if (isNaN(httpsRedirectPort)) {
+          console.error("bad arguments. --https-redirect must be a number.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.httpsRedirect = httpsRedirectPort;
+        i++;
+        continue;
       case "--https-cert":
         if (flags.serverOptions.cert) {
           console.error("bad arguments.");
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
-        const httpsCertPath = String(args[i + 1]) as any;
+        const httpsCertPath = args[i + 1] as any;
         if (typeof httpsCertPath !== "string") {
-          console.error("bad arguments. --port must be a string.");
+          console.error("bad arguments. --https-cert must be a string.");
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
@@ -236,9 +256,9 @@ export function parseArguments(): Arguments {
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
-        const httpsKeyPath = String(args[i + 1]) as any;
+        const httpsKeyPath = args[i + 1] as any;
         if (typeof httpsKeyPath !== "string") {
-          console.error("bad arguments. --port must be a string.");
+          console.error("bad arguments. --https-key must be a string.");
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
@@ -475,6 +495,8 @@ export function parseArguments(): Arguments {
   const miqroJSONPath = !flags.disableMiqroJSON ? flags.miqroJSONPath ? resolve(flags.miqroJSONPath) : getMiqroJSONPath() : false;
   const miqroRC = miqroJSONPath ? importMiqroJSON(miqroJSONPath) : {};
 
+  //console.dir(miqroRC.serverOptions);
+
   // try to load .miqrorc
   if (!flags.disableMiqroJSON && miqroJSONPath) {
     if (services.length === 0) {
@@ -489,13 +511,25 @@ export function parseArguments(): Arguments {
         flags.https = miqroRC.https;
       }
     }
+    if (flags.httpsRedirect === null) {
+      if (miqroRC.httpsRedirect && flags.https) {
+        /*console.log("reading key from " + String(miqroRC.serverOptions?.key));
+        flags.serverOptions.key = readFileSync(String(miqroRC.serverOptions?.key));*/
+        flags.httpsRedirect = miqroRC.httpsRedirect;
+      }
+    }
     if (!flags.serverOptions.key) {
       if (miqroRC.serverOptions?.key) {
+        /*console.log("reading key from " + String(miqroRC.serverOptions?.key));
+        flags.serverOptions.key = readFileSync(String(miqroRC.serverOptions?.key));*/
         flags.serverOptions.key = miqroRC.serverOptions?.key;
       }
     }
+
     if (!flags.serverOptions.cert) {
       if (miqroRC.serverOptions?.cert) {
+        /*console.log("reading cert from " + String(miqroRC.serverOptions?.cert));
+        flags.serverOptions.cert = readFileSync(String(miqroRC.serverOptions?.cert));*/
         flags.serverOptions.cert = miqroRC.serverOptions?.cert;
       }
     }
@@ -612,6 +646,21 @@ export function parseArguments(): Arguments {
 
   const generateDocType = flags.generateDocType ? flags.generateDocType as any : "MD";
 
+  if (flags.https && (!flags.serverOptions.key)) {
+    console.error("bad arguments. cannot use --https without --https-key. or set values in miqro.json file.");
+    process.exit(EXIT_CODES.BAD_ARGUMENTS);
+  }
+
+  if (flags.https && (!flags.serverOptions.cert)) {
+    console.error("bad arguments. cannot use --https without --https-cert. or set values in miqro.json file.");
+    process.exit(EXIT_CODES.BAD_ARGUMENTS);
+  }
+
+  if (flags.httpsRedirect && !flags.https) {
+    console.error("bad arguments. cannot use --https-redirect without --https. or set values in miqro.json file.");
+    process.exit(EXIT_CODES.BAD_ARGUMENTS);
+  }
+
   return {
     name: flags.name ? flags.name : undefined,
     browser: flags.browser !== null ? flags.browser : undefined,
@@ -637,6 +686,7 @@ export function parseArguments(): Arguments {
     services,
     editor: flags.editor ? true : false,
     https: flags.https ? true : false,
+    httpsRedirect: flags.httpsRedirect ? flags.httpsRedirect : undefined,
     serverOptions: flags.serverOptions
   }
 }
