@@ -21,7 +21,7 @@ export class WebSocketManager {
     this.onUpgrade = this.onUpgrade.bind(this);
     this.logger = options && options.logger ? options.logger : null;
     this.name = options && options.name ? options.name : "WebSocketManager";
-    this.loggerProvider = options.loggerProvider;
+    this.loggerProvider = options && options.loggerProvider;
     this.avoidLogSocket = options && options.avoidLogSocket ? options.avoidLogSocket : false;
   }
 
