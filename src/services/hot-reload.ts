@@ -19,7 +19,10 @@ function tryConnection() {
         const newSocket = getSocket();
         newSocket.addEventListener("open", (event) => {
             console.log("reloading");
-            window.location.reload();
+            setTimeout(()=>{
+              window.location.reload();
+            }, 500);
+            
         });
         newSocket.addEventListener("error", (err) => {
             console.error(err);
