@@ -50,6 +50,7 @@ export interface InflateOptions {
   embemedJSX: boolean;
   minify: boolean;
   useExport: boolean;
+  platform?: string;
   logger?: Logger | Console;
 }
 
@@ -78,7 +79,8 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
       const { outputFiles: [{ contents }] } = await esBuild({
         ...DEFAULT_ESOPTION,
         entryPoints: [inFileTmp],
-        minify: options.minify
+        minify: options.minify,
+        platform: options.platform ? options.platform: DEFAULT_ESOPTION.platform
       });
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
@@ -97,7 +99,8 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
       const { outputFiles: [{ contents }] } = await esBuild({
         ...DEFAULT_ESOPTION,
         entryPoints: [inFileTmp],
-        minify: options.minify
+        minify: options.minify,
+        platform: options.platform ? options.platform: DEFAULT_ESOPTION.platform
       });
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
@@ -449,10 +452,12 @@ export async function importJSXFile(inFile: string, logger?: Logger | Console): 
     embemedJSX: false,
     minify: false,
     useExport: true,
+    platform: "node",
     logger
   });
   const tmpBuildDir = resolve(JSX_TMP_DIR, String(process.pid), "import", Date.now() + "-" + randomUUID());
-  const inFileTmp = resolve(tmpBuildDir, basename(inFile) + ".mjs");
+  //const inFileTmp = resolve(tmpBuildDir, basename(inFile) + ".mjs");
+  const inFileTmp = resolve(tmpBuildDir, basename(inFile) + ".cjs");
   //const logger = getLogger(`${SERVER_IDENTIFIER}_JSX`);
   mkdirSync(tmpBuildDir, {
     recursive: true
@@ -462,17 +467,17 @@ export async function importJSXFile(inFile: string, logger?: Logger | Console): 
     assertGlobalTampered();
     logger?.trace("importing [%s] from [%s]. to change the import folder set JSX_TMP", relative(cwd(), inFile), dirname(relative(JSX_TMP_DIR, inFileTmp)));
     logger?.debug("importing [%s]", relative(cwd(), inFile));
-    const module = await import(inFileTmp);
+    const module = await import(resolve(inFileTmp));
     assertGlobalTampered();
     if (CLEAR_JSX_CACHE) {
       logger?.trace("clearing cache at [%s]. to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
       unlinkSync(inFileTmp);
       rmdirSync(tmpBuildDir);
     }
-    return module;
+    return module.default;
   } catch (e) {
     logger?.error(e);
-    logger?.error("error with: " + inFile);
+    logger?.error("error with2: " + inFile);
     if (CLEAR_JSX_CACHE) {
       logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
       unlinkSync(inFileTmp);
