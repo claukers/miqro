@@ -44,17 +44,17 @@ export async function inflateAppForSea(logger: Logger, inflateDir: string, servi
   writeFile(logger, resolve(inflateDir, "sea", "lib.cjs"), Buffer.from(getAsset("lib.cjs")));
 
   const WSLIST = services.filter(service => getWSConfigPath(resolve(cwd(), service))).map(service => {
-    return `(await import("../${service}/ws.cjs")).default`;
+    return `(await import("../${service}/ws.cjs")).default.default`;
   }).join(",")
 
   const SERVERCONFIGLIST = services.filter(service => getServerConfigPath(resolve(cwd(), service))).map(service => {
-    return `(await import("../${service}/server.cjs")).default`;
+    return `(await import("../${service}/server.cjs")).default.default`;
   }).join(",\n");
 
   const DBCONFIGLIST = services.filter(service => getDBConfigPath(resolve(cwd(), service))).map(service => {
     return `new Promise(async (resolve, reject) => {
     try {
-      const db = await dbManager.setupDB((await import("../${service}/db.cjs")).default);
+      const db = await dbManager.setupDB((await import("../${service}/db.cjs")).default.default);
       await (await import("./${service}/migration-up.js")).runMigrations(db);
       resolve();
     } catch(e) {
@@ -114,16 +114,16 @@ export async function inflateServiceForSea(logger: Logger, inflateDir: string, s
 export async function setupRouter() {
   const router = new Router();
 ${getErrorConfigPath(servicePath) ? `
-  const errorConfig = (await import("../../${service}/catch.cjs")).default;
+  const errorConfig = (await import("../../${service}/catch.cjs")).default.default;
   if(errorConfig && errorConfig.catch) {
     for(const m of errorConfig.catch) {
       router.catch(m);
     }
   }` : ""}
-${getCORSConfigPath(servicePath) ? `  router.use(server.middleware.cors((await import("../../${service}/cors.cjs")).default));` : ""}
-${getAuthConfigPath(servicePath) ? `  router.use(server.middleware.session((await import("../../${service}/auth.cjs")).default));` : ""}
+${getCORSConfigPath(servicePath) ? `  router.use(server.middleware.cors((await import("../../${service}/cors.cjs")).default.default));` : ""}
+${getAuthConfigPath(servicePath) ? `  router.use(server.middleware.session((await import("../../${service}/auth.cjs")).default.default));` : ""}
 ${getMiddlewareConfigPath(servicePath) ? `
-  const middlewareConfig = (await import("../../${service}/middleware.cjs")).default;
+  const middlewareConfig = (await import("../../${service}/middleware.cjs")).default.default;
   if(middlewareConfig && middlewareConfig.middleware) {
     for(const m of middlewareConfig.middleware) {
       router.use(m);
@@ -137,7 +137,7 @@ ${Object.keys(serviceRouteFileMap)
         if (rPath) {
           const rPathExt = extname(rPath);
           const apiInflatedPath = join("..", "..", rPath.substring(0, rPath.length - rPathExt.length) + ".cjs");
-          return `  await appendAPIModule(router, "../../${service}/http", "./${apiInflatedPath}", (await import("./${apiInflatedPath}")).default);`;
+          return `  await appendAPIModule(router, "../../${service}/http", "./${apiInflatedPath}", (await import("./${apiInflatedPath}")).default.default);`;
         } else {
           return "";
         }
@@ -160,7 +160,7 @@ export async function runMigrations(db) {
   await migration.init(db);
 ${serviceMigrations.map(file => {
     const name = `${file.substring(0, file.length - extname(file).length)}`;
-    return `  await migration.up.module(db, "${name}", (await import("../../${service}/migration/${name}.cjs")).default)`;
+    return `  await migration.up.module(db, "${file}", (await import("../../${service}/migration/${name}.cjs")).default.default)`;
   }).join("\n")}
 }`);
 
@@ -169,7 +169,7 @@ export async function runMigrations(db) {
   await migration.init(db);
 ${serviceMigrations.reverse().map(file => {
     const name = `${file.substring(0, file.length - extname(file).length)}`;
-    return `  await migration.down.module(db, "${name}", (await import("../../${service}/migration/${name}.cjs")).default)`;
+    return `  await migration.down.module(db, "${file}", (await import("../../${service}/migration/${name}.cjs")).default.default)`;
   }).join("\n")}
 }`);
 
