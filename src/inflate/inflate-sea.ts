@@ -44,17 +44,17 @@ export async function inflateAppForSea(logger: Logger, inflateDir: string, servi
   writeFile(logger, resolve(inflateDir, "sea", "lib.cjs"), Buffer.from(getAsset("lib.cjs")));
 
   const WSLIST = services.filter(service => getWSConfigPath(resolve(cwd(), service))).map(service => {
-    return `(await import("../${service}/ws.cjs")).default.default`;
+    return `(await import("../${service}/ws.cjs")).default`;
   }).join(",")
 
   const SERVERCONFIGLIST = services.filter(service => getServerConfigPath(resolve(cwd(), service))).map(service => {
-    return `(await import("../${service}/server.cjs")).default.default`;
+    return `(await import("../${service}/server.cjs")).default`;
   }).join(",\n");
 
   const DBCONFIGLIST = services.filter(service => getDBConfigPath(resolve(cwd(), service))).map(service => {
     return `new Promise(async (resolve, reject) => {
     try {
-      const db = await dbManager.setupDB((await import("../${service}/db.cjs")).default.default);
+      const db = await dbManager.setupDB((await import("../${service}/db.cjs")).default);
       await (await import("./${service}/migration-up.js")).runMigrations(db);
       resolve();
     } catch(e) {
