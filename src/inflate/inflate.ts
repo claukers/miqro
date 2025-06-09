@@ -20,10 +20,11 @@ export interface InflateAppOptions {
   //editor: boolean;
   //inflateTests: boolean;
   hotreload?: boolean;
+  port: string;
   serverInterface: ServerInterface;
 }
 
-export async function inflateApp({ serverInterface, logger, hotreload, services/*, dbManager*/, inflateDir, inflateSea/*, editor, inflateTests*/ }: InflateAppOptions): Promise<[Router, InflateError[] | null, RouteFileMap, WSConfig[]/*, ServerConfigMap*/, LogConfigMap]> {
+export async function inflateApp({ serverInterface, logger, hotreload, services/*, dbManager*/, inflateDir, inflateSea/*, editor, inflateTests*/, port }: InflateAppOptions): Promise<[Router, InflateError[] | null, RouteFileMap, WSConfig[]/*, ServerConfigMap*/, LogConfigMap]> {
   logger.trace("inflateApp");
   const errors: InflateError[] = [];
   //const migrations: string[] = [];
@@ -90,7 +91,7 @@ export async function inflateApp({ serverInterface, logger, hotreload, services/
   }
 
   if (inflateDir && inflateSea) {
-    await inflateAppForSea(logger, inflateDir, services);
+    await inflateAppForSea(logger, inflateDir, services, port);
   }
 
   router.use(assertGlobalTampered);

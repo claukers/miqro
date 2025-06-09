@@ -37,7 +37,9 @@ export async function inflateSeaAssets(logger: Logger, inflateDir: string) {
   writeFile(logger, resolve(inflateDir, "install-nodejs.sh"), Buffer.from(getAsset("install-nodejs.sh")));
 }
 
-export async function inflateAppForSea(logger: Logger, inflateDir: string, services: string[]) {
+export async function inflateAppForSea(logger: Logger, inflateDir: string, services: string[], port: string) {
+
+  const PORT = port;
 
   inflateSeaAssets(logger, inflateDir);
 
@@ -69,7 +71,7 @@ export async function inflateAppForSea(logger: Logger, inflateDir: string, servi
   writeFile(logger, join(inflateDir, "sea", "app.cjs"), `const { createServerInterface, ServerRequestHandler, WebSocketManager, initGlobals, DBManager, App, LoggerHandler, LogProvider, LocalCache, ClusterCache } = require("./lib.cjs");
 
 async function main() {
-  const PORT = process.env["PORT"] ? process.env["PORT"] : 8080; 
+  const PORT = "${PORT}"; 
   const loggerProvider = new LogProvider();
   const localCache = new LocalCache();
   const cache = new ClusterCache();
@@ -100,6 +102,7 @@ async function main() {
   
   await app.listen(PORT);
   ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].filter(config=>config.start).map(config=>config.start(serverInterface)));` : ""}
+  loggerProvider.getLogger("server").info("listening on [%s]", PORT);
 }
 main().catch(e=>console.error(e));
 `

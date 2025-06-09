@@ -366,6 +366,7 @@ export class Miqro {
         services: this.options.services,
         serverInterface: this.serverInterface,
         //dbManager: this.dbManager,
+        port: this.options.port,
         inflateDir: options?.inflateDir,
         inflateSea: options?.inflateSea ? true : false,
         //inflateTests: options?.inflateTests ? true : false,
