@@ -213,7 +213,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
 
                 if (inflateDir && r.defaultInflatePath && inflateSea) {
                   const rPath = r.defaultInflatePath;
-                  const inflatePath = join(inflateDir, service, "http", rPath + ".api.js");
+                  const inflatePath = join(inflateDir, service, "http", rPath + ".api.cjs");
                   mkdirSync(dirname(inflatePath), {
                     recursive: true
                   });

@@ -30,7 +30,7 @@ export async function inflateDBConfig(logger: Logger, service: string, dbConfigL
 
       if (config) {
         if (inflateDir) {
-          const inflatePath = resolve(inflateDir, service, "db.js");
+          const inflatePath = resolve(inflateDir, service, "db.cjs");
           mkdirSync(dirname(inflatePath), {
             recursive: true
           });
@@ -85,7 +85,7 @@ export async function inflateDBMigrations(logger: Logger, service: string, dbNam
         });
 
         if (inflateDir) {
-          const inflatePath = resolve(inflateDir, service, "migration", migrationName.substring(0, migrationName.length - extname(migrationName).length) + ".js");
+          const inflatePath = resolve(inflateDir, service, "migration", migrationName.substring(0, migrationName.length - extname(migrationName).length) + ".cjs");
           mkdirSync(dirname(inflatePath), {
             recursive: true
           });

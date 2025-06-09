@@ -15,7 +15,7 @@ export async function setupAUTH(logger: Logger, servicePath: string, service: st
       mainRouter.use(SessionHandler(authModule));
 
       if (inflateDir && inflateSea) {
-        const inflatePath = resolve(inflateDir, service, "auth.js");
+        const inflatePath = resolve(inflateDir, service, "auth.cjs");
         mkdirSync(dirname(inflatePath), {
           recursive: true
         });

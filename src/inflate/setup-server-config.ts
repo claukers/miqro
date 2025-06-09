@@ -23,7 +23,7 @@ export async function setupServerConfig(logger: Logger, servicePath: string, ser
 
 
       if (inflateDir) {
-        const inflatePath = resolve(inflateDir, service, "server.js");
+        const inflatePath = resolve(inflateDir, service, "server.cjs");
         mkdirSync(dirname(inflatePath), {
           recursive: true
         });

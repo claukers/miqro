@@ -18,7 +18,7 @@ export async function setupError(logger: Logger, servicePath: string, service: s
         }
       }
       if (inflateDir && inflateSea) {
-        const inflatePath = resolve(inflateDir, service, "catch.js");
+        const inflatePath = resolve(inflateDir, service, "catch.cjs");
         mkdirSync(dirname(inflatePath), {
           recursive: true
         });

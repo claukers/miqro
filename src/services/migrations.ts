@@ -19,7 +19,7 @@ export async function runMigrations(logger: Logger | undefined, db: Database | n
 
     if (inflateDir) {
       for (const migration of serviceMigrations) {
-        const inflatePath = resolve(inflateDir, service, "migration", migration.substring(0, migration.length - extname(migration).length) + ".js");
+        const inflatePath = resolve(inflateDir, service, "migration", migration.substring(0, migration.length - extname(migration).length) + ".cjs");
         mkdirSync(dirname(inflatePath), {
           recursive: true
         });
@@ -49,7 +49,7 @@ export async function runMigrationsDown(logger: Logger | Console | undefined, db
 
     if (inflateDir) {
       for (const migration of serviceMigrations) {
-        const inflatePath = resolve(inflateDir, service, "migration", migration.substring(0, migration.length - extname(migration).length) + ".js");
+        const inflatePath = resolve(inflateDir, service, "migration", migration.substring(0, migration.length - extname(migration).length) + ".cjs");
         mkdirSync(dirname(inflatePath), {
           recursive: true
         });

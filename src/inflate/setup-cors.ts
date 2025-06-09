@@ -15,7 +15,7 @@ export async function setupCORS(logger: Logger, servicePath: string, service: st
       mainRouter.use(CORS(corsOptions));
 
       if (inflateDir && inflateSea) {
-        const inflatePath = resolve(inflateDir, service, "cors.js");
+        const inflatePath = resolve(inflateDir, service, "cors.cjs");
         mkdirSync(dirname(inflatePath), {
           recursive: true
         });

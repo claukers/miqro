@@ -23,7 +23,7 @@ export async function inflateWSConfig(logger: Logger, servicePath: string, servi
       }
 
       if (inflateDir) {
-        const inflatePath = resolve(inflateDir, service, "ws.js");
+        const inflatePath = resolve(inflateDir, service, "ws.cjs");
         mkdirSync(dirname(inflatePath), {
           recursive: true
         });

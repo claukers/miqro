@@ -19,7 +19,7 @@ export async function setupMiddleware(logger: Logger, servicePath: string, servi
         }
       }
       if (inflateDir && inflateSea) {
-        const inflatePath = resolve(inflateDir, service, "middleware.js");
+        const inflatePath = resolve(inflateDir, service, "middleware.cjs");
         mkdirSync(dirname(inflatePath), {
           recursive: true
         });

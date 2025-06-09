@@ -20,7 +20,7 @@ export async function setupLogConfig(logger: Logger, servicePath: string, servic
       logConfigMap[service] = logConfig;
 
       if (inflateDir) {
-        const inflatePath = resolve(inflateDir, service, "log.js");
+        const inflatePath = resolve(inflateDir, service, "log.cjs");
         mkdirSync(dirname(inflatePath), {
           recursive: true
         });
