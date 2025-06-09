@@ -31,6 +31,7 @@ export async function setupServerConfig(logger: Logger, servicePath: string, ser
         writeFileSync(inflatePath, await inflateJSX(serverPath, {
           embemedJSX: false,
           minify: false,
+          platform: "node",
           useExport: true,
           logger
         }));

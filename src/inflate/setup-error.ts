@@ -27,6 +27,7 @@ export async function setupError(logger: Logger, servicePath: string, service: s
           embemedJSX: false,
           minify: false,
           useExport: true,
+          platform: "node",
           logger
         }));
       }

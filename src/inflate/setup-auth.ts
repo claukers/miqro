@@ -24,6 +24,7 @@ export async function setupAUTH(logger: Logger, servicePath: string, service: st
           embemedJSX: false,
           minify: false,
           useExport: true,
+          platform: "node",
           logger
         }));
       }

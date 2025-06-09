@@ -24,6 +24,7 @@ export async function setupCORS(logger: Logger, servicePath: string, service: st
           embemedJSX: false,
           minify: false,
           useExport: true,
+          platform: "node",
           logger
         }));
       }

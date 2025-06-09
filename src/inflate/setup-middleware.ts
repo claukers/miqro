@@ -27,6 +27,7 @@ export async function setupMiddleware(logger: Logger, servicePath: string, servi
         writeFileSync(inflatePath, await inflateJSX(middlewarePath, {
           embemedJSX: false,
           minify: false,
+          platform: "node",
           useExport: true,
           logger
         }));

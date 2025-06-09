@@ -28,6 +28,7 @@ export async function runMigrations(logger: Logger | undefined, db: Database | n
           embemedJSX: false,
           minify: false,
           useExport: true,
+          platform: "node",
           logger
         }));
       }
@@ -55,6 +56,7 @@ export async function runMigrationsDown(logger: Logger | Console | undefined, db
         logger?.log("writing [%s]", relative(cwd(), inflatePath));
         writeFileSync(inflatePath, await inflateJSX(resolve(migrationsFolderPath, migration), {
           embemedJSX: false,
+          platform: "node",
           minify: false,
           useExport: true,
           logger

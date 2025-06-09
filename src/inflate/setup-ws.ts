@@ -31,6 +31,7 @@ export async function inflateWSConfig(logger: Logger, servicePath: string, servi
         writeFileSync(inflatePath, await inflateJSX(wsPath, {
           embemedJSX: false,
           minify: false,
+          platform: "node",
           useExport: true,
           logger
         }));

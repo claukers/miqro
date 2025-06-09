@@ -39,6 +39,7 @@ export async function inflateDBConfig(logger: Logger, service: string, dbConfigL
             embemedJSX: false,
             minify: false,
             useExport: true,
+            platform: "node",
             logger
           }));
         }
@@ -93,6 +94,7 @@ export async function inflateDBMigrations(logger: Logger, service: string, dbNam
             embemedJSX: false,
             minify: false,
             useExport: true,
+            platform: "node",
             logger
           }));
         }

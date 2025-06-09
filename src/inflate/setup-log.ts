@@ -29,6 +29,7 @@ export async function setupLogConfig(logger: Logger, servicePath: string, servic
           embemedJSX: false,
           minify: false,
           useExport: true,
+          platform: "node",
           logger
         }));
       }

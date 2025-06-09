@@ -195,6 +195,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                 embemedJSX: false,
                 minify: false,
                 useExport: true,
+                platform: "node",
                 logger
               }) : "";
 
