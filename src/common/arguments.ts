@@ -187,13 +187,14 @@ export function parseArguments(): Arguments {
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
-        const cPath = String(args[i + 1]).toUpperCase() as any;
-        if (typeof cPath !== "string") {
+        if (typeof args[i + 1] !== "string") {
           console.error("bad arguments. --config must be a string.");
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        } else {
+          const cPath = String(args[i + 1]) as any;
+          flags.miqroJSONPath = cPath;
         }
-        flags.miqroJSONPath = cPath;
         i++;
         continue;
       case "--install-tsconfig":
@@ -271,13 +272,14 @@ export function parseArguments(): Arguments {
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
-        const cPort = String(args[i + 1]) as any;
-        if (typeof cPort !== "string") {
+        if (typeof args[i + 1] !== "string") {
           console.error("bad arguments. --port must be a string.");
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        } else {
+          const cPort = String(args[i + 1]) as any;
+          flags.port = cPort;
         }
-        flags.port = cPort;
         i++;
         continue;
       case "--name":
@@ -286,13 +288,15 @@ export function parseArguments(): Arguments {
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
-        const cName = String(args[i + 1]).toUpperCase() as any;
-        if (typeof cName !== "string") {
+        if (typeof args[i + 1] !== "string") {
           console.error("bad arguments. --port must be a string.");
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        } else {
+          const cName = String(args[i + 1]).toUpperCase() as any;
+          flags.name = cName;
         }
-        flags.name = cName;
+
         i++;
         continue;
       case "--log-file":
@@ -301,13 +305,15 @@ export function parseArguments(): Arguments {
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
-        const cLofFile = String(args[i + 1]) as any;
-        if (typeof cLofFile !== "string") {
+
+        if (typeof args[i + 1] !== "string") {
           console.error("bad arguments. --port must be a string.");
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        } else {
+          const cLofFile = String(args[i + 1]) as any;
+          flags.logFile = cLofFile;
         }
-        flags.logFile = cLofFile;
         i++;
         continue;
       case "--browser":
@@ -316,13 +322,15 @@ export function parseArguments(): Arguments {
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
-        const cBrowser = String(args[i + 1]) as any;
-        if (typeof cBrowser !== "string") {
+
+        if (typeof args[i + 1] !== "string") {
           console.error("bad arguments. --port must be a string.");
           console.error(usage);
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        } else {
+          const cBrowser = String(args[i + 1]) as any;
+          flags.browser = cBrowser;
         }
-        flags.browser = cBrowser;
         i++;
         continue;
       case "--generate-doc":
