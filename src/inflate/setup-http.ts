@@ -165,388 +165,271 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
 }> {
   const router = new Router();
   router.use(assertGlobalTampered);
-  await Promise.all(scanFiles(dir).map(file => new Promise<void>(async (resolve) => {
-    try {
-      switch (file.ext) {
-        case ".jsx":
-        case ".js":
-        case ".ts":
-        case ".tsx": {
-          switch (file.subExt) {
-            case ".test":
-              return resolve();
-            case ".ignore":
-              logger.warn("ignoring [%s]", file.filePath);
-              return resolve();
-            case ".api": {
+  for (const file of scanFiles(dir)) {
+    await new Promise<void>(async (resolve) => {
+      try {
+        switch (file.ext) {
+          case ".jsx":
+          case ".cjs":
+          case ".js":
+          case ".ts":
+          case ".tsx": {
+            switch (file.subExt) {
+              case ".test":
+                return resolve();
+              case ".ignore":
+                logger.warn("ignoring [%s]", file.filePath);
+                return resolve();
+              case ".api": {
 
-              const module = await importAPIRoute(file.filePath, logger);
+                const module = await importAPIRoute(file.filePath, logger);
 
-              const routes = getRoutes(join("/", dirname(relative(dir, file.filePath))), file.subName, module);
+                const routes = getRoutes(join("/", dirname(relative(dir, file.filePath))), file.subName, module);
 
-              routeFileMap[file.filePath] = {
-                routes,
-                service,
-                filePath: file.filePath,
-                previewMethod: "api"
-              };
+                routeFileMap[file.filePath] = {
+                  routes,
+                  service,
+                  filePath: file.filePath,
+                  previewMethod: "api"
+                };
 
-              const inflatedCode = inflateDir ? await inflateJSX(file.filePath, {
-                embemedJSX: false,
-                minify: false,
-                useExport: true,
-                platform: "node",
-                logger
-              }) : "";
+                const inflatedCode = inflateDir ? await inflateJSX(file.filePath, {
+                  embemedJSX: false,
+                  minify: false,
+                  useExport: true,
+                  platform: "node",
+                  logger
+                }) : "";
 
-              for (const r of routes) {
+                for (const r of routes) {
 
-                /*if (inflateDir && r.inflatePath) {
-                  const rPath = r.inflatePath;
-                  const inflatePath = join(inflateDir, service, "http", rPath + ".api.js");
-                  mkdirSync(dirname(inflatePath), {
-                    recursive: true
-                  });
-                  logger.log("writing [%s]", relative(cwd(), inflatePath));
-                  writeFileSync(inflatePath, inflatedCode);
-                }*/
-
-                if (inflateDir && r.defaultInflatePath && inflateSea) {
-                  const rPath = r.defaultInflatePath;
-                  const inflatePath = join(inflateDir, service, "http", rPath + ".api.cjs");
-                  mkdirSync(dirname(inflatePath), {
-                    recursive: true
-                  });
-                  logger.log("writing [%s]", relative(cwd(), inflatePath));
-                  writeFileSync(inflatePath, inflatedCode);
-                }
-
-
-                router.use(assertGlobalTampered);
-                router.use(module.handler, r.path, r.method as any, r.options);
-              }
-              return resolve();
-            }
-            case ".json": {
-              const module = await importJSONModule(file.filePath, logger);
-              const routes = getRoutes(join("/", dirname(relative(dir, file.filePath))), file.subName + ".json", module.apiOptions as Partial<APIRoute>);
-
-              routeFileMap[file.filePath] = {
-                routes,
-                service,
-                filePath: file.filePath,
-                previewMethod: "html"
-              };
-
-              for (const r of routes) {
-
-                const contentType = CONTENT_TYPE_MAP[".json"] ? CONTENT_TYPE_MAP[".json"] : DEFAULT_CONTENT_TYPE;
-
-
-
-                if (inflateDir) {
-
-                  if (r.inflatePath) {
-                    //if (r.method === "GET" || r.method === "get") {
+                  /*if (inflateDir && r.inflatePath) {
                     const rPath = r.inflatePath;
-                    const inflatePath = join(inflateDir, service, "static", rPath);
+                    const inflatePath = join(inflateDir, service, "http", rPath + ".api.js");
                     mkdirSync(dirname(inflatePath), {
                       recursive: true
                     });
-                    if (existsSync(inflatePath) && statSync(inflatePath).isDirectory()) {
-                      logger.trace("ignoring writing over directory [%s] for file [%s]", relative(cwd(), inflatePath), file.filePath);
-                      continue;
-                    }
-                    const JSON_STATIC = await getJSON({ server } as ServerRequest, null, newURL(r.path), module.apiOptions?.basePath, module.default);
-                    //const JSON = await getJSON({ server } as ServerRequest, null, newURL(r.path), module.apiOptions?.basePath, module.default);
                     logger.log("writing [%s]", relative(cwd(), inflatePath));
-                    writeFileSync(inflatePath, JSON_STATIC);
-                    //}
+                    writeFileSync(inflatePath, inflatedCode);
+                  }*/
+
+                  if (inflateDir && r.defaultInflatePath && inflateSea) {
+                    const rPath = r.defaultInflatePath;
+                    const inflatePath = join(inflateDir, service, "http", rPath + ".api.cjs");
+                    mkdirSync(dirname(inflatePath), {
+                      recursive: true
+                    });
+                    logger.log("writing [%s]", relative(cwd(), inflatePath));
+                    writeFileSync(inflatePath, inflatedCode);
+                  }
+
+
+                  router.use(assertGlobalTampered);
+                  router.use(module.handler, r.path, r.method as any, r.options);
+                }
+                return resolve();
+              }
+              case ".json": {
+                const module = await importJSONModule(file.filePath, logger);
+                const routes = getRoutes(join("/", dirname(relative(dir, file.filePath))), file.subName + ".json", module.apiOptions as Partial<APIRoute>);
+
+                routeFileMap[file.filePath] = {
+                  routes,
+                  service,
+                  filePath: file.filePath,
+                  previewMethod: "html"
+                };
+
+                for (const r of routes) {
+
+                  const contentType = CONTENT_TYPE_MAP[".json"] ? CONTENT_TYPE_MAP[".json"] : DEFAULT_CONTENT_TYPE;
+
+
+
+                  if (inflateDir) {
+
+                    if (r.inflatePath) {
+                      //if (r.method === "GET" || r.method === "get") {
+                      const rPath = r.inflatePath;
+                      const inflatePath = join(inflateDir, service, "static", rPath);
+                      mkdirSync(dirname(inflatePath), {
+                        recursive: true
+                      });
+                      if (existsSync(inflatePath) && statSync(inflatePath).isDirectory()) {
+                        logger.trace("ignoring writing over directory [%s] for file [%s]", relative(cwd(), inflatePath), file.filePath);
+                        continue;
+                      }
+                      const JSON_STATIC = await getJSON({ server } as ServerRequest, null, newURL(r.path), module.apiOptions?.basePath, module.default);
+                      //const JSON = await getJSON({ server } as ServerRequest, null, newURL(r.path), module.apiOptions?.basePath, module.default);
+                      logger.log("writing [%s]", relative(cwd(), inflatePath));
+                      writeFileSync(inflatePath, JSON_STATIC);
+                      //}
+
+                      if (staticFileMap && inflateSea) {
+                        staticFileMap[file.filePath] = {
+                          contentType,
+                          filePath: file.filePath,
+                          method: r.method,
+                          previewMethod: "html",
+                          path: r.path,
+                          body: Buffer.from(JSON_STATIC),
+                          inflatePath: inflateDir ? join(inflateDir, service, "static", r.inflatePath) : undefined
+                        }
+                      }
+                    }
+                  }
+
+                  router.use(assertGlobalTampered);
+                  router.use(async function (req: Request, res: Response) {
+
+                    const JSON = await getJSON(req, res, newURL(req.path), module.apiOptions?.basePath, module.default);
+
+                    return res.asyncEnd({
+                      status: 200,
+                      headers: {
+                        ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
+                      },
+                      body: JSON
+                    });
+                  }, r.path, r.method as any, r.options)
+                }
+
+                return resolve();
+              }
+              case ".html": {
+
+                const module = await importHTMLModule(file.filePath, logger);
+
+                const routes = getRoutes(join("/", dirname(relative(dir, file.filePath))), file.subName + ".html", module.apiOptions as Partial<APIRoute>);
+
+                routeFileMap[file.filePath] = {
+                  routes,
+                  filePath: file.filePath,
+                  service,
+                  previewMethod: "html"
+                };
+
+                for (const r of routes) {
+
+                  const contentType = CONTENT_TYPE_MAP[".html"] ? CONTENT_TYPE_MAP[".html"] : DEFAULT_CONTENT_TYPE;
+
+                  if (inflateDir) {
+
+                    if (r.inflatePath) {
+                      //if (r.method === "GET" || r.method === "get") {
+                      const rPath = r.inflatePath;
+                      const inflatePath = join(inflateDir, service, "static", rPath);
+                      mkdirSync(dirname(inflatePath), {
+                        recursive: true
+                      });
+                      if (existsSync(inflatePath) && statSync(inflatePath).isDirectory()) {
+                        logger.trace("ignoring writing over directory [%s] for file [%s]", relative(cwd(), inflatePath), file.filePath);
+                        continue;
+                      }
+                      const toRender = typeof module.default === "function" ? module.default({ server } as ServerRequest, null) : module.default;
+                      const HTML_STATIC = await getHTML(hotreload, { server } as ServerRequest, null, newURL(r.path), module.apiOptions?.basePath, await toRender);
+
+                      logger.log("writing [%s]", relative(cwd(), inflatePath));
+                      writeFileSync(inflatePath, HTML_STATIC);
+                      //}
+
+
+                      if (staticFileMap && inflateSea) {
+                        staticFileMap[file.filePath + r.method + r.path] = {
+                          filePath: file.filePath,
+                          contentType,
+                          method: r.method,
+                          previewMethod: "html",
+                          path: r.path,
+                          body: Buffer.from(HTML_STATIC),
+                          inflatePath: inflateDir ? join(inflateDir, service, "static", r.inflatePath) : undefined
+                        }
+                      }
+                    }
+                  }
+
+                  router.use(assertGlobalTampered);
+                  router.use(async function (req: Request, res: Response) {
+                    const toRender = typeof module.default === "function" ? module.default(req, res) : module.default;
+                    const HTML = await getHTML(hotreload, req, res, newURL(req.path), module.apiOptions?.basePath, await toRender);
+
+                    return res.asyncEnd({
+                      status: 200,
+                      headers: {
+                        ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
+                      },
+                      body: HTML
+                    });
+                  }, r.path, r.method as any, r.options)
+                }
+                return resolve();
+              }
+              case ".min":
+              case ".js":
+              default: {
+                // allow fall-through when extension is .js and .ts because is a static route without embemedJSX
+                if (file.ext !== ".js" && file.ext !== ".ts") {
+                  const code = await inflateJSX(file.filePath, {
+                    embemedJSX: true,
+                    minify: file.subExt === ".min" ? true : false,
+                    useExport: false,
+                    logger
+                  });
+                  const contentType = CONTENT_TYPE_MAP[".js"];
+                  const path = join("/", dirname(relative(dir, file.filePath)), file.name + ".js");
+
+                  routeFileMap[file.filePath] = {
+                    routes: [{
+                      method: "GET",
+                      path
+                    }],
+                    filePath: file.filePath,
+                    service,
+                    previewMethod: "html"
+                  };
+
+                  if (inflateDir) {
+                    const inflatePath = join(inflateDir, service, "static", path);
+                    mkdirSync(dirname(inflatePath), {
+                      recursive: true
+                    });
+                    logger.log("writing [%s]", relative(cwd(), inflatePath));
+                    writeFileSync(inflatePath, code);
+
 
                     if (staticFileMap && inflateSea) {
                       staticFileMap[file.filePath] = {
                         contentType,
                         filePath: file.filePath,
-                        method: r.method,
+                        method: "GET",
                         previewMethod: "html",
-                        path: r.path,
-                        body: Buffer.from(JSON_STATIC),
-                        inflatePath: inflateDir ? join(inflateDir, service, "static", r.inflatePath) : undefined
+                        path,
+                        body: Buffer.from(code),
+                        inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
                       }
                     }
                   }
-                }
 
-                router.use(assertGlobalTampered);
-                router.use(async function (req: Request, res: Response) {
-
-                  const JSON = await getJSON(req, res, newURL(req.path), module.apiOptions?.basePath, module.default);
-
-                  return res.asyncEnd({
-                    status: 200,
-                    headers: {
-                      ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
-                    },
-                    body: JSON
-                  });
-                }, r.path, r.method as any, r.options)
-              }
-
-              return resolve();
-            }
-            case ".html": {
-
-              const module = await importHTMLModule(file.filePath, logger);
-
-              const routes = getRoutes(join("/", dirname(relative(dir, file.filePath))), file.subName + ".html", module.apiOptions as Partial<APIRoute>);
-
-              routeFileMap[file.filePath] = {
-                routes,
-                filePath: file.filePath,
-                service,
-                previewMethod: "html"
-              };
-
-              for (const r of routes) {
-
-                const contentType = CONTENT_TYPE_MAP[".html"] ? CONTENT_TYPE_MAP[".html"] : DEFAULT_CONTENT_TYPE;
-
-                if (inflateDir) {
-
-                  if (r.inflatePath) {
-                    //if (r.method === "GET" || r.method === "get") {
-                    const rPath = r.inflatePath;
-                    const inflatePath = join(inflateDir, service, "static", rPath);
-                    mkdirSync(dirname(inflatePath), {
-                      recursive: true
+                  router.use(assertGlobalTampered);
+                  router.get(path, async function (req, res) {
+                    return res.asyncEnd({
+                      status: 200,
+                      headers: {
+                        ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
+                      },
+                      body: code
                     });
-                    if (existsSync(inflatePath) && statSync(inflatePath).isDirectory()) {
-                      logger.trace("ignoring writing over directory [%s] for file [%s]", relative(cwd(), inflatePath), file.filePath);
-                      continue;
-                    }
-                    const toRender = typeof module.default === "function" ? module.default({ server } as ServerRequest, null) : module.default;
-                    const HTML_STATIC = await getHTML(hotreload, { server } as ServerRequest, null, newURL(r.path), module.apiOptions?.basePath, await toRender);
-
-                    logger.log("writing [%s]", relative(cwd(), inflatePath));
-                    writeFileSync(inflatePath, HTML_STATIC);
-                    //}
-
-
-                    if (staticFileMap && inflateSea) {
-                      staticFileMap[file.filePath + r.method + r.path] = {
-                        filePath: file.filePath,
-                        contentType,
-                        method: r.method,
-                        previewMethod: "html",
-                        path: r.path,
-                        body: Buffer.from(HTML_STATIC),
-                        inflatePath: inflateDir ? join(inflateDir, service, "static", r.inflatePath) : undefined
-                      }
-                    }
-                  }
+                  });
+                  return resolve();
                 }
-
-                router.use(assertGlobalTampered);
-                router.use(async function (req: Request, res: Response) {
-                  const toRender = typeof module.default === "function" ? module.default(req, res) : module.default;
-                  const HTML = await getHTML(hotreload, req, res, newURL(req.path), module.apiOptions?.basePath, await toRender);
-
-                  return res.asyncEnd({
-                    status: 200,
-                    headers: {
-                      ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
-                    },
-                    body: HTML
-                  });
-                }, r.path, r.method as any, r.options)
-              }
-              return resolve();
-            }
-            case ".min":
-            case ".js":
-            default: {
-              // allow fall-through when extension is .js and .ts because is a static route without embemedJSX
-              if (file.ext !== ".js" && file.ext !== ".ts") {
-                const code = await inflateJSX(file.filePath, {
-                  embemedJSX: true,
-                  minify: file.subExt === ".min" ? true : false,
-                  useExport: false,
-                  logger
-                });
-                const contentType = CONTENT_TYPE_MAP[".js"];
-                const path = join("/", dirname(relative(dir, file.filePath)), file.name + ".js");
-
-                routeFileMap[file.filePath] = {
-                  routes: [{
-                    method: "GET",
-                    path
-                  }],
-                  filePath: file.filePath,
-                  service,
-                  previewMethod: "html"
-                };
-
-                if (inflateDir) {
-                  const inflatePath = join(inflateDir, service, "static", path);
-                  mkdirSync(dirname(inflatePath), {
-                    recursive: true
-                  });
-                  logger.log("writing [%s]", relative(cwd(), inflatePath));
-                  writeFileSync(inflatePath, code);
-
-
-                  if (staticFileMap && inflateSea) {
-                    staticFileMap[file.filePath] = {
-                      contentType,
-                      filePath: file.filePath,
-                      method: "GET",
-                      previewMethod: "html",
-                      path,
-                      body: Buffer.from(code),
-                      inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
-                    }
-                  }
-                }
-
-                router.use(assertGlobalTampered);
-                router.get(path, async function (req, res) {
-                  return res.asyncEnd({
-                    status: 200,
-                    headers: {
-                      ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
-                    },
-                    body: code
-                  });
-                });
-                return resolve();
               }
             }
           }
-        }
-        case ".md": {
-          switch (file.subExt) {
-            case ".html": {
-              const code = await inflateMD2HTML(file.filePath, logger);
-              const contentType = CONTENT_TYPE_MAP[".html"];
-              const path = join("/", dirname(relative(dir, file.filePath)), file.name);
-              routeFileMap[file.filePath] = {
-                routes: [{
-                  method: "GET",
-                  path
-                }],
-                service,
-                filePath: file.filePath,
-                previewMethod: "html"
-              };
-
-              if (inflateDir) {
-                const inflatePath = join(inflateDir, service, "static", path);
-                mkdirSync(dirname(inflatePath), {
-                  recursive: true
-                });
-                logger.log("writing [%s]", relative(cwd(), inflatePath));
-                writeFileSync(inflatePath, code);
-                if (staticFileMap && inflateSea) {
-                  staticFileMap[file.filePath] = {
-                    contentType,
-                    method: "GET",
-                    filePath: file.filePath,
-                    previewMethod: "html",
-                    path,
-                    body: Buffer.from(code),
-                    inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
-                  }
-                }
-              }
-
-              router.use(assertGlobalTampered);
-              router.get(path, async function (_req, res) {
-                res.asyncEnd({
-                  status: 200,
-                  headers: {
-                    ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
-                  },
-                  body: code
-                });
-              });
-              return resolve();
-            }
-          }
-        }
-        default:
-          if (file.ext === ".js" || file.ext === ".ts") {
+          case ".md": {
             switch (file.subExt) {
-              case ".ignore": {
-                logger.warn("ignoring [%s]", file.filePath);
-                return resolve();
-              }
-              case ".bundle":
-              case ".min": {
-                const code = await inflateJSX(file.filePath, {
-                  embemedJSX: false,
-                  minify: file.subExt === ".min" ? true : false,
-                  useExport: false,
-                  logger
-                });
-                const contentType = CONTENT_TYPE_MAP[".js"];
-                const path = join("/", dirname(relative(dir, file.filePath)), file.name + ".js");
-                routeFileMap[file.filePath] = {
-                  routes: [{
-                    method: "GET",
-                    path
-                  }],
-                  filePath: file.filePath,
-                  service,
-                  previewMethod: "html"
-                };
-
-                if (inflateDir) {
-                  const inflatePath = join(inflateDir, service, "static", path);
-                  mkdirSync(dirname(inflatePath), {
-                    recursive: true
-                  });
-                  logger.log("writing [%s]", relative(cwd(), inflatePath));
-                  writeFileSync(inflatePath, code);
-                  if (staticFileMap && inflateSea) {
-                    staticFileMap[file.filePath] = {
-                      contentType,
-                      method: "GET",
-                      filePath: file.filePath,
-                      previewMethod: "html",
-                      path,
-                      body: Buffer.from(code),
-                      inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
-                    }
-                  }
-                }
-
-                router.use(assertGlobalTampered);
-                router.get(path, async function (_req, res) {
-                  res.asyncEnd({
-                    status: 200,
-                    headers: {
-                      ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
-                    },
-                    body: code
-                  });
-                });
-                return resolve();
-              }
-            }
-          } else if (file.ext === ".bundle") {
-            switch (file.subExt) {
-              case ".ignore": {
-                logger.warn("ignoring [%s]", file.filePath);
-                return resolve();
-              }
-              case ".css": {
-                const code = readFileSync(file.filePath).toString()
-                  .split("\n")
-                  .filter(c => c)
-                  .filter(c => c.charAt(0) !== "#")
-                  .map(cssPath => readFileSync(pathResolve(dirname(file.filePath), cssPath)).toString())
-                  .join("\n");
-                const contentType = CONTENT_TYPE_MAP[".css"];
+              case ".html": {
+                const code = await inflateMD2HTML(file.filePath, logger);
+                const contentType = CONTENT_TYPE_MAP[".html"];
                 const path = join("/", dirname(relative(dir, file.filePath)), file.name);
                 routeFileMap[file.filePath] = {
                   routes: [{
@@ -592,21 +475,141 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
               }
             }
           }
-          createStaticRoute(service, logger, router, dir, file, inflateDir, routeFileMap, staticFileMap);
-          return resolve();
+          default:
+            if (file.ext === ".js" || file.ext === ".ts") {
+              switch (file.subExt) {
+                case ".ignore": {
+                  logger.warn("ignoring [%s]", file.filePath);
+                  return resolve();
+                }
+                case ".bundle":
+                case ".min": {
+                  const code = await inflateJSX(file.filePath, {
+                    embemedJSX: false,
+                    minify: file.subExt === ".min" ? true : false,
+                    useExport: false,
+                    logger
+                  });
+                  const contentType = CONTENT_TYPE_MAP[".js"];
+                  const path = join("/", dirname(relative(dir, file.filePath)), file.name + ".js");
+                  routeFileMap[file.filePath] = {
+                    routes: [{
+                      method: "GET",
+                      path
+                    }],
+                    filePath: file.filePath,
+                    service,
+                    previewMethod: "html"
+                  };
 
+                  if (inflateDir) {
+                    const inflatePath = join(inflateDir, service, "static", path);
+                    mkdirSync(dirname(inflatePath), {
+                      recursive: true
+                    });
+                    logger.log("writing [%s]", relative(cwd(), inflatePath));
+                    writeFileSync(inflatePath, code);
+                    if (staticFileMap && inflateSea) {
+                      staticFileMap[file.filePath] = {
+                        contentType,
+                        method: "GET",
+                        filePath: file.filePath,
+                        previewMethod: "html",
+                        path,
+                        body: Buffer.from(code),
+                        inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
+                      }
+                    }
+                  }
+
+                  router.use(assertGlobalTampered);
+                  router.get(path, async function (_req, res) {
+                    res.asyncEnd({
+                      status: 200,
+                      headers: {
+                        ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
+                      },
+                      body: code
+                    });
+                  });
+                  return resolve();
+                }
+              }
+            } else if (file.ext === ".bundle") {
+              switch (file.subExt) {
+                case ".ignore": {
+                  logger.warn("ignoring [%s]", file.filePath);
+                  return resolve();
+                }
+                case ".css": {
+                  const code = readFileSync(file.filePath).toString()
+                    .split("\n")
+                    .filter(c => c)
+                    .filter(c => c.charAt(0) !== "#")
+                    .map(cssPath => readFileSync(pathResolve(dirname(file.filePath), cssPath)).toString())
+                    .join("\n");
+                  const contentType = CONTENT_TYPE_MAP[".css"];
+                  const path = join("/", dirname(relative(dir, file.filePath)), file.name);
+                  routeFileMap[file.filePath] = {
+                    routes: [{
+                      method: "GET",
+                      path
+                    }],
+                    service,
+                    filePath: file.filePath,
+                    previewMethod: "html"
+                  };
+
+                  if (inflateDir) {
+                    const inflatePath = join(inflateDir, service, "static", path);
+                    mkdirSync(dirname(inflatePath), {
+                      recursive: true
+                    });
+                    logger.log("writing [%s]", relative(cwd(), inflatePath));
+                    writeFileSync(inflatePath, code);
+                    if (staticFileMap && inflateSea) {
+                      staticFileMap[file.filePath] = {
+                        contentType,
+                        method: "GET",
+                        filePath: file.filePath,
+                        previewMethod: "html",
+                        path,
+                        body: Buffer.from(code),
+                        inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
+                      }
+                    }
+                  }
+
+                  router.use(assertGlobalTampered);
+                  router.get(path, async function (_req, res) {
+                    res.asyncEnd({
+                      status: 200,
+                      headers: {
+                        ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
+                      },
+                      body: code
+                    });
+                  });
+                  return resolve();
+                }
+              }
+            }
+            createStaticRoute(service, logger, router, dir, file, inflateDir, routeFileMap, staticFileMap);
+            return resolve();
+
+        }
+      } catch (e) {
+        logger.error("error with " + file.filePath);
+        logger.error(e);
+        errors.push({
+          filePath: file.filePath,
+          error: e
+        });
+      } finally {
+        return resolve();
       }
-    } catch (e) {
-      logger.error("error with " + file.filePath);
-      logger.error(e);
-      errors.push({
-        filePath: file.filePath,
-        error: e
-      });
-    } finally {
-      return resolve();
-    }
-  })));
+    });
+  }
   router.use(assertGlobalTampered);
   return {
     routeFileMap,
