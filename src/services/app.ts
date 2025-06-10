@@ -457,7 +457,7 @@ export class Miqro {
     await notifiyServerConfig(this.logger, this.serverInterface, this.adminInterface, this.inflated.serverConfigMap, "load");
 
     if (this.logger && (cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0")) {
-      this.logger?.debug("\t\t==http routes==");
+      /*this.logger?.debug("\t\t==http routes==");
       this.server.logPaths({
         debug: this.logger.debug.bind(this.logger),
         error: this.logger.error.bind(this.logger),
@@ -465,7 +465,9 @@ export class Miqro {
         log: this.logger.debug.bind(this.logger),
         trace: this.logger.trace.bind(this.logger),
         warn: this.logger.warn.bind(this.logger)
-      });
+      });*/
+      this.logger?.info("\t\t==http routes==");
+      this.server.logPaths(this.logger);
     }
 
     this.logger?.trace("calling listen on [%s]", this.options.port);
@@ -600,15 +602,16 @@ export class Miqro {
     await notifiyServerConfig(this.logger, this.serverInterface, this.adminInterface, this.inflated.serverConfigMap, "load");
 
     if (this.logger && (cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0")) {
-      this.logger?.debug("\t\t==http routes==");
-      this.server.logPaths({
+      this.logger?.info("\t\t==http routes==");
+      this.server.logPaths(this.logger);
+      /*this.server.logPaths({
         debug: this.logger.debug.bind(this.logger),
         error: this.logger.error.bind(this.logger),
         info: this.logger.debug.bind(this.logger),
         log: this.logger.debug.bind(this.logger),
         trace: this.logger.trace.bind(this.logger),
         warn: this.logger.warn.bind(this.logger)
-      });
+      });*/
     }
 
     //this.logger?.log("=====================");
