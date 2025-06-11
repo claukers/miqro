@@ -24,15 +24,15 @@ cp -R ./node_modules/@miqro/jsx/build/ ./sea/types/@miqro/jsx
 mkdir -p sea/types/@miqro/test/dist
 cp -R ./node_modules/@miqro/test/dist/ ./sea/types/@miqro/test/dist
 
-rm ./sea/types/cookie/*.js
-rm ./sea/types/cookie/*.map
-rm ./sea/types/@miqro/**/*.js
-rm ./sea/types/@miqro/**/**/*.js
-rm ./sea/types/@miqro/**/**/**/*.js
-rm ./sea/types/@miqro/**/**/**/**/*.js
-rm ./sea/types/@miqro/**/*.map
-rm ./sea/types/@miqro/**/**/*.map
-rm ./sea/types/@miqro/**/**/**/*.map
+rm sea/types/cookie/dist/*.js
+rm sea/types/cookie/dist/*.map
+#rm ./sea/types/@miqro/**/*.js
+rm sea/types/@miqro/**/**/*.js
+rm sea/types/@miqro/**/**/**/*.js
+rm sea/types/@miqro/**/**/**/**/*.js
+#rm ./sea/types/@miqro/**/*.map
+rm sea/types/@miqro/**/**/*.map
+rm sea/types/@miqro/**/**/**/*.map
 #rm ./sea/types/@miqro/**/**/**/**/*.map
 
 cp src/types/@miqro/core.d.ts sea/types/@miqro/core.d.ts
