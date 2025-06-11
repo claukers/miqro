@@ -34,7 +34,7 @@ export class LocalCache implements CacheInterface {
     if (!(list instanceof Set)) {
       throw new Error("cannot apply on non Set");
     }
-    if (list.has(value)) {
+    if (!list.has(value)) {
       list.add(value);
     }
     this.localCache.set(key, list);

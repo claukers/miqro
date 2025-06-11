@@ -45,7 +45,7 @@ export class ClusterCache implements CacheInterface {
               if (!(list instanceof Set)) {
                 throw new Error("cannot apply push on non array");
               }
-              if (list.has(msg.value)) {
+              if (!list.has(msg.value)) {
                 list.add(msg.value);
               }
               this.localCache.set(msg.key, list);
@@ -139,7 +139,7 @@ export class ClusterCache implements CacheInterface {
     if (!(list instanceof Set)) {
       throw new Error("cannot apply on non Set");
     }
-    if (list.has(value)) {
+    if (!list.has(value)) {
       list.add(value);
     }
     this.localCache.set(key, list);
