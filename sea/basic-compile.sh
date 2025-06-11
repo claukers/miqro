@@ -3,7 +3,7 @@
 rm -Rf bin;
 mkdir -p bin/;
 
-sh ./install-nodejs.sh
+sh sea/install-nodejs.sh
 
 NODE_BIN="sh sea/node.sh"
 SIGN_REMOVE_BIN="sh sea/sign-remove.sh"

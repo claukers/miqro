@@ -1,7 +1,8 @@
 #!/usr/bin/env sh
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$PWD
+#$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-sh "${SCRIPT_DIR}/install-esbuild.sh"
+sh "${SCRIPT_DIR}/sea/install-esbuild.sh"
 
-sh "${SCRIPT_DIR}/install-nodejs.sh"
+sh "${SCRIPT_DIR}/sea/install-nodejs.sh"

@@ -121,10 +121,10 @@ chmod +x bin/$TARGET_BIN_NAME
 
 $POSTJECT_BIN "${TARGET_DARWIN_ARM64}" NODE_SEA_BLOB build/sea-prep-darwin-arm64.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2 --macho-segment-name NODE_SEA
 $SIGN_ADD_BIN "${TARGET_DARWIN_ARM64}"
-$POSTJECT_BIN "${TARGET_DARWIN_X64}" NODE_SEA_BLOB build/sea-prep-darwin-x64.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2 --macho-segment-name NODE_SEA
-$SIGN_ADD_BIN "${TARGET_DARWIN_X64}"
+#$POSTJECT_BIN "${TARGET_DARWIN_X64}" NODE_SEA_BLOB build/sea-prep-darwin-x64.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2 --macho-segment-name NODE_SEA
+#$SIGN_ADD_BIN "${TARGET_DARWIN_X64}"
 
-$POSTJECT_BIN "${TARGET_LINUX_ARM64}" NODE_SEA_BLOB build/sea-prep-linux-arm64.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
+#$POSTJECT_BIN "${TARGET_LINUX_ARM64}" NODE_SEA_BLOB build/sea-prep-linux-arm64.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
 $POSTJECT_BIN "${TARGET_LINUX_X64}" NODE_SEA_BLOB build/sea-prep-linux-x64.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
 
 #$POSTJECT_BIN "${TARGET_WIN_X64}" NODE_SEA_BLOB build/sea-prep-win-x64.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2

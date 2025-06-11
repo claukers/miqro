@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$PWD
+#$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 BIN_NAME="node"
 ARGS="$@"
 
@@ -10,10 +11,10 @@ case $(uname -s) in
     Linux)
       case $(uname -m) in
         aarch64)
-            ${SCRIPT_DIR}/deps/nodejs/linux/arm64/${BIN_NAME} ${ARGS}
+            ${SCRIPT_DIR}/sea/deps/nodejs/linux/arm64/${BIN_NAME} ${ARGS}
           ;;
-        x64)
-            ${SCRIPT_DIR}/deps/nodejs/linux/x64/${BIN_NAME} ${ARGS}
+        x86_64)
+            ${SCRIPT_DIR}/sea/deps/nodejs/linux/x64/${BIN_NAME} ${ARGS}
           ;;
         *) echo "unsopported architecture"; exit 99; ;;
       esac
@@ -21,10 +22,10 @@ case $(uname -s) in
     Darwin)
       case $(uname -m) in
           arm64)
-            ${SCRIPT_DIR}/deps/nodejs/darwin/arm64/${BIN_NAME} ${ARGS}
+            ${SCRIPT_DIR}/sea/deps/nodejs/darwin/arm64/${BIN_NAME} ${ARGS}
           ;;
           x64)
-            ${SCRIPT_DIR}/deps/nodejs/darwin/arm64/${BIN_NAME} ${ARGS}
+            ${SCRIPT_DIR}/sea/deps/nodejs/darwin/arm64/${BIN_NAME} ${ARGS}
           ;;
           *) echo "unsopported architecture"; exit 99; ;;
         esac
