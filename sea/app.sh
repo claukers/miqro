@@ -12,7 +12,7 @@ case $(uname -s) in
         aarch64)
             ${SCRIPT_DIR}/linux-arm64/${BIN_NAME} ${ARGS}
           ;;
-        x64)
+        x86_64)
             ${SCRIPT_DIR}/linux-x64/${BIN_NAME} ${ARGS}
           ;;
         *) echo "unsopported architecture"; exit 99; ;;
