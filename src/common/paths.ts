@@ -13,59 +13,36 @@ export function getServicePath(service: string) {
   return resolve(cwd(), service);
 }
 
-export function getLogConfigPath(servicePath: string) {
-  const logConfigPath = resolve(servicePath, "log.ts");
-  const logConfigPathJS = resolve(servicePath, "log.js");
-  if (existsSync(logConfigPath) && !statSync(logConfigPath).isDirectory()) {
-    return logConfigPath;
-  } else if (existsSync(logConfigPathJS) && !statSync(logConfigPathJS).isDirectory()) {
-    return logConfigPathJS;
+const EXTENSIONS = [".ts", ".js", ".cjs"];
+
+function getFilePath(dirname: string, name: string, extensions: string[]) {
+  for (const ex of extensions) {
+    const path = resolve(dirname, name + ex);
+    if (existsSync(path) && !statSync(path).isDirectory()) {
+      return path;
+    }
   }
   return false;
+}
+
+export function getLogConfigPath(servicePath: string) {
+  return getFilePath(servicePath, "log", EXTENSIONS);
 }
 
 export function getCORSConfigPath(servicePath: string) {
-  const corsPath = resolve(servicePath, "cors.ts");
-  const corsPathJS = resolve(servicePath, "cors.js");
-  if (existsSync(corsPath) && !statSync(corsPath).isDirectory()) {
-    return corsPath;
-  } else if (existsSync(corsPathJS) && !statSync(corsPathJS).isDirectory()) {
-    return corsPathJS;
-  }
-  return false;
+  return getFilePath(servicePath, "cors", EXTENSIONS);
 }
 
 export function getServerConfigPath(servicePath: string) {
-  const serverPath = resolve(servicePath, "server.ts");
-  const serverPathJS = resolve(servicePath, "server.js");
-  if (existsSync(serverPath)) {
-    return serverPath;
-  } else if (existsSync(serverPathJS)) {
-    return serverPathJS;
-  }
-  return false;
+  return getFilePath(servicePath, "server", EXTENSIONS);
 }
 
 export function getWSConfigPath(servicePath: string) {
-  const wsPath = resolve(servicePath, "ws.ts");
-  const wsPathJS = resolve(servicePath, "ws.js");
-  if (existsSync(wsPath)) {
-    return wsPath;
-  } else if (existsSync(wsPathJS)) {
-    return wsPathJS;
-  }
-  return false;
+  return getFilePath(servicePath, "ws", EXTENSIONS);
 }
 
 export function getDBConfigPath(servicePath: string) {
-  const dbPath = resolve(servicePath, "db.ts");
-  const dbPathJS = resolve(servicePath, "db.js");
-  if (existsSync(dbPath)) {
-    return dbPath;
-  } else if (existsSync(dbPathJS)) {
-    return dbPathJS;
-  }
-  return false;
+  return getFilePath(servicePath, "db", EXTENSIONS);
 }
 
 export function getStaticFilesPath(servicePath: string) {
@@ -77,36 +54,15 @@ export function getStaticFilesPath(servicePath: string) {
 }
 
 export function getMiddlewareConfigPath(servicePath: string) {
-  const middlewarePath = resolve(servicePath, "middleware.ts");
-  const middlewarePathJS = resolve(servicePath, "middleware.js");
-  if (existsSync(middlewarePath) && !statSync(middlewarePath).isDirectory()) {
-    return middlewarePath;
-  } else if (existsSync(middlewarePathJS) && !statSync(middlewarePathJS).isDirectory()) {
-    return middlewarePathJS;
-  }
-  return false;
+  return getFilePath(servicePath, "middleware", EXTENSIONS);
 }
 
 export function getErrorConfigPath(servicePath: string) {
-  const errorPath = resolve(servicePath, "catch.ts");
-  const errorPathJS = resolve(servicePath, "catch.js");
-  if (existsSync(errorPath) && !statSync(errorPath).isDirectory()) {
-    return errorPath;
-  } else if (existsSync(errorPathJS) && !statSync(errorPathJS).isDirectory()) {
-    return errorPathJS;
-  }
-  return false;
+  return getFilePath(servicePath, "catch", EXTENSIONS);
 }
 
 export function getDocConfigPath(servicePath: string) {
-  const docPath = resolve(servicePath, "doc.ts");
-  const docPathJS = resolve(servicePath, "doc.js");
-  if (existsSync(docPath) && !statSync(docPath).isDirectory()) {
-    return docPath;
-  } else if (existsSync(docPathJS) && !statSync(docPathJS).isDirectory()) {
-    return docPathJS;
-  }
-  return false;
+  return getFilePath(servicePath, "doc", EXTENSIONS);
 }
 
 export function getMiqroJSONPath() {
@@ -118,14 +74,7 @@ export function getMiqroJSONPath() {
 }
 
 export function getAuthConfigPath(servicePath: string) {
-  const authPath = resolve(servicePath, "auth.ts");
-  const authPathJS = resolve(servicePath, "auth.js");
-  if (existsSync(authPath) && !statSync(authPath).isDirectory()) {
-    return authPath;
-  } else if (existsSync(authPathJS) && !statSync(authPathJS).isDirectory()) {
-    return authPathJS;
-  }
-  return false;
+  return getFilePath(servicePath, "auth", EXTENSIONS);
 }
 
 export function getHTTPRouterPath(servicePath: string) {

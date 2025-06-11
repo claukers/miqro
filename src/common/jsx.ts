@@ -1,6 +1,6 @@
 import { Runtime } from "@miqro/jsx";
 import { createNodeRuntime } from "@miqro/jsx-node";
-import { basename, dirname, relative, resolve } from "node:path";
+import { basename, dirname, extname, relative, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync, rmdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { Request, Response, CORSOptions, Logger, APIRoute } from "@miqro/core";
@@ -80,7 +80,7 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
         ...DEFAULT_ESOPTION,
         entryPoints: [inFileTmp],
         minify: options.minify,
-        platform: options.platform ? options.platform: DEFAULT_ESOPTION.platform
+        platform: options.platform ? options.platform : DEFAULT_ESOPTION.platform
       });
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
@@ -100,7 +100,7 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
         ...DEFAULT_ESOPTION,
         entryPoints: [inFileTmp],
         minify: options.minify,
-        platform: options.platform ? options.platform: DEFAULT_ESOPTION.platform
+        platform: options.platform ? options.platform : DEFAULT_ESOPTION.platform
       });
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
@@ -317,7 +317,8 @@ export const DocConfigSchema: Schema<DocConfig> = {
 }
 
 export async function importAPIRoute(inFile: string, logger?: Logger) {
-  const mod = (await importJSXFile(inFile, logger)).default;
+  const isCJS = extname(inFile) === ".cjs";
+  const mod = isCJS ? (await importJSXFile(inFile, logger)).default.default : (await importJSXFile(inFile, logger)).default;
   const module = typeof mod === "function" ? { handler: mod } : parser.parse(mod, APIRouteSchema, basename(inFile));
   if (module !== undefined) {
     return module as APIRoute;
@@ -327,7 +328,9 @@ export async function importAPIRoute(inFile: string, logger?: Logger) {
 }
 
 export async function importMigrationModule(inFile: string, logger?: Logger) {
-  const module = parser.parse((await importJSXFile(inFile, logger)).default, MigrationSchema, basename(inFile));
+  const isCJS = extname(inFile) === ".cjs";
+  const mod = isCJS ? (await importJSXFile(inFile, logger)).default.default : (await importJSXFile(inFile, logger)).default;
+  const module = parser.parse(mod, MigrationSchema, basename(inFile));
   if (module !== undefined) {
     return module;
   } else {
@@ -358,7 +361,10 @@ export async function importJSONModule(inFile: string, logger?: Logger) {
 }
 
 export async function importAuthModule(inFile: string, logger?: Logger) {
-  const module = parser.parse((await importJSXFile(inFile, logger)).default, AuthConfigSchema, basename(inFile));
+  const isCJS = extname(inFile) === ".cjs";
+  const mod = isCJS ? (await importJSXFile(inFile, logger)).default.default : (await importJSXFile(inFile, logger)).default;
+
+  const module = parser.parse(mod, AuthConfigSchema, basename(inFile));
   if (module !== undefined) {
     return module;
   } else {
@@ -367,7 +373,10 @@ export async function importAuthModule(inFile: string, logger?: Logger) {
 }
 
 export async function importMiddlewareConfigModule(inFile: string, logger?: Logger) {
-  const module = parser.parse((await importJSXFile(inFile, logger)).default, MiddlewareConfigSchema, basename(inFile));
+  const isCJS = extname(inFile) === ".cjs";
+  const mod = isCJS ? (await importJSXFile(inFile, logger)).default.default : (await importJSXFile(inFile, logger)).default;
+
+  const module = parser.parse(mod, MiddlewareConfigSchema, basename(inFile));
   if (module !== undefined) {
     return module;
   } else {
@@ -376,7 +385,10 @@ export async function importMiddlewareConfigModule(inFile: string, logger?: Logg
 }
 
 export async function importErrorConfigModule(inFile: string, logger?: Logger) {
-  const module = parser.parse((await importJSXFile(inFile, logger)).default, ErrorConfigSchema, basename(inFile));
+  const isCJS = extname(inFile) === ".cjs";
+  const mod = isCJS ? (await importJSXFile(inFile, logger)).default.default : (await importJSXFile(inFile, logger)).default;
+
+  const module = parser.parse(mod, ErrorConfigSchema, basename(inFile));
   if (module !== undefined) {
     return module;
   } else {
@@ -385,7 +397,10 @@ export async function importErrorConfigModule(inFile: string, logger?: Logger) {
 }
 
 export async function importDocConfigModule(inFile: string, logger?: Logger) {
-  const module = parser.parse((await importJSXFile(inFile, logger)).default, DocConfigSchema, basename(inFile));
+  const isCJS = extname(inFile) === ".cjs";
+  const mod = isCJS ? (await importJSXFile(inFile, logger)).default.default : (await importJSXFile(inFile, logger)).default;
+
+  const module = parser.parse(mod, DocConfigSchema, basename(inFile));
   if (module !== undefined) {
     return module;
   } else {
@@ -394,7 +409,10 @@ export async function importDocConfigModule(inFile: string, logger?: Logger) {
 }
 
 export async function importConfigConfigModule(inFile: string, logger?: Logger) {
-  const module = parser.parse((await importJSXFile(inFile, logger)).default, MiddlewareConfigSchema, basename(inFile));
+  const isCJS = extname(inFile) === ".cjs";
+  const mod = isCJS ? (await importJSXFile(inFile, logger)).default.default : (await importJSXFile(inFile, logger)).default;
+
+  const module = parser.parse(mod, MiddlewareConfigSchema, basename(inFile));
   if (module !== undefined) {
     return module;
   } else {
@@ -403,7 +421,10 @@ export async function importConfigConfigModule(inFile: string, logger?: Logger) 
 }
 
 export async function importCORSModule(inFile: string, logger?: Logger) {
-  const module = parser.parse((await importJSXFile(inFile, logger)).default, CORSOptionsSchema, basename(inFile));
+  const isCJS = extname(inFile) === ".cjs";
+  const mod = isCJS ? (await importJSXFile(inFile, logger)).default.default : (await importJSXFile(inFile, logger)).default;
+
+  const module = parser.parse(mod, CORSOptionsSchema, basename(inFile));
   if (module !== undefined) {
     return module;
   } else {
@@ -412,7 +433,10 @@ export async function importCORSModule(inFile: string, logger?: Logger) {
 }
 
 export async function importWSConfigModule(inFile: string, logger?: Logger) {
-  const module = parser.parse((await importJSXFile(inFile, logger)).default, WSConfigSchema, basename(inFile));
+  const isCJS = extname(inFile) === ".cjs";
+  const mod = isCJS ? (await importJSXFile(inFile, logger)).default.default : (await importJSXFile(inFile, logger)).default;
+
+  const module = parser.parse(mod, WSConfigSchema, basename(inFile));
   if (module !== undefined) {
     return module;
   } else {
@@ -421,7 +445,10 @@ export async function importWSConfigModule(inFile: string, logger?: Logger) {
 }
 
 export async function importDBConfigModule(inFile: string, logger?: Logger) {
-  const module = parser.parse((await importJSXFile(inFile, logger)).default, DBConfigSchema, basename(inFile));
+  const isCJS = extname(inFile) === ".cjs";
+  const mod = isCJS ? (await importJSXFile(inFile, logger)).default.default : (await importJSXFile(inFile, logger)).default;
+
+  const module = parser.parse(mod, DBConfigSchema, basename(inFile));
   if (module !== undefined) {
     return module;
   } else {
@@ -439,7 +466,10 @@ export async function importLogConfigModule(inFile: string, logger?: Logger) {
 }
 
 export async function importServerConfigModule(inFile: string, logger?: Logger) {
-  const module = parser.parse((await importJSXFile(inFile, logger)).default, ServerConfigSchema, basename(inFile));
+  const isCJS = extname(inFile) === ".cjs";
+  const mod = isCJS ? (await importJSXFile(inFile, logger)).default.default : (await importJSXFile(inFile, logger)).default;
+
+  const module = parser.parse(mod, ServerConfigSchema, basename(inFile));
   if (module !== undefined) {
     return module;
   } else {
