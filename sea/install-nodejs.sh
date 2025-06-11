@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 TARGET="${PWD}/sea/deps/nodejs"
-VERSION="24.1.0"
+VERSION="24.2.0"
 
 if [ -d "$TARGET" ]; then
   echo "$TARGET already exists exist."
