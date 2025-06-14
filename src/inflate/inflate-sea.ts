@@ -1,10 +1,10 @@
 import { Logger } from "@miqro/core";
-import { chmodSync, constants, mkdirSync, writeFileSync } from "node:fs";
+import { chmodSync, constants, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import { cwd, platform } from "node:process";
 
 import { RouteFileMap, StaticFileMap } from "./setup-http.js";
-import { getAuthConfigPath, getCORSConfigPath, getDBConfigPath, getErrorConfigPath, getMiddlewareConfigPath, getMigrationsPath, getServerConfigPath, getServicePath, getWSConfigPath } from "../common/paths.js";
+import { getAuthConfigPath, getCORSConfigPath, getDBConfigPath, getErrorConfigPath, getMiddlewareConfigPath, getMigrationsPath, getMiqroJSONPath, getServerConfigPath, getServicePath, getWSConfigPath } from "../common/paths.js";
 import { getAsset } from "../common/assets.js";
 import { migration } from "@miqro/query";
 import { esBuild } from "../common/esbuild.js";
@@ -119,6 +119,10 @@ main().catch(e=>console.error(e));
     platform: "node",
     outfile: join(inflateDir, "sea", "app.bundle.cjs")
   });
+  const miqroRCPath = getMiqroJSONPath();
+  if (miqroRCPath) {
+    writeFile(logger, join(inflateDir, "miqro.json"), readFileSync(miqroRCPath));
+  }
 }
 
 export async function inflateServiceForSea(logger: Logger, inflateDir: string, service: string, servicePath: string/*, serviceMigrations: string[]*/, serviceRouteFileMap: RouteFileMap, serviceStaticFileMap: StaticFileMap) {
