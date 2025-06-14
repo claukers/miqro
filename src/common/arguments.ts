@@ -27,6 +27,7 @@ interface MiqroJSON {
   https?: boolean;
   serverOptions?: ServerOptions;
   httpsRedirect?: number;
+  inflateParallel?: number;
 }
 
 const MiqroJSONSchema: Schema<MiqroJSON> = {
@@ -41,7 +42,8 @@ const MiqroJSONSchema: Schema<MiqroJSON> = {
     editor: "boolean?",
     https: "boolean?",
     serverOptions: "any?",
-    httpsRedirect: "number?"
+    httpsRedirect: "number?",
+    inflateParallel: "number?"
   }
 }
 
@@ -86,6 +88,7 @@ export interface Arguments {
   https: boolean;
   serverOptions: ServerOptions;
   httpsRedirect?: number;
+  inflateParallel?: number;
 }
 
 /**
@@ -97,6 +100,7 @@ export function parseArguments(): Arguments {
 
   const args = cluster.isPrimary ? process.argv.slice(2, process.argv.length) : process.argv.slice(3, process.argv.length);
   const flags: {
+    inflateParallel: number | null;
     httpsRedirect: number | null;
     https: boolean | null;
     serverOptions: ServerOptions;
@@ -123,6 +127,7 @@ export function parseArguments(): Arguments {
     inflateDir?: string | null;
     hotreload?: boolean | null;
   } = {
+    inflateParallel: null,
     httpsRedirect: null,
     https: null,
     serverOptions: {},
@@ -466,6 +471,27 @@ export function parseArguments(): Arguments {
         services.push(args[i + 1]);
         i++;
         continue;
+      case "--inflate-parallel":
+        if (args[i + 1] === undefined) {
+          console.error("bad arguments. service directory not provided.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        if (typeof args[i + 1] !== "string") {
+          console.error("bad arguments. --inflate-parallel must be a number.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        } else {
+          const cParallel = parseInt(String(args[i + 1]), 10);
+          if (isNaN(cParallel)) {
+            console.error("bad arguments. --inflate-parallel must be a number.");
+            console.error(usage);
+            process.exit(EXIT_CODES.BAD_ARGUMENTS);
+          }
+          flags.inflateParallel = cParallel;
+        }
+        i++;
+        continue;
       case "--inflate-dir":
         if (flags.inflateDir !== null && flags.compile === null) {
           console.error("bad arguments. --inflate-dir already set.");
@@ -571,6 +597,12 @@ export function parseArguments(): Arguments {
         flags.editor = miqroRC.editor;
       }
     }
+
+    if (flags.inflateParallel === null) {
+      if (miqroRC.inflateParallel !== undefined) {
+        flags.inflateParallel = miqroRC.inflateParallel;
+      }
+    }
   }
 
   flags.editor = flags.editor ? flags.editor : false;
@@ -670,6 +702,7 @@ export function parseArguments(): Arguments {
   }
 
   return {
+    inflateParallel: flags.inflateParallel ? flags.inflateParallel : undefined,
     name: flags.name ? flags.name : undefined,
     browser: flags.browser !== null ? flags.browser : undefined,
     logFile: flags.logFile !== null ? flags.logFile : undefined,

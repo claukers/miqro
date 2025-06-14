@@ -51,6 +51,7 @@ export interface MiqroOptions {
 export interface InflateOptions {
   inflateDir?: string;
   inflateSea?: boolean;
+  inflateParallel?: number;
 }
 
 export interface InflatedResult {
@@ -370,7 +371,8 @@ export class Miqro {
         inflateDir: options?.inflateDir,
         inflateSea: options?.inflateSea ? true : false,
         //inflateTests: options?.inflateTests ? true : false,
-        hotreload: this.options?.hotreload ? true : false
+        hotreload: this.options?.hotreload ? true : false,
+        inflateParallel: options?.inflateParallel
       });
 
       wsConfigList.push(...serviceWSConfigList);

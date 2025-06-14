@@ -44,6 +44,7 @@ export const help = `
 --https-key\n\tpoint to a server.key file for https.
 --https-cert\n\tpoint to a server.cert file for https.
 --https-redirect\n\tserves an aditional http server that redirects to https. it needs a port number.
+--inflate-parallel\n\tsets the max parallel esbuild instances. defaults to 1.
 
 ==environment variables==
 

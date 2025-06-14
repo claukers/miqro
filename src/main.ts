@@ -55,7 +55,8 @@ async function main(args: Arguments) {
       // --compile
       await app.inflate({
         inflateDir: args.inflateDir,
-        inflateSea: true
+        inflateSea: true,
+        inflateParallel: args.inflateParallel
       });
       await app.dbManager.closeAll();
       await app.webSocketManager.disconnectAll();
@@ -66,7 +67,8 @@ async function main(args: Arguments) {
       // loadApp with inflateDir arg to inflate inflatable files
       await app.inflate({
         inflateDir: args.inflateDir,
-        inflateSea: args.inflateSEA
+        inflateSea: args.inflateSEA,
+        inflateParallel: args.inflateParallel
       });
       await app.dbManager.closeAll();
       await app.webSocketManager.disconnectAll();

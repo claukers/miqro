@@ -45,7 +45,7 @@ export interface StaticFileMap {
   }
 }
 
-export async function setupHTTPRouter(server: ServerInterface, logger: Logger, hotreload: boolean, servicePath: string, service: string, routeFileMap: RouteFileMap, staticFileMap: StaticFileMap | null, inflateDir: string | undefined | false, inflateSea: boolean, errors: InflateError[]) {
+export async function setupHTTPRouter(server: ServerInterface, logger: Logger, hotreload: boolean, servicePath: string, service: string, routeFileMap: RouteFileMap, staticFileMap: StaticFileMap | null, inflateDir: string | undefined | false, inflateSea: boolean, errors: InflateError[], inflateParallel?: number) {
   const mainRouter = new Router();
   const apiRouterPath = getHTTPRouterPath(servicePath); //resolve(process.cwd(), service, "http");
   let middlewareConfig: MiddlewareConfig | null = null;
@@ -58,7 +58,7 @@ export async function setupHTTPRouter(server: ServerInterface, logger: Logger, h
 
   if (apiRouterPath) {
     logger.trace("setting up http routes from [%s]", service);
-    const { router: httpRouter } = await createRouterFromDirectory(server, hotreload, service, logger, apiRouterPath, errors, routeFileMap, staticFileMap, inflateDir, inflateSea);
+    const { router: httpRouter } = await createRouterFromDirectory(server, hotreload, service, logger, apiRouterPath, errors, routeFileMap, staticFileMap, inflateDir, inflateSea, inflateParallel);
     mainRouter.use(httpRouter);
   }
 
@@ -158,15 +158,17 @@ function createStaticRouterFromDirectory(service: string, logger: Logger, dir: s
   return router;
 }
 
-async function createRouterFromDirectory(server: ServerInterface, hotreload: boolean, service: string, logger: Logger, dir: string, errors: InflateError[] = [], routeFileMap: RouteFileMap = {}, staticFileMap: StaticFileMap | null = null, inflateDir: string | undefined | false, inflateSea: boolean): Promise<{
+async function createRouterFromDirectory(server: ServerInterface, hotreload: boolean, service: string, logger: Logger, dir: string, errors: InflateError[] = [], routeFileMap: RouteFileMap = {}, staticFileMap: StaticFileMap | null = null, inflateDir: string | undefined | false, inflateSea: boolean, inflateParallel?: number): Promise<{
   router: Router;
   errors: InflateError[];
   routeFileMap: RouteFileMap;
 }> {
   const router = new Router();
+  const maxParallel = inflateParallel ? inflateParallel : 1;
+  let tR = [];
   router.use(assertGlobalTampered);
   for (const file of scanFiles(dir)) {
-    await new Promise<void>(async (resolve) => {
+    tR.push(new Promise<void>(async (resolve) => {
       try {
         switch (file.ext) {
           case ".jsx":
@@ -608,7 +610,15 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
       } finally {
         return resolve();
       }
-    });
+    }));
+    if (tR.length >= maxParallel) {
+      await Promise.all(tR);
+      tR = [];
+    }
+  }
+  if (tR.length > 0) {
+    await Promise.all(tR);
+    tR = [];
   }
   router.use(assertGlobalTampered);
   return {

@@ -22,9 +22,10 @@ export interface InflateAppOptions {
   hotreload?: boolean;
   port: string;
   serverInterface: ServerInterface;
+  inflateParallel?: number;
 }
 
-export async function inflateApp({ serverInterface, logger, hotreload, services/*, dbManager*/, inflateDir, inflateSea/*, editor, inflateTests*/, port }: InflateAppOptions): Promise<[Router, InflateError[] | null, RouteFileMap, WSConfig[]/*, ServerConfigMap*/, LogConfigMap]> {
+export async function inflateApp({ inflateParallel, serverInterface, logger, hotreload, services/*, dbManager*/, inflateDir, inflateSea/*, editor, inflateTests*/, port }: InflateAppOptions): Promise<[Router, InflateError[] | null, RouteFileMap, WSConfig[]/*, ServerConfigMap*/, LogConfigMap]> {
   logger.trace("inflateApp");
   const errors: InflateError[] = [];
   //const migrations: string[] = [];
@@ -69,7 +70,7 @@ export async function inflateApp({ serverInterface, logger, hotreload, services/
 
     await setupLogConfig(logger, servicePath, service, logConfigMap, inflateSea ? inflateDir : false, errors);
 
-    router.use(await setupHTTPRouter(serverInterface, logger, hotreload ? hotreload : false, servicePath, service, serviceRouteFileMap, serviceStaticFileMap, inflateDir, inflateSea, errors));
+    router.use(await setupHTTPRouter(serverInterface, logger, hotreload ? hotreload : false, servicePath, service, serviceRouteFileMap, serviceStaticFileMap, inflateDir, inflateSea, errors, inflateParallel));
     routeFileMap = {
       ...routeFileMap,
       ...serviceRouteFileMap
