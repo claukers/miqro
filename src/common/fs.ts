@@ -1,3 +1,4 @@
+import { mkdir, writeFile } from "node:fs";
 import { basename, extname } from "node:path";
 
 export function describeFilePath(filePath: string) {
@@ -14,4 +15,36 @@ export function describeFilePath(filePath: string) {
     subName,
     filePath
   };
+}
+
+export async function mkdirASync(path: string, options?: Partial<{ recursive: true; }>) {
+  return new Promise<void>((resolve, reject) => {
+    try {
+      mkdir(path, options, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    } catch (e) {
+      reject(e);
+    }
+  })
+}
+
+export async function writeFileASync(path: string, body?) {
+  return new Promise<void>((resolve, reject) => {
+    try {
+      writeFile(path, body, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    } catch (e) {
+      reject(e);
+    }
+  })
 }

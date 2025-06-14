@@ -186,6 +186,7 @@ export class Miqro {
     });
     await app.inflate({
       inflateDir: miqroJSON.inflateDir ? String(miqroJSON.inflateDir) : undefined,
+      inflateParallel: miqroJSON.inflateParallel ? miqroJSON.inflateParallel : undefined,
       ...(inflate ? inflate : {}),
     });
     return app;

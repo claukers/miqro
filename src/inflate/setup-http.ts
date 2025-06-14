@@ -1,5 +1,5 @@
 import { Router, newURL, Response, Request, RouterHandlerOptions, Logger, APIRoute, normalizePath, HandlerWithOptions, Handler } from "@miqro/core";
-import { existsSync, mkdirSync, readFile, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdir, readFile, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve as pathResolve } from "node:path";
 
 import { CONTENT_TYPE_MAP, DEFAULT_CONTENT_TYPE } from "../common/content-type.js";
@@ -13,7 +13,7 @@ import { getHTTPRouterPath, getStaticFilesPath } from "../common/paths.js";
 import { setupCORS } from "./setup-cors.js";
 import { setupAUTH } from "./setup-auth.js";
 import { getRoutes } from "../services/utils/get-route.js";
-import { describeFilePath } from "../common/fs.js";
+import { describeFilePath, mkdirASync, writeFileASync } from "../common/fs.js";
 import { inflateMD2HTML } from "./md.js";
 import { MiddlewareConfig, ServerInterface, ServerRequest } from "../types.js";
 import { setupMiddleware } from "./setup-middleware.js";
@@ -65,7 +65,7 @@ export async function setupHTTPRouter(server: ServerInterface, logger: Logger, h
   const staticFilesPath = getStaticFilesPath(servicePath); //resolve(process.cwd(), service, "static");
   if (staticFilesPath) {
     logger.trace("setting up static file routes from [%s]", service);
-    const staticRouter = createStaticRouterFromDirectory(service, logger, staticFilesPath, inflateDir, routeFileMap, staticFileMap);
+    const staticRouter = await createStaticRouterFromDirectory(service, logger, staticFilesPath, inflateDir, routeFileMap, staticFileMap, inflateParallel);
     mainRouter.use(staticRouter);
   }
 
@@ -78,83 +78,107 @@ export async function setupHTTPRouter(server: ServerInterface, logger: Logger, h
   return mainRouter;
 }
 
-function createStaticRoute(service: string, logger: Logger, router: Router, dir: string, file: ScannedFile, inflateDir?: string | undefined | false, routeFileMap?: RouteFileMap, staticFileMap?: StaticFileMap) {
-  logger.trace("creating static route for [%s]", file.filePath);
-  logger.trace("[%o]", {
-    file,
-    dir
-  });
-  const contentType = CONTENT_TYPE_MAP[String(file.ext).toLocaleLowerCase()];
-  const path = join("/", relative(dir, file.filePath));
+async function createStaticRoute(service: string, logger: Logger, router: Router, dir: string, file: ScannedFile, inflateDir?: string | undefined | false, routeFileMap?: RouteFileMap, staticFileMap?: StaticFileMap) {
+  return new Promise<void>(async (resolve, reject) => {
+    try {
+      logger.trace("creating static route for [%s]", file.filePath);
+      logger.trace("[%o]", {
+        file,
+        dir
+      });
+      const contentType = CONTENT_TYPE_MAP[String(file.ext).toLocaleLowerCase()];
+      const path = join("/", relative(dir, file.filePath));
 
 
-  routeFileMap[file.filePath] = {
-    routes: [{
-      method: "GET",
-      path: normalizePath(path)
-    }],
-    service,
-    filePath: file.filePath,
-    previewMethod: "html"
-  };
-
-  if (inflateDir) {
-    const inflatePath = join(inflateDir, service, "static", path);
-    mkdirSync(dirname(inflatePath), {
-      recursive: true
-    });
-    logger.log("writing [%s]", relative(cwd(), inflatePath));
-    const body = readFileSync(file.filePath);
-    writeFileSync(inflatePath, body);
-    if (staticFileMap) {
-      staticFileMap[file.filePath] = {
-        contentType,
+      routeFileMap[file.filePath] = {
+        routes: [{
+          method: "GET",
+          path: normalizePath(path)
+        }],
+        service,
         filePath: file.filePath,
-        previewMethod: "html",
-        method: "GET",
-        path: normalizePath(path),
-        body: Buffer.from(body),
-        inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
-      }
-    }
-  }
+        previewMethod: "html"
+      };
 
+      if (inflateDir) {
+        const inflatePath = join(inflateDir, service, "static", path);
+        mkdir(dirname(inflatePath), {
+          recursive: true
+        }, (err) => {
 
-
-  router.use(assertGlobalTampered);
-  router.get(path, async function (_req, res) {
-    await new Promise<void>((resolve, reject) => {
-      try {
-        readFile(file.filePath, async (err, body) => {
-          if (err) {
-            reject(err);
-          } else {
-            try {
-              await res.asyncEnd({
-                status: 200,
-                headers: {
-                  ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
-                },
-                body
-              });
-              resolve();
-            } catch (e) {
-              reject(e);
-            }
-          }
         })
-      } catch (e) {
-        reject(e);
+        await mkdirASync(dirname(inflatePath), {
+          recursive: true
+        });
+        logger.log("writing [%s]", relative(cwd(), inflatePath));
+        const body = readFileSync(file.filePath);
+        await writeFileASync(inflatePath, body);
+        if (staticFileMap) {
+          staticFileMap[file.filePath] = {
+            contentType,
+            filePath: file.filePath,
+            previewMethod: "html",
+            method: "GET",
+            path: normalizePath(path),
+            body: Buffer.from(body),
+            inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
+          }
+        }
       }
-    });
+
+
+
+      router.use(assertGlobalTampered);
+      router.get(path, async function (_req, res) {
+        await new Promise<void>((resolve, reject) => {
+          try {
+            readFile(file.filePath, async (err, body) => {
+              if (err) {
+                reject(err);
+              } else {
+                try {
+                  await res.asyncEnd({
+                    status: 200,
+                    headers: {
+                      ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
+                    },
+                    body
+                  });
+                  resolve();
+                } catch (e) {
+                  reject(e);
+                }
+              }
+            })
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+      resolve();
+    } catch (e) {
+      reject(e);
+    }
   });
 }
 
-function createStaticRouterFromDirectory(service: string, logger: Logger, dir: string, inflateDir: string | false | undefined, routeFileMap: RouteFileMap | undefined, staticFileMap: StaticFileMap | null): Router {
+async function createStaticRouterFromDirectory(service: string, logger: Logger, dir: string, inflateDir: string | false | undefined, routeFileMap: RouteFileMap | undefined, staticFileMap: StaticFileMap | null, inflateParallel?: number): Promise<Router> {
   const router = new Router();
-  scanFiles(dir).forEach(file => {
-    createStaticRoute(service, logger, router, dir, file, inflateDir, routeFileMap, staticFileMap);
-  });
+  const maxParallel = inflateParallel ? inflateParallel : 1;
+  logger.debug("loading static directory with parallel [%s]", maxParallel);
+  let tR = [];
+  const files = scanFiles(dir);
+  for (const file of files) {
+    tR.push(await createStaticRoute(service, logger, router, dir, file, inflateDir, routeFileMap, staticFileMap));
+    if (tR.length >= maxParallel) {
+      await Promise.all(tR);
+      tR = [];
+    }
+  }
+  if (tR.length > 0) {
+    await Promise.all(tR);
+    tR = [];
+  }
   return router;
 }
 
@@ -165,9 +189,11 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
 }> {
   const router = new Router();
   const maxParallel = inflateParallel ? inflateParallel : 1;
+  server.logger.debug("loading http directory with parallel [%s]", maxParallel);
   let tR = [];
   router.use(assertGlobalTampered);
-  for (const file of scanFiles(dir)) {
+  const files = scanFiles(dir);
+  for (const file of files) {
     tR.push(new Promise<void>(async (resolve) => {
       try {
         switch (file.ext) {
@@ -218,11 +244,11 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                   if (inflateDir && r.defaultInflatePath && inflateSea) {
                     const rPath = r.defaultInflatePath;
                     const inflatePath = join(inflateDir, service, "http", rPath + ".api.cjs");
-                    mkdirSync(dirname(inflatePath), {
+                    await mkdirASync(dirname(inflatePath), {
                       recursive: true
                     });
                     logger.log("writing [%s]", relative(cwd(), inflatePath));
-                    writeFileSync(inflatePath, inflatedCode);
+                    await writeFileASync(inflatePath, inflatedCode);
                   }
 
 
@@ -254,7 +280,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                       //if (r.method === "GET" || r.method === "get") {
                       const rPath = r.inflatePath;
                       const inflatePath = join(inflateDir, service, "static", rPath);
-                      mkdirSync(dirname(inflatePath), {
+                      await mkdirASync(dirname(inflatePath), {
                         recursive: true
                       });
                       if (existsSync(inflatePath) && statSync(inflatePath).isDirectory()) {
@@ -264,7 +290,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                       const JSON_STATIC = await getJSON({ server } as ServerRequest, null, newURL(r.path), module.apiOptions?.basePath, module.default);
                       //const JSON = await getJSON({ server } as ServerRequest, null, newURL(r.path), module.apiOptions?.basePath, module.default);
                       logger.log("writing [%s]", relative(cwd(), inflatePath));
-                      writeFileSync(inflatePath, JSON_STATIC);
+                      await writeFileASync(inflatePath, JSON_STATIC);
                       //}
 
                       if (staticFileMap && inflateSea) {
@@ -321,7 +347,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                       //if (r.method === "GET" || r.method === "get") {
                       const rPath = r.inflatePath;
                       const inflatePath = join(inflateDir, service, "static", rPath);
-                      mkdirSync(dirname(inflatePath), {
+                      await mkdirASync(dirname(inflatePath), {
                         recursive: true
                       });
                       if (existsSync(inflatePath) && statSync(inflatePath).isDirectory()) {
@@ -332,7 +358,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                       const HTML_STATIC = await getHTML(hotreload, { server } as ServerRequest, null, newURL(r.path), module.apiOptions?.basePath, await toRender);
 
                       logger.log("writing [%s]", relative(cwd(), inflatePath));
-                      writeFileSync(inflatePath, HTML_STATIC);
+                      await writeFileASync(inflatePath, HTML_STATIC);
                       //}
 
 
@@ -392,11 +418,11 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
 
                   if (inflateDir) {
                     const inflatePath = join(inflateDir, service, "static", path);
-                    mkdirSync(dirname(inflatePath), {
+                    await mkdirASync(dirname(inflatePath), {
                       recursive: true
                     });
                     logger.log("writing [%s]", relative(cwd(), inflatePath));
-                    writeFileSync(inflatePath, code);
+                    await writeFileASync(inflatePath, code);
 
 
                     if (staticFileMap && inflateSea) {
@@ -445,11 +471,11 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
 
                 if (inflateDir) {
                   const inflatePath = join(inflateDir, service, "static", path);
-                  mkdirSync(dirname(inflatePath), {
+                  await mkdirASync(dirname(inflatePath), {
                     recursive: true
                   });
                   logger.log("writing [%s]", relative(cwd(), inflatePath));
-                  writeFileSync(inflatePath, code);
+                  await writeFileASync(inflatePath, code);
                   if (staticFileMap && inflateSea) {
                     staticFileMap[file.filePath] = {
                       contentType,
@@ -506,11 +532,11 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
 
                   if (inflateDir) {
                     const inflatePath = join(inflateDir, service, "static", path);
-                    mkdirSync(dirname(inflatePath), {
+                    await mkdirASync(dirname(inflatePath), {
                       recursive: true
                     });
                     logger.log("writing [%s]", relative(cwd(), inflatePath));
-                    writeFileSync(inflatePath, code);
+                    await writeFileASync(inflatePath, code);
                     if (staticFileMap && inflateSea) {
                       staticFileMap[file.filePath] = {
                         contentType,
@@ -564,11 +590,11 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
 
                   if (inflateDir) {
                     const inflatePath = join(inflateDir, service, "static", path);
-                    mkdirSync(dirname(inflatePath), {
+                    await mkdirASync(dirname(inflatePath), {
                       recursive: true
                     });
                     logger.log("writing [%s]", relative(cwd(), inflatePath));
-                    writeFileSync(inflatePath, code);
+                    await writeFileASync(inflatePath, code);
                     if (staticFileMap && inflateSea) {
                       staticFileMap[file.filePath] = {
                         contentType,
@@ -596,7 +622,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                 }
               }
             }
-            createStaticRoute(service, logger, router, dir, file, inflateDir, routeFileMap, staticFileMap);
+            await createStaticRoute(service, logger, router, dir, file, inflateDir, routeFileMap, staticFileMap);
             return resolve();
 
         }
