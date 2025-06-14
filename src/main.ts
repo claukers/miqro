@@ -30,7 +30,9 @@ async function main(args: Arguments) {
     // check arguments
     if (args.generateDoc) {
       // --generate-doc
-      const inflated = await app.inflate();
+      const inflated = await app.inflate({
+        inflateParallel: args.inflateParallel
+      });
       await generateDocs(args, app.logger, inflated);
       process.exit(EXIT_CODES.NORMAL_EXIT);
     } else if (args.migrateUp || args.migrateDown) {
@@ -44,7 +46,9 @@ async function main(args: Arguments) {
       process.exit(EXIT_CODES.NORMAL_EXIT);
     } else if (args.test) {
       // --test
-      await app.inflate();
+      await app.inflate({
+        inflateParallel: args.inflateParallel
+      });
       await app.start();
       await testMain(app);
       await app.stop();
@@ -75,7 +79,9 @@ async function main(args: Arguments) {
       process.exit(EXIT_CODES.NORMAL_EXIT);
     } else {
       // server
-      await app.inflate();
+      await app.inflate({
+        inflateParallel: args.inflateParallel
+      });
       await app.start();
     }
   }
