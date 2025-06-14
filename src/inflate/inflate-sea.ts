@@ -7,6 +7,7 @@ import { RouteFileMap, StaticFileMap } from "./setup-http.js";
 import { getAuthConfigPath, getCORSConfigPath, getDBConfigPath, getErrorConfigPath, getMiddlewareConfigPath, getMigrationsPath, getServerConfigPath, getServicePath, getWSConfigPath } from "../common/paths.js";
 import { getAsset } from "../common/assets.js";
 import { migration } from "@miqro/query";
+import { esBuild } from "../common/esbuild.js";
 
 //export const libCJSBuffer = Buffer.from(getAsset("lib.cjs"));
 /*export const COMPILESH = Buffer.from(Buffer.from(getAsset("compile.base64.sh")).toString(), "base64");
@@ -107,6 +108,17 @@ async function main() {
 main().catch(e=>console.error(e));
 `
   );
+
+  logger.log("writing [%s]", relative(cwd(), join(inflateDir, "sea", "app.bundle.cjs")));
+  await esBuild({
+    entryPoints: [join(inflateDir, "sea", "app.cjs")],
+    bundle: true,
+    minify: true,
+    jsxFactory: "JSX.createElement",
+    jsxFragment: "JSX.Fragment",
+    platform: "node",
+    outfile: join(inflateDir, "sea", "app.bundle.cjs")
+  });
 }
 
 export async function inflateServiceForSea(logger: Logger, inflateDir: string, service: string, servicePath: string/*, serviceMigrations: string[]*/, serviceRouteFileMap: RouteFileMap, serviceStaticFileMap: StaticFileMap) {

@@ -11,7 +11,7 @@ SIGN_ADD_BIN="sh sea/sign-add.sh"
 POSTJECT_BIN="${NODE_BIN} sea/postject.cjs"
 ESBUILD_BIN="sea/esbuild"
 
-$ESBUILD_BIN sea/app.cjs --bundle --platform=node --external:sqlite3 --external:pg --external:esbuild --outfile=sea/app.bundle.cjs
+#$ESBUILD_BIN sea/app.cjs --bundle --platform=node --external:sqlite3 --external:pg --external:esbuild --outfile=sea/app.bundle.cjs
 
 $NODE_BIN --experimental-sea-config sea/config.json
 
