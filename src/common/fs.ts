@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs";
+import { mkdir, rmdir, unlink, writeFile } from "node:fs";
 import { basename, extname } from "node:path";
 
 export function describeFilePath(filePath: string) {
@@ -46,5 +46,37 @@ export async function writeFileASync(path: string, body?) {
     } catch (e) {
       reject(e);
     }
-  })
+  });
+}
+
+export async function rmdirASync(path: string) {
+  return new Promise<void>((resolve, reject) => {
+    try {
+      rmdir(path, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
+export async function unlinkASync(path: string) {
+  return new Promise<void>((resolve, reject) => {
+    try {
+      unlink(path, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
 }

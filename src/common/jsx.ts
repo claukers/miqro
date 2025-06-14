@@ -2,7 +2,6 @@ import { Runtime } from "@miqro/jsx";
 import { createNodeRuntime } from "@miqro/jsx-node";
 import { basename, dirname, extname, relative, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
-import { mkdirSync, readFileSync, rmdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { Request, Response, CORSOptions, Logger, APIRoute } from "@miqro/core";
 import { Parser, Schema } from "@miqro/parser";
 import { APIRouteSchema, SessionHandlerOptionsSchema } from "@miqro/core";
@@ -17,6 +16,7 @@ import { getAsset, initAsset, validateAsset } from "./assets.js";
 import { calculateChecksumFromBuffer } from "./checksum.js";
 import { HandlerWithOptionsSchema, RouteOptionsSchema } from "@miqro/core/build/types.js";
 import { Migration } from "@miqro/query";
+import { mkdirASync, rmdirASync, unlinkASync, writeFileASync } from "./fs.js";
 
 let jsxJSBuffer: null | Buffer = null; // Buffer.from(getAsset("jsx.dom.js"));
 let jsxJSBufferChecksumPromise: null | Promise<string> = null; // calculateChecksumFromBuffer(jsxJSBuffer);
@@ -70,11 +70,11 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
   try {
 
     if (!options.embemedJSX) {
-      mkdirSync(tmpBuildDir, {
+      await mkdirASync(tmpBuildDir, {
         recursive: true
       });
-      writeFileSync(inFileTmp, browserJSXGlobals(inFile, false, options.useExport));
-      //writeFileSync(inFileTmp, browserJSXGlobals(relative(tmpBuildDir, inFile), false));
+      await writeFileASync(inFileTmp, browserJSXGlobals(inFile, false, options.useExport));
+      //await writeFileASync(inFileTmp, browserJSXGlobals(relative(tmpBuildDir, inFile), false));
       logger?.trace("inflating [%s] from [%s]. to change the import folder set JSX_TMP", relative(cwd(), inFile), dirname(relative(JSX_TMP_DIR, inFileTmp)));
       const { outputFiles: [{ contents }] } = await esBuild({
         ...DEFAULT_ESOPTION,
@@ -84,17 +84,17 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
       });
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
-        unlinkSync(inFileTmp);
-        rmdirSync(tmpBuildDir);
+        await unlinkASync(inFileTmp);
+        await rmdirASync(tmpBuildDir);
       }
       return contents;
     } else {
-      mkdirSync(tmpBuildDir, {
+      await mkdirASync(tmpBuildDir, {
         recursive: true
       });
-      //writeFileSync(jsxJSPath, Buffer.from(getAsset("jsx-dom-bundle")));
-      writeFileSync(inFileTmp, browserJSXGlobals(inFile, jsxJSPath));
-      //writeFileSync(inFileTmp, browserJSXGlobals(relative(tmpBuildDir, inFile), relative(tmpBuildDir, jsxJSPath)));
+      //await writeFileASync(jsxJSPath, Buffer.from(getAsset("jsx-dom-bundle")));
+      await writeFileASync(inFileTmp, browserJSXGlobals(inFile, jsxJSPath));
+      //await writeFileASync(inFileTmp, browserJSXGlobals(relative(tmpBuildDir, inFile), relative(tmpBuildDir, jsxJSPath)));
       logger?.trace("inflating [%s] from [%s] with jsx.js embedded. to change the import folder set JSX_TMP", relative(cwd(), inFile), dirname(relative(JSX_TMP_DIR, inFileTmp)));
       const { outputFiles: [{ contents }] } = await esBuild({
         ...DEFAULT_ESOPTION,
@@ -104,9 +104,9 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
       });
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
-        unlinkSync(inFileTmp);
-        //unlinkSync(jsxJSPath);
-        rmdirSync(tmpBuildDir);
+        await unlinkASync(inFileTmp);
+        //await unlinkASync(jsxJSPath);
+        await rmdirASync(tmpBuildDir);
       }
       return contents;
     }
@@ -116,9 +116,9 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
     if (options.embemedJSX) {
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
-        unlinkSync(inFileTmp);
-        //unlinkSync(jsxJSPath);
-        rmdirSync(tmpBuildDir);
+        await unlinkASync(inFileTmp);
+        //await unlinkASync(jsxJSPath);
+        await rmdirASync(tmpBuildDir);
       } else {
         //console.error("errors on: " + tmpBuildDir);
         logger?.error("error with: %s", inFileTmp);
@@ -489,11 +489,11 @@ export async function importJSXFile(inFile: string, logger?: Logger | Console): 
   //const inFileTmp = resolve(tmpBuildDir, basename(inFile) + ".mjs");
   const inFileTmp = resolve(tmpBuildDir, basename(inFile) + ".cjs");
   //const logger = getLogger(`${SERVER_IDENTIFIER}_JSX`);
-  mkdirSync(tmpBuildDir, {
+  await mkdirASync(tmpBuildDir, {
     recursive: true
   });
   try {
-    writeFileSync(inFileTmp, inflatedCode);
+    await writeFileASync(inFileTmp, inflatedCode);
     assertGlobalTampered();
     logger?.trace("importing [%s] from [%s]. to change the import folder set JSX_TMP", relative(cwd(), inFile), dirname(relative(JSX_TMP_DIR, inFileTmp)));
     logger?.debug("importing [%s]", relative(cwd(), inFile));
@@ -501,8 +501,8 @@ export async function importJSXFile(inFile: string, logger?: Logger | Console): 
     assertGlobalTampered();
     if (CLEAR_JSX_CACHE) {
       logger?.trace("clearing cache at [%s]. to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
-      unlinkSync(inFileTmp);
-      rmdirSync(tmpBuildDir);
+      await unlinkASync(inFileTmp);
+      await rmdirASync(tmpBuildDir);
     }
     return module.default;
   } catch (e) {
@@ -510,8 +510,8 @@ export async function importJSXFile(inFile: string, logger?: Logger | Console): 
     logger?.error("error with2: " + inFile);
     if (CLEAR_JSX_CACHE) {
       logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
-      unlinkSync(inFileTmp);
-      rmdirSync(tmpBuildDir);
+      await unlinkASync(inFileTmp);
+      await rmdirASync(tmpBuildDir);
     } else {
       //console.error("errors on: " + tmpBuildDir);
       logger?.error("error with: %s", inFileTmp);
