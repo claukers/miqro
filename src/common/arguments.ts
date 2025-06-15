@@ -85,6 +85,7 @@ export interface Arguments {
   services: string[];
   editor: boolean;
   hotreload: boolean;
+  watch: boolean;
   https: boolean;
   serverOptions: ServerOptions;
   httpsRedirect?: number;
@@ -126,6 +127,7 @@ export function parseArguments(): Arguments {
     editor: boolean | null;
     inflateDir?: string | null;
     hotreload?: boolean | null;
+    watch?: boolean | null;
   } = {
     inflateParallel: null,
     httpsRedirect: null,
@@ -135,6 +137,7 @@ export function parseArguments(): Arguments {
     browser: null,
     logFile: null,
     hotreload: null,
+    watch: null,
     miqroJSONPath: null,
     installMiqroJSON: null,
     disableMiqroJSON: null,
@@ -211,6 +214,14 @@ export function parseArguments(): Arguments {
         flags.installTSConfig = true;
         continue;
       case "--watch":
+        if (flags.watch !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.watch = true;
+        continue;
+      case "--hot-reload":
         if (flags.hotreload !== null) {
           console.error("bad arguments.");
           console.error(usage);
@@ -659,22 +670,22 @@ export function parseArguments(): Arguments {
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.test && (flags.hotreload || flags.editor || flags.compile || flags.inflate)) {
+  if (flags.test && (flags.watch || flags.hotreload || flags.editor || flags.compile || flags.inflate)) {
     console.error("bad arguments. cannot use --editor with --test");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.migrateUp && (flags.hotreload || flags.editor || flags.compile || flags.test || flags.migrateDown || flags.inflate)) {
+  if (flags.migrateUp && (flags.watch || flags.hotreload || flags.editor || flags.compile || flags.test || flags.migrateDown || flags.inflate)) {
     console.error("bad arguments. cannot use with --migrate-up");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.migrateDown && (flags.hotreload || flags.editor || flags.compile || flags.test || flags.migrateUp || flags.inflate)) {
+  if (flags.migrateDown && (flags.watch || flags.hotreload || flags.editor || flags.compile || flags.test || flags.migrateUp || flags.inflate)) {
     console.error("bad arguments. cannot use with --migrate-down");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.generateDoc && (flags.hotreload || flags.editor || flags.compile || flags.test || flags.migrateUp || flags.inflate || flags.migrateDown)) {
+  if (flags.generateDoc && (flags.watch || flags.hotreload || flags.editor || flags.compile || flags.test || flags.migrateUp || flags.inflate || flags.migrateDown)) {
     console.error("bad arguments. cannot use with --generate-doc");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
@@ -708,6 +719,7 @@ export function parseArguments(): Arguments {
     logFile: flags.logFile !== null ? flags.logFile : undefined,
     generateDocAll: flags.generateDocAll ? true : false,
     hotreload: flags.hotreload ? true : false,
+    watch: flags.watch ? true : false,
     disableMiqroJSON: flags.disableMiqroJSON !== null ? flags.disableMiqroJSON : false,
     miqroJSONPath: miqroJSONPath ? miqroJSONPath : false,
     installTypes: flags.installTypes ? true : false,

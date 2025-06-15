@@ -47,6 +47,7 @@ export async function watchAndServer(app: Miqro) {
   }
 
   function watchDir(toWatch: string) {
+    clearTimeout(timeout);
     const files = existsSync(toWatch) ? readdirSync(toWatch) : [];
     for (const file of files) {
       const filePath = resolve(toWatch, file);
@@ -60,6 +61,7 @@ export async function watchAndServer(app: Miqro) {
   }
 
   function stopWatch() {
+    clearTimeout(timeout);
     const toClose = watchers.splice(0, watchers.length);
     for (const watcher of toClose) {
       watcher.close();
@@ -69,6 +71,7 @@ export async function watchAndServer(app: Miqro) {
 
   function reWatch() {
     stopWatch();
+    clearTimeout(timeout);
     for (const service of app.options.services) {
       const toWatch = resolve(process.cwd(), service);
       watchDir(toWatch);

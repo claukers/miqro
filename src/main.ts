@@ -23,6 +23,7 @@ async function main(args: Arguments) {
       browser: args.browser,
       logFile: args.logFile,
       hotreload: args.test ? false : args.hotreload,
+      watch: args.test ? false : args.watch,
       https: args.test ? false : args.https,
       serverOptions: args.serverOptions,
       httpRedirect: args.test ? undefined : args.httpsRedirect

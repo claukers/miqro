@@ -43,6 +43,7 @@ export interface MiqroOptions {
   browser?: string | boolean;
   logFile?: string | boolean;
   hotreload?: boolean;
+  watch?: boolean;
   serverOptions?: ServerOptions<any, any>;
   https?: boolean;
   httpRedirect?: number;
@@ -494,7 +495,7 @@ export class Miqro {
 
     await notifiyServerConfig(this.logger, this.serverInterface, this.adminInterface, this.inflated.serverConfigMap, "start");
 
-    if (this.options.hotreload && (cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0")) {
+    if (this.options.watch && (cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0")) {
       this.watcher = await watchAndServer(this);
     }
 
