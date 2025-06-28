@@ -51,11 +51,13 @@ export interface InflateOptions {
   minify: boolean;
   useExport: boolean;
   platform?: string;
+  mainFields?: string;
   logger?: Logger | Console;
 }
 
 const DEFAULT_ESOPTION = {
-  // platform: "neutral",
+  platform: "neutral",
+  mainFields: "module,main",
   // platform: "node",
   bundle: true,
   jsxFactory: "JSX.createElement",
@@ -86,7 +88,8 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
         ...DEFAULT_ESOPTION,
         entryPoints: [inFileTmp],
         minify: options.minify,
-        platform: options.platform ? options.platform : undefined //DEFAULT_ESOPTION.platform 
+        platform: options.platform !== undefined ? options.platform : DEFAULT_ESOPTION.platform,
+        mainFields: options.mainFields !== undefined ? options.mainFields : DEFAULT_ESOPTION.mainFields
       });
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
@@ -106,7 +109,8 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
         ...DEFAULT_ESOPTION,
         entryPoints: [inFileTmp],
         minify: options.minify,
-        platform: options.platform ? options.platform : undefined //DEFAULT_ESOPTION.platform
+        platform: options.platform !== undefined ? options.platform : DEFAULT_ESOPTION.platform,
+        mainFields: options.mainFields !== undefined ? options.mainFields : DEFAULT_ESOPTION.mainFields
       });
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);

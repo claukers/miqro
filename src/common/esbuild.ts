@@ -52,8 +52,9 @@ const NODEJS_EXTERNAL = [
 ];
 
 export async function esBuild(options: {
-  platform?: string;
+  platform?: string | false;
   entryPoints: [string];
+  mainFields?: string;
   bundle?: boolean;
   jsxFactory?: string;
   jsxFragment?: string;
@@ -69,7 +70,7 @@ export async function esBuild(options: {
     try {
       //const logger = getLogger(`${SERVER_IDENTIFIER}_ESBUILD`);
       const valid = await validateESBuild(logger);
-      const esBuildCMD = `${getESBuildBinaryPath()} "${options.entryPoints[0]}" ${NODEJS_EXTERNAL.map(e => `--external:${e}`).join(" ")} --loader:.js=jsx --jsx-factory=${options.jsxFactory} --jsx-fragment=${options.jsxFragment} ${options.bundle ? " --bundle" : ""}${options.minify ? " --minify" : ""}${options.outfile ? ` --outfile="${options.outfile}"` : ""}${options.platform ? ` --platform=${options.platform}` : ""}`;
+      const esBuildCMD = `${getESBuildBinaryPath()} "${options.entryPoints[0]}" ${NODEJS_EXTERNAL.map(e => `--external:${e}`).join(" ")} --loader:.js=jsx --jsx-factory=${options.jsxFactory} --jsx-fragment=${options.jsxFragment} ${options.bundle ? " --bundle" : ""}${options.minify ? " --minify" : ""}${options.outfile ? ` --outfile="${options.outfile}"` : ""}${options.platform ? ` --platform=${options.platform}` : ""}${options.mainFields ? ` --main-fields=${options.mainFields}` : ""}`;
       logger?.trace(esBuildCMD);
       if (!valid) {
         const err = new Error(`esbuild installation at [${getESBuildBinaryPath()}] tampered`);

@@ -1,7 +1,6 @@
-import { WebSocketServer, Logger, ReadBuffer, URLEncodedParser, JSONParser, TextParser, CORS, SessionHandler } from "@miqro/core";
-import { Database } from "@miqro/query";
+import { Logger } from "@miqro/core";
 import cluster from "node:cluster";
-import { CacheInterface, MigrateOptions, NamedMigration, ServerInterface } from "../../types.js";
+import { CacheInterface, NamedMigration, ServerInterface } from "../../types.js";
 import { DBManager } from "./db-manager.js";
 import { Miqro } from "../app.js";
 import { WebSocketManager } from "./websocketmanager.js";
@@ -9,12 +8,13 @@ import { execSync } from "node:child_process";
 import { LogProvider } from "./log.js";
 import { HTMLEncode } from "../../../editor/common/html-encode.js";
 import { inflateMD2HTML } from "../../inflate/md.js";
-import { createSecretKey } from "node:crypto";
+
 import { Parser } from "@miqro/parser";
 import { ClusterCache } from "./cluster-cache.js";
 import { LocalCache } from "./cache.js";
 import { middleware } from "./middleware.js";
-import { decodeJWT, decodeProtectedHeaderJWT, decryptJWT, encryptJWT, signJWT, verifyJWT } from "../../common/jwt.js";
+import { jwt } from "./jwt.js";
+
 // import { initGlobals } from "../globals.js";
 
 export interface ServerInterfaceImplOptions {
@@ -34,7 +34,6 @@ export function createServerInterface(options: ServerInterfaceImplOptions): Serv
     middleware,
     encodeHTML: HTMLEncode,
     inflateMDtoHTML: inflateMD2HTML,
-    createSecretKey,
     newParser() {
       return new Parser();
     },
@@ -53,26 +52,7 @@ export function createServerInterface(options: ServerInterfaceImplOptions): Serv
     isPrimaryWorker(): boolean {
       return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0";
     },
-    jwt: {
-      decode(jwt) {
-        return decodeJWT(jwt);
-      },
-      decodeProtectedHeader(token) {
-        return decodeProtectedHeaderJWT(token);
-      },
-      decrypt(jwt, secret, options) {
-        return decryptJWT(jwt, secret, options);
-      },
-      encrypt(payload, secret, options) {
-        return encryptJWT(payload, secret, options);
-      },
-      sign(payload, secret, options) {
-        return signJWT(payload, secret, options);
-      },
-      verify(jwt, secret, options) {
-        return verifyJWT(jwt, secret, options);
-      }
-    },
+    jwt,
     cache: options.cache,
     localCache: options.localCache,
     logger: options.logger,
