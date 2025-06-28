@@ -50,7 +50,7 @@ export interface InflateOptions {
   embemedJSX: boolean;
   minify: boolean;
   useExport: boolean;
-  platform?: string;
+  platform?: string | boolean;
   logger?: Logger | Console;
 }
 
@@ -80,7 +80,7 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
         ...DEFAULT_ESOPTION,
         entryPoints: [inFileTmp],
         minify: options.minify,
-        platform: options.platform ? options.platform : DEFAULT_ESOPTION.platform
+        platform: options.platform !== undefined ? options.platform : DEFAULT_ESOPTION.platform
       });
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
@@ -100,7 +100,7 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
         ...DEFAULT_ESOPTION,
         entryPoints: [inFileTmp],
         minify: options.minify,
-        platform: options.platform ? options.platform : DEFAULT_ESOPTION.platform
+        platform: options.platform !== undefined ? options.platform : DEFAULT_ESOPTION.platform
       });
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);

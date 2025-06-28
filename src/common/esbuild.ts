@@ -47,7 +47,7 @@ const NODEJS_EXTERNAL = [
 ];
 
 export async function esBuild(options: {
-  platform?: string;
+  platform?: string | boolean;
   entryPoints: [string];
   bundle?: boolean;
   jsxFactory?: string;
