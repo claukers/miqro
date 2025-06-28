@@ -516,7 +516,6 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                     embemedJSX: false,
                     minify: file.subExt === ".min" ? true : false,
                     useExport: false,
-                    platform: false,
                     logger
                   });
                   const contentType = CONTENT_TYPE_MAP[".js"];
