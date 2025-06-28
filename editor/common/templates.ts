@@ -340,7 +340,7 @@ window.addEventListener("load", (event) => {
   });
 });  
 `},
-  SSRTSX: {
+  /*SSRTSX: {
     prefix: "http",
     sufix: ".tsx",
     displayName: "an ssr component example using webcomponents",
@@ -423,7 +423,7 @@ export function SSRComponent(props, children) {
     );
 }
 `
-  },
+  },*/
   JS: {
     prefix: "http",
     sufix: ".js",
