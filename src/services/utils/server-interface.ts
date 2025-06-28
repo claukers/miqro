@@ -13,6 +13,7 @@ import { createSecretKey } from "node:crypto";
 import { Parser } from "@miqro/parser";
 import { ClusterCache } from "./cluster-cache.js";
 import { LocalCache } from "./cache.js";
+import { middleware } from "./middleware.js";
 import { decodeJWT, decodeProtectedHeaderJWT, decryptJWT, encryptJWT, signJWT, verifyJWT } from "../../common/jwt.js";
 // import { initGlobals } from "../globals.js";
 
@@ -30,14 +31,7 @@ export interface ServerInterfaceImplOptions {
 export function createServerInterface(options: ServerInterfaceImplOptions): ServerInterface {
   // initGlobals();
   return Object.freeze<ServerInterface>({
-    middleware: Object.freeze({
-      buffer: ReadBuffer,
-      url: URLEncodedParser,
-      json: JSONParser,
-      text: TextParser,
-      cors: CORS,
-      session: SessionHandler
-    }),
+    middleware,
     encodeHTML: HTMLEncode,
     inflateMDtoHTML: inflateMD2HTML,
     createSecretKey,

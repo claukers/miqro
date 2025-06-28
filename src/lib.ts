@@ -16,4 +16,5 @@ export { appendAPIModule } from "./inflate/utils/sea-utils.js";
 export { createServerInterface, ServerInterfaceImplOptions } from "./services/utils/server-interface.js";
 export { App, LoggerHandler, Router } from "@miqro/core";
 export { migration } from "@miqro/query";
+export { middleware } from "./services/utils/middleware.js";
 

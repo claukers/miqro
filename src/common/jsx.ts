@@ -492,7 +492,7 @@ export async function importJSXFile(inFile: string, logger?: Logger | Console): 
     logger
   });
   const tmpBuildDir = resolve(JSX_TMP_DIR, String(process.pid), "import", Date.now() + "-" + randomUUID());
-  //const inFileTmp = resolve(tmpBuildDir, basename(inFile) + ".mjs");
+  // const inFileTmp = resolve(tmpBuildDir, basename(inFile) + ".mjs");
   const inFileTmp = resolve(tmpBuildDir, basename(inFile) + ".cjs");
   //const logger = getLogger(`${SERVER_IDENTIFIER}_JSX`);
   await mkdirASync(tmpBuildDir, {
@@ -504,6 +504,7 @@ export async function importJSXFile(inFile: string, logger?: Logger | Console): 
     logger?.trace("importing [%s] from [%s]. to change the import folder set JSX_TMP", relative(cwd(), inFile), dirname(relative(JSX_TMP_DIR, inFileTmp)));
     logger?.debug("importing [%s]", relative(cwd(), inFile));
     const module = await import(resolve(inFileTmp));
+    // console.dir(module);
     // assertGlobalTampered();
     if (CLEAR_JSX_CACHE) {
       logger?.trace("clearing cache at [%s]. to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);

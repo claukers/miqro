@@ -1,2 +1,0 @@
-/*import "./jsx.globals.js";
-*/

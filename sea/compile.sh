@@ -11,8 +11,8 @@ ESBUILD_BIN="sh sea/esbuild.sh"
 TSC_BIN="sh sea/tsc.sh"
 
 #types.json
-sh sea/copy-types.sh
-$NODE_BIN sea/generate-global-types-asset-json.js
+# sh sea/copy-types.sh
+# $NODE_BIN sea/generate-global-types-asset-json.js
 
 #version.tag
 $NODE_BIN sea/version.tag.js

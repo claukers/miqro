@@ -47,18 +47,18 @@ export async function inflateAppForSea(logger: Logger, inflateDir: string, servi
   writeFile(logger, resolve(inflateDir, "sea", "lib.cjs"), Buffer.from(getAsset("lib.cjs")));
 
   const WSLIST = services.filter(service => getWSConfigPath(resolve(cwd(), service))).map(service => {
-    return `(await import("../${service}/ws.cjs")).default`;
+    return `(await require("../${service}/ws.cjs")).default`;
   }).join(",")
 
   const SERVERCONFIGLIST = services.filter(service => getServerConfigPath(resolve(cwd(), service))).map(service => {
-    return `(await import("../${service}/server.cjs")).default`;
+    return `(await require("../${service}/server.cjs")).default`;
   }).join(",\n");
 
   const DBCONFIGLIST = services.filter(service => getDBConfigPath(resolve(cwd(), service))).map(service => {
     return `new Promise(async (resolve, reject) => {
     try {
-      const db = await dbManager.setupDB((await import("../${service}/db.cjs")).default);
-      await (await import("./${service}/migration-up.js")).runMigrations(db);
+      const db = await dbManager.setupDB((await require("../${service}/db.cjs")).default);
+      await (await require("./${service}/migration-up.cjs")).runMigrations(db);
       resolve();
     } catch(e) {
       reject(e);
@@ -97,7 +97,7 @@ async function main() {
   ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].filter(config=>config.preload).map(config=>config.preload(serverInterface)));\n` : ""}
   app.use(ServerRequestHandler(serverInterface));
   app.use(LoggerHandler());
-  ${services.map(service => `app.use(await (await import("./${join(service, "router.js")}")).setupRouter());`).join("\n")}
+  ${services.map(service => `app.use(await (await require("./${join(service, "router.cjs")}")).setupRouter());`).join("\n")}
   ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].filter(config=>config.load).map(config=>config.load(serverInterface)));\n` : ""}
   
   await app.listen(PORT);
@@ -128,20 +128,20 @@ export async function inflateServiceForSea(logger: Logger, inflateDir: string, s
   const migrationsFolderPath = getMigrationsPath(servicePath);
 
   const serviceMigrations: string[] = migrationsFolderPath ? migration.getSortedMigrations(migrationsFolderPath) : [];
-  writeFile(logger, join(inflateDir, "sea", service, "router.js"), `import { appendAPIModule, Router } from "./../lib.cjs";\n
-export async function setupRouter() {
+  writeFile(logger, join(inflateDir, "sea", service, "router.cjs"), `const { appendAPIModule, Router, middleware } = require("./../lib.cjs");\n
+async function setupRouter() {
   const router = new Router();
 ${getErrorConfigPath(servicePath) ? `
-  const errorConfig = (await import("../../${service}/catch.cjs")).default.default;
+  const errorConfig = (await require("../../${service}/catch.cjs")).default.default;
   if(errorConfig && errorConfig.catch) {
     for(const m of errorConfig.catch) {
       router.catch(m);
     }
   }` : ""}
-${getCORSConfigPath(servicePath) ? `  router.use(server.middleware.cors((await import("../../${service}/cors.cjs")).default.default));` : ""}
-${getAuthConfigPath(servicePath) ? `  router.use(server.middleware.session((await import("../../${service}/auth.cjs")).default.default));` : ""}
+${getCORSConfigPath(servicePath) ? `  router.use(middleware.cors((await require("../../${service}/cors.cjs")).default.default));` : ""}
+${getAuthConfigPath(servicePath) ? `  router.use(middleware.session((await require("../../${service}/auth.cjs")).default.default));` : ""}
 ${getMiddlewareConfigPath(servicePath) ? `
-  const middlewareConfig = (await import("../../${service}/middleware.cjs")).default.default;
+  const middlewareConfig = (await require("../../${service}/middleware.cjs")).default.default;
   if(middlewareConfig && middlewareConfig.middleware) {
     for(const m of middlewareConfig.middleware) {
       router.use(m);
@@ -155,13 +155,13 @@ ${Object.keys(serviceRouteFileMap)
         if (rPath) {
           const rPathExt = extname(rPath);
           const apiInflatedPath = join("..", "..", rPath.substring(0, rPath.length - rPathExt.length) + ".cjs");
-          return `  await appendAPIModule(router, "../../${service}/http", "./${apiInflatedPath}", (await import("./${apiInflatedPath}")).default.default);`;
+          return `  await appendAPIModule(router, "../../${service}/http", "./${apiInflatedPath}", (await require("./${apiInflatedPath}")).default.default);`;
         } else {
           return "";
         }
       }).filter(l => l)[0])
       .join("\n")}
-  router.use(await (await import("./static-router.js")).setupRouter())
+  router.use(await (await require("./static-router.cjs")).setupRouter())
 
 ${getMiddlewareConfigPath(servicePath) ? `
   if(middlewareConfig && middlewareConfig.post) {
@@ -171,32 +171,41 @@ ${getMiddlewareConfigPath(servicePath) ? `
   }` : ""}
       
   return router;
+}
+module.exports = {
+  setupRouter
 }`);
 
-  writeFile(logger, join(inflateDir, "sea", service, "migration-up.js"), `import { migration } from "./../lib.cjs";\n
-export async function runMigrations(db) {
+  writeFile(logger, join(inflateDir, "sea", service, "migration-up.cjs"), `const { migration } = require("./../lib.cjs");\n
+async function runMigrations(db) {
   await migration.init(db);
 ${serviceMigrations.map(file => {
     const name = `${file.substring(0, file.length - extname(file).length)}`;
-    return `  await migration.up.module(db, "${file}", (await import("../../${service}/migration/${name}.cjs")).default.default)`;
+    return `  await migration.up.module(db, "${file}", (await require("../../${service}/migration/${name}.cjs")).default.default)`;
   }).join("\n")}
+}
+module.exports = {
+  runMigrations
 }`);
 
-  writeFile(logger, join(inflateDir, "sea", service, "migration-down.js"), `import { migration } from "./../lib.cjs";\n
-export async function runMigrations(db) {
+  writeFile(logger, join(inflateDir, "sea", service, "migration-down.cjs"), `const { migration } = require("./../lib.cjs");\n
+async function runMigrations(db) {
   await migration.init(db);
 ${serviceMigrations.reverse().map(file => {
     const name = `${file.substring(0, file.length - extname(file).length)}`;
-    return `  await migration.down.module(db, "${file}", (await import("../../${service}/migration/${name}.cjs")).default.default)`;
+    return `  await migration.down.module(db, "${file}", (await require("../../${service}/migration/${name}.cjs")).default.default)`;
   }).join("\n")}
+}
+module.exports = {
+  runMigrations
 }`);
 
   const staticFiles = Object.keys(serviceStaticFileMap);
   /*if (staticFiles.length !== 0) {
     writeFile(logger, join(inflateDir, "sea", service, "static.base64.json"), JSON.stringify(serviceStaticFileMap));
   }*/
-  writeFile(logger, join(inflateDir, "sea", service, "static-router.js"), `import { appendAPIModule, Router } from "./../lib.cjs";\n
-export async function setupRouter() {
+  writeFile(logger, join(inflateDir, "sea", service, "static-router.cjs"), `const { appendAPIModule, Router } = require("./../lib.cjs");\n
+async function setupRouter() {
   const router = new Router();
   ${staticFiles.length === 0 ? "" : `
 ${staticFiles.map((filePath) => {
@@ -212,6 +221,9 @@ ${staticFiles.map((filePath) => {
   }).join("\n")}
 `}
   return router;
+}
+module.exports = {
+  setupRouter
 }`);
 
 }
