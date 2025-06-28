@@ -61,6 +61,8 @@ example/
 ```example/http/index.html.tsx```
 
 ```typescript
+import JSX from "@miqro/jsx";
+
 export default (req, res) => {
   return <html>
     <body>
@@ -212,6 +214,7 @@ you can also export a request function and customize the route by exporting a ``
 
 ```ìndex.html.tsx```
 ```tsx
+import JSX from "@miqro/jsx";
 import { ServerRequest, ServerResponse, APIOptions } from "miqro";
 import { MyComponent } from "./component.js";
 
@@ -240,14 +243,16 @@ example defining a ```WebComponent``` with ```JSX``` using ```@miqro/jsx```.
 
 ```script.min.tsx```
 ```typescript
+import JSX, { useState, useEffect } from "@miqro/jsx";
+import { define } from "@miqro/jsx-dom";
 /*
 basic dynamic component example
 */
 export function TickerComponent() {
   // create a state variable count
-  const [count, setCount] = jsx.useState(0);
+  const [count, setCount] = useState(0);
   // create a effect with a setTimeout that updates count after 1000ms
-  jsx.useEffect(() => {
+  useEffect(() => {
     // create the timeout
     const timeout = setTimeout(() => {
       setCount(count + 1);
@@ -273,7 +278,7 @@ window.addEventListener("load", async (event) => {
   <script src="..."></script>
   
   */
-  jsx.define("ticker-tag", TickerComponent, {
+  define("ticker-tag", TickerComponent, {
     shadowInit: false, // or { mode: "closed" | "closed" }
     //extends: "p";
     //observedAttributes: ["width", "height", "some-attr"]; // attribues that are observed for changes to re-render the JSX component
@@ -373,7 +378,7 @@ interface ServerRequest extends Request {
 }
 ```
 
-example using ```req.server``` to access a key in the cache.
+example using ```req.server``` to access a key in the node:cluster synced cache.
 
 ```typescript
 import { ServerRequest, ServerResponse } from "miqro";
@@ -473,19 +478,7 @@ TODO
 
 TODO
 
-#### jsx global
-
-TODO
-
-#### JSX global
-
-TODO
-
 #### test global
-
-TODO
-
-#### server global
 
 TODO
 
@@ -593,7 +586,6 @@ CLUSTER_COUNT=10 miqro-cluster --service api/
 --compile		inflates the application and tries to create a NODE SEA binary.
 --inflate-sea		inflates the application with sea compilation scripts.
 --install-tsconfig	creates a tsconfig.json configured to use with --install-types.
---install-types		creates and updates the .types/ folder use together with --install-tsconfig.
 
 ==environment variables==
 
