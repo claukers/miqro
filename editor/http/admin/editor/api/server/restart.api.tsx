@@ -1,4 +1,4 @@
-import { APIRoute } from "@miqro/core";
+import { APIRoute, JSONParser } from "@miqro/core";
 import { relative } from "node:path";
 import { BASE_PATH } from "../../../../../common/constants.server.js";
 import { AdminRequest } from "../../../../../common/admin-interface.js";
@@ -7,7 +7,7 @@ export default {
   method: "POST",
   path: "/restart",
   description: "admin editor server restart endpoint",
-  middleware: [server.middleware.json()],
+  middleware: [JSONParser()],
   request: {
     body: false
   },

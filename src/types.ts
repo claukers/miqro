@@ -33,7 +33,7 @@ export interface JWTSignOptions {
   options?: SignOptions;
 }
 
-declare global {
+/*declare global {
   // jsx only for the default value of tsconfig.json
   //var React: {};
   var JSX: {
@@ -60,7 +60,7 @@ declare global {
     useElement: typeof jsxLib.useElement;
     useRefresh: typeof jsxLib.useRefresh;
   }
-}
+}*/
 
 export { APIRoute } from "@miqro/core";
 export { Migration } from "@miqro/query";
@@ -233,7 +233,7 @@ export interface TestHelperGlobal {
   }
 }
 
-declare global {
+/*declare global {
   // only available server side
   var server: ServerGlobal;
 
@@ -245,7 +245,7 @@ declare global {
   var describe: Function;
   var before: Function;
   var after: Function;
-}
+}*/
 
 export interface AuthConfig extends SessionHandlerOptions {
 

@@ -1,3 +1,6 @@
+import * as jsx from "@miqro/jsx";
+import JSX from "@miqro/jsx";
+
 interface StartPageProps {
   togglePanel: (panel: string) => void;
   isPanelVisible: (panel: string) => boolean;

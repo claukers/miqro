@@ -1,1 +1,2 @@
-import "./jsx.globals.js";
+/*import "./jsx.globals.js";
+*/

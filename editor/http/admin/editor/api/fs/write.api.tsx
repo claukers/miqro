@@ -1,10 +1,10 @@
-import { APIRoute } from "@miqro/core";
+import { APIRoute, JSONParser } from "@miqro/core";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { getPath } from "./read.api.js";
 import { dirname } from "node:path";
 
 export default {
-  middleware: [server.middleware.json()],
+  middleware: [JSONParser()],
   method: "POST",
   path: "/write",
   description: "admin editor file write endpoint",

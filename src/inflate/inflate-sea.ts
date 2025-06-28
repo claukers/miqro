@@ -69,7 +69,7 @@ export async function inflateAppForSea(logger: Logger, inflateDir: string, servi
 
   writeFile(logger, join(inflateDir, "sea", "package.json"), `{ "type": "module", "private": true }`);
 
-  writeFile(logger, join(inflateDir, "sea", "app.cjs"), `const { createServerInterface, ServerRequestHandler, WebSocketManager, initGlobals, DBManager, App, LoggerHandler, LogProvider, LocalCache, ClusterCache } = require("./lib.cjs");
+  writeFile(logger, join(inflateDir, "sea", "app.cjs"), `const { createServerInterface, ServerRequestHandler, WebSocketManager, DBManager, App, LoggerHandler, LogProvider, LocalCache, ClusterCache } = require("./lib.cjs");
 
 async function main() {
   const PORT = "${PORT}"; 
@@ -78,7 +78,6 @@ async function main() {
   const cache = new ClusterCache();
   const webSocketManager = new WebSocketManager();
   const dbManager = new DBManager();
-  await initGlobals();
   const serverInterface = createServerInterface({
     cache,
     localCache,

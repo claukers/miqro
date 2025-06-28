@@ -1,3 +1,6 @@
+import * as jsx from "@miqro/jsx";
+import JSX from "@miqro/jsx";
+
 import { BASEEDITOR_PATH } from "../common/constants.js";
 import { TEMPLATES } from "../common/templates.js";
 import { HighlightTextArea } from "./highlight-text-area.js";

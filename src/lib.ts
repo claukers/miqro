@@ -9,7 +9,7 @@ export { WebSocketManager, WebSocketManagerOptions } from "./services/utils/webs
 export { DBManager } from "./services/utils/db-manager.js";
 export { LogProvider, LogProviderOptions } from "./services/utils/log.js";
 export { Miqro, MiqroOptions, ServerRequestHandler } from "./services/app.js";
-export { initGlobals, assertGlobalTampered } from "./services/globals.js";
+// export { initGlobals, assertGlobalTampered } from "./services/globals.js";
 
 //exported for --inflate-sea
 export { appendAPIModule } from "./inflate/utils/sea-utils.js";

@@ -1,3 +1,6 @@
+import * as jsx from "@miqro/jsx";
+import JSX from "@miqro/jsx";
+
 import { APIPReview } from "./api-preview.js";
 import { FileEditorToolbar } from "./file-editor-toolbar.js";
 import { HighlightTextArea } from "./highlight-text-area.js";

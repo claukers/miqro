@@ -1,3 +1,5 @@
+import * as jsx from "@miqro/jsx";
+import JSX from "@miqro/jsx";
 import { FileEditor } from "./file-editor.js";
 import { NewFile } from "./new-file.js";
 import { useScroll } from "./scroll-query.js";

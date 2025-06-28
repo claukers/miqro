@@ -1,4 +1,4 @@
-import { APIRoute } from "@miqro/core";
+import { APIRoute, JSONParser } from "@miqro/core";
 import { unlinkSync } from "node:fs";
 import { getPath } from "./read.api.js";
 
@@ -6,7 +6,7 @@ export default {
   description: "admin editor file deletion endpoint",
   method: "POST",
   path: "/delete",
-  middleware: [server.middleware.json()],
+  middleware: [JSONParser()],
   request: {
     body: {
       path: "string"

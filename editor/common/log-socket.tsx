@@ -1,3 +1,5 @@
+import * as jsx from "@miqro/jsx";
+
 interface LogLine { out: string; identifier: string; level: "error" | "warn" | "debug" | "trace" | "info" }
 
 export interface LogSocket {

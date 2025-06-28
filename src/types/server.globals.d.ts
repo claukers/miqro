@@ -1,4 +1,4 @@
-import "./jsx.globals.js";
+/*import "./jsx.globals.js";
 
 import { Logger } from "./@miqro/core/lib.js";
 import { request } from "./@miqro/request/lib.js";
@@ -45,3 +45,4 @@ declare global {
   var before: Function;
   var after: Function;
 }
+*/

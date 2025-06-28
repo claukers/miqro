@@ -1,3 +1,6 @@
+import * as jsx from "@miqro/jsx";
+import JSX from "@miqro/jsx";
+
 let scrollTimeout2: any = null;
 
 export function useScroll(): [{ scrollTop: string; scrollLeft: string }, (newScroll: { scrollTop: number; scrollLeft: number; }, inmediate?: boolean) => void] {

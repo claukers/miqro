@@ -18,7 +18,7 @@ export async function initESBuild(logger: Logger) {
   return initAsset(logger, getESBuildBinaryPath(), esbuildBinaryBuffer, true, esbuildBinaryChecksumPromise, false);
 }
 
-const NODEJS_EXTERNAL = [
+/*const NODEJS_EXTERNAL = [
   "node:cluster",
   "node:assert",
   "node:util",
@@ -44,7 +44,9 @@ const NODEJS_EXTERNAL = [
   "browser.globals",
   "sqlite3",
   "pg"
-];
+];*/
+
+const NODEJS_EXTERNAL = [];
 
 export async function esBuild(options: {
   platform?: string;
