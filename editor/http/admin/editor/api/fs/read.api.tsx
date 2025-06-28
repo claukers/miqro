@@ -1,4 +1,4 @@
-import { APIRoute } from "@miqro/core";
+import { APIRoute, JSONParser } from "@miqro/core";
 import { readFileSync } from "node:fs";
 import { SUPPORTED_LANGUAGES } from "../../../../../common/constants.js";
 import { relative, resolve } from "node:path";
@@ -9,7 +9,7 @@ export default {
   method: "POST",
   path: "/read",
   description: "admin editor file read endpoint",
-  middleware: [server.middleware.json()],
+  middleware: [JSONParser()],
   request: {
     body: {
       path: "string"

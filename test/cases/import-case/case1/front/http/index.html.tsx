@@ -1,4 +1,4 @@
-import { } from "../../../../../../src/types/miqro";
+import JSX from "@miqro/jsx";
 
 export default <html>
   <body>

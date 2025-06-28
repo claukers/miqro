@@ -1,4 +1,4 @@
-import "../services/globals.js";
+//import "../services/globals.js";
 import { FSWatcher, existsSync, readdirSync, statSync, watch } from "node:fs";
 import { resolve } from "node:path";
 import { Miqro } from "../services/app.js";

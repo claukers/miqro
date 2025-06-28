@@ -26,7 +26,7 @@ const ASSETS_ROUTER = {
   "sign-add.sh": "sea/sign-add.sh",
   "app.sh": "sea/app.sh",
   "jsx.dom.js": "build/jsx.dom.js",
-  "types.json": "sea/types.json",
+  // "types.json": "sea/types.json",
   "editor-assets/editor.bundle.js": "build/editor.bundle.js",
   "editor-assets/style.css": "build/style.css",
   "editor-assets/font.ttf": "build/font.ttf"
@@ -75,12 +75,12 @@ export async function initAssets(logger: Logger) {
   await Promise.all([initJSXJS(logger), initESBuild(logger)]);
 }
 
-export async function initTypes(logger: MinimalLogger) {
+/*export async function initTypes(logger: MinimalLogger) {
   const typesJSON = JSON.parse(Buffer.from(getAsset("types.json")).toString("utf-8"));
   await Promise.all(Object.keys(typesJSON).map(typeFile =>
     initAsset(logger, resolve(cwd(), "." + typeFile), Buffer.from(typesJSON[typeFile], "base64"))
   ));
-}
+}*/
 
 export async function validateAsset(logger: MinimalLogger | undefined, path: string, internalChecksum: string): Promise<boolean> {
   mkdirSync(dirname(path), {

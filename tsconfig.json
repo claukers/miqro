@@ -7,7 +7,10 @@
     "outDir": "./build/esm",
     "strict": false,
     "module": "NodeNext",
-    "lib": ["es2021", "dom"],
+    "lib": [
+      "es2021",
+      "dom"
+    ],
     "jsx": "react",
     "jsxFactory": "JSX.createElement",
     "jsxFragmentFactory": "JSX.Fragment",
@@ -20,16 +23,17 @@
     ]*/
   },
   "include": [
-      "src/**/*",
-      "editor/**/*"
+    "src/**/*",
+    "editor/**/*"
   ],
   "exclude": [
-      "node_modules",
-      "sea",
-      "test",
-      ".types",
-      "node_modules/@miqro/jsx/build/esm/jsx.d.ts",
-      ".types/@miqro/jsx/esm/jsx.d.ts",
-      "src/types/"
+    "*.test.tsx",
+    "node_modules",
+    "sea",
+    "test",
+    ".types",
+    "node_modules/@miqro/jsx/build/esm/jsx.d.ts",
+    ".types/@miqro/jsx/esm/jsx.d.ts",
+    "src/types/"
   ]
 }

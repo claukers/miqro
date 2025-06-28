@@ -1,3 +1,6 @@
+import * as jsx from "@miqro/jsx";
+import JSX from "@miqro/jsx";
+
 interface FileBrowserFile {
   filePath: string;
   fileName: string;

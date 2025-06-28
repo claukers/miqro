@@ -17,7 +17,7 @@ import { createEditorRouter } from "./editor.js";
 import { EDITOR_CONFIG_KEY, HOT_RELOAD_PATH } from "../common/constants.js";
 import { watchAndServer } from "../common/watch.js";
 import { LocalCache } from "./utils/cache.js";
-import { initGlobals } from "./globals.js";
+// import { initGlobals } from "./globals.js";
 import { EditorAdminInterface } from "../../editor/common/admin-interface.js";
 import { LogProvider, LogProviderOptions } from "./utils/log.js";
 import { initAssets } from "../common/assets.js";
@@ -219,7 +219,7 @@ export class Miqro {
     if (this.inflated !== null) {
       throw new Error("already inflated! call deflate()");
     }
-    initGlobals();
+    // initGlobals();
     // block others from inflating while inflateApp is running
     this.inflated = undefined;
     this.inflated = {
@@ -280,7 +280,7 @@ export class Miqro {
     // init assets only once for all ApplicationServer's
     if (Miqro.initAssetsPromise === null) {
       // init globals only once for all inflations
-      initGlobals();
+      // initGlobals();
       Miqro.initAssetsPromise = initAssets(this.logger);
     }
     await Miqro.initAssetsPromise;
@@ -328,7 +328,7 @@ export class Miqro {
       // init assets only once for all ApplicationServer's
       if (Miqro.initAssetsPromise === null) {
         // init globals only once for all inflations
-        initGlobals();
+        // initGlobals();
         Miqro.initAssetsPromise = initAssets(this.logger);
       }
       await Miqro.initAssetsPromise;

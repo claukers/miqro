@@ -1,4 +1,6 @@
 import { HighlightTextArea } from "./highlight-text-area.js";
+import * as jsx from "@miqro/jsx";
+import JSX from "@miqro/jsx";
 
 const DEFAULT_HEADERS = `{"content-type": "application/json"}`;
 const DEFAULT_BODY = `{}`;

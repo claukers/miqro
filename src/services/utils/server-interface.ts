@@ -1,13 +1,21 @@
-import { WebSocketServer, Logger } from "@miqro/core";
-import { Database } from "@miqro/query";
+import { Logger } from "@miqro/core";
 import cluster from "node:cluster";
-import { CacheInterface, MigrateOptions, NamedMigration, ServerInterface } from "../../types.js";
+import { CacheInterface, NamedMigration, ServerInterface } from "../../types.js";
 import { DBManager } from "./db-manager.js";
 import { Miqro } from "../app.js";
 import { WebSocketManager } from "./websocketmanager.js";
 import { execSync } from "node:child_process";
 import { LogProvider } from "./log.js";
-import { initGlobals } from "../globals.js";
+import { HTMLEncode } from "../../../editor/common/html-encode.js";
+import { inflateMD2HTML } from "../../inflate/md.js";
+
+import { Parser } from "@miqro/parser";
+import { ClusterCache } from "./cluster-cache.js";
+import { LocalCache } from "./cache.js";
+import { middleware } from "./middleware.js";
+import { jwt } from "./jwt.js";
+
+// import { initGlobals } from "../globals.js";
 
 export interface ServerInterfaceImplOptions {
   cache: CacheInterface;
@@ -21,8 +29,30 @@ export interface ServerInterfaceImplOptions {
 }
 
 export function createServerInterface(options: ServerInterfaceImplOptions): ServerInterface {
-  initGlobals();
+  // initGlobals();
   return Object.freeze<ServerInterface>({
+    middleware,
+    encodeHTML: HTMLEncode,
+    inflateMDtoHTML: inflateMD2HTML,
+    newParser() {
+      return new Parser();
+    },
+    newClusterCache(name, logger) {
+      return new ClusterCache(name, logger);
+    },
+    newLocalCache(name, logger) {
+      return new LocalCache(name, logger);
+    },
+    getWorkerNumber(): number {
+      return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === undefined ? 0 : parseInt(process.env["CLUSTER_NODE_NUMBER"], 10);
+    },
+    getWorkerCount(): number {
+      return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === undefined || process.env["CLUSTER_COUNT"] === undefined ? 1 : parseInt(process.env["CLUSTER_COUNT"], 10);
+    },
+    isPrimaryWorker(): boolean {
+      return cluster.isPrimary || process.env["CLUSTER_NODE_NUMBER"] === "0";
+    },
+    jwt,
     cache: options.cache,
     localCache: options.localCache,
     logger: options.logger,
@@ -86,7 +116,7 @@ export function createServerInterface(options: ServerInterfaceImplOptions): Serv
     },
     getLogger(identifier, loggerOptions) {
       return options?.loggerProvider?.getLogger(identifier, loggerOptions);
-    },
-    ...server
+    }
+    // ...server
   });
 }

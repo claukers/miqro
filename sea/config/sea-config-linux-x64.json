@@ -19,7 +19,6 @@
     "sign-add.sh": "sea/sign-add.sh",
     "app.sh": "sea/app.sh",
     "jsx.dom.js": "build/jsx.dom.js",
-    "types.json": "sea/types.json",
     "editor-assets/editor.bundle.js": "build/editor.bundle.js",
     "editor-assets/style.css": "build/style.css",
     "editor-assets/font.ttf": "build/font.ttf"

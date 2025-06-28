@@ -3,7 +3,7 @@ import { Logger, Router } from "@miqro/core";
 import { RouteFileMap, setupHTTPRouter, StaticFileMap } from "./setup-http.js";
 //import { WSMapConfig } from "./utils/websocketmanager.js";
 //import { ServerConfigMap, setupServerConfig } from "./setup-server-config.js";
-import { assertGlobalTampered } from "../services/globals.js";
+// import { assertGlobalTampered } from "../services/globals.js";
 import { getServicePath } from "../common/paths.js";
 import { inflateWSConfig } from "./setup-ws.js";
 import { inflateAppForSea, inflateServiceForSea } from "./inflate-sea.js";
@@ -35,7 +35,7 @@ export async function inflateApp({ inflateParallel, serverInterface, logger, hot
   const logConfigMap: LogConfigMap = {};
   //const serverConfigMap: ServerConfigMap = {};
 
-  router.use(assertGlobalTampered);
+  // router.use(assertGlobalTampered);
 
   /*if (editor) {
     logger.info("setting up editor on %s", BASEEDITOR_PATH);
@@ -95,7 +95,7 @@ export async function inflateApp({ inflateParallel, serverInterface, logger, hot
     await inflateAppForSea(logger, inflateDir, services, port);
   }
 
-  router.use(assertGlobalTampered);
+  // router.use(assertGlobalTampered);
 
   return errors.length === 0 ? [router, null, routeFileMap/*, migrations*/, wsConfigList/*, serverConfigMap*/, logConfigMap] : [router, errors, routeFileMap/*, migrations*/, wsConfigList/*, serverConfigMap*/, logConfigMap];
 }

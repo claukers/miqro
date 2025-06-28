@@ -110,7 +110,7 @@ export default {
     sufix: ".test.tsx",
     displayName: "a test file",
     language: "typescript",
-    template: () => `import { } from "miqro";
+    template: () => `import JSX from "@miqro/jsx";
 import { strictEqual } from "node:assert";
 
 describe("test group", () => {
@@ -138,7 +138,8 @@ describe("test group", () => {
     sufix: ".html.tsx",
     displayName: ".html.tsx file",
     language: "typescript",
-    template: () => `import { ServerRequest, ServerResponse, APIOptions } from "miqro";
+    template: () => `import JSX from "@miqro/jsx";
+import { ServerRequest, ServerResponse, APIOptions } from "miqro";
 
 /*export const apiOptions: APIOptions = {
   path: ["/", "/index.html"],
@@ -284,10 +285,7 @@ export default {
     "lib": ["es2021", "dom"],
     "jsx": "react",
     "jsxFactory": "JSX.createElement",
-    "jsxFragmentFactory": "JSX.Fragment",
-    "typeRoots": [
-      "./.types"
-    ]
+    "jsxFragmentFactory": "JSX.Fragment"
   }
 }
 `},
@@ -311,13 +309,14 @@ export default {
     sufix: ".min.tsx",
     displayName: "min.tsx file",
     language: "typescript",
-    template: () => `import { } from "miqro";
+    template: () => `import JSX from "@miqro/jsx";
+import { define } from "@miqro/jsx-dom";
 
 export function MyComponent() {
   return <p>HelloWorld</p>
 }
 window.addEventListener("load", (event) => {
-  jsx.define("my-tag", MyComponent, {
+  define("my-tag", MyComponent, {
     shadowInit: false,
     observedAttributes: []
   });
@@ -328,19 +327,20 @@ window.addEventListener("load", (event) => {
     sufix: ".tsx",
     displayName: ".tsx file",
     language: "typescript",
-    template: () => `import { } from "miqro";
+    template: () => `import JSX from "@miqro/jsx";
+import { define } from "@miqro/jsx-dom";
 
 export function MyComponent() {
   return <p>HelloWorld</p>
 }
 window.addEventListener("load", (event) => {
-  jsx.define("my-tag", MyComponent, {
+  define("my-tag", MyComponent, {
     shadowInit: false,
     observedAttributes: []
   });
 });  
 `},
-  SSRTSX: {
+  /*SSRTSX: {
     prefix: "http",
     sufix: ".tsx",
     displayName: "an ssr component example using webcomponents",
@@ -423,7 +423,7 @@ export function SSRComponent(props, children) {
     );
 }
 `
-  },
+  },*/
   JS: {
     prefix: "http",
     sufix: ".js",

@@ -8,7 +8,7 @@ import { createNodeRuntime } from "@miqro/jsx-node";
 import { getHotReloadScript } from "../services/hot-reload.js";
 import { RuntimeURL } from "@miqro/jsx";
 import { cwd } from "node:process";
-import { assertGlobalTampered } from "../services/globals.js";
+// import { assertGlobalTampered } from "../services/globals.js";
 import { getHTTPRouterPath, getStaticFilesPath } from "../common/paths.js";
 import { setupCORS } from "./setup-cors.js";
 import { setupAUTH } from "./setup-auth.js";
@@ -128,7 +128,7 @@ async function createStaticRoute(service: string, logger: Logger, router: Router
 
 
 
-      router.use(assertGlobalTampered);
+      // router.use(assertGlobalTampered);
       router.get(path, async function (_req, res) {
         await new Promise<void>((resolve, reject) => {
           try {
@@ -191,7 +191,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
   const maxParallel = inflateParallel ? inflateParallel : 1;
   server.logger.debug("loading http directory with parallel [%s]", maxParallel);
   let tR = [];
-  router.use(assertGlobalTampered);
+  // router.use(assertGlobalTampered);
   const files = scanFiles(dir);
   for (const file of files) {
     tR.push(new Promise<void>(async (resolve) => {
@@ -252,7 +252,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                   }
 
 
-                  router.use(assertGlobalTampered);
+                  // router.use(assertGlobalTampered);
                   router.use(module.handler, r.path, r.method as any, r.options);
                 }
                 return resolve();
@@ -307,7 +307,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                     }
                   }
 
-                  router.use(assertGlobalTampered);
+                  // router.use(assertGlobalTampered);
                   router.use(async function (req: Request, res: Response) {
 
                     const JSON = await getJSON(req, res, newURL(req.path), module.apiOptions?.basePath, module.default);
@@ -376,7 +376,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                     }
                   }
 
-                  router.use(assertGlobalTampered);
+                  // router.use(assertGlobalTampered);
                   router.use(async function (req: Request, res: Response) {
                     const toRender = typeof module.default === "function" ? module.default(req, res) : module.default;
                     const HTML = await getHTML(hotreload, req, res, newURL(req.path), module.apiOptions?.basePath, await toRender);
@@ -438,7 +438,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                     }
                   }
 
-                  router.use(assertGlobalTampered);
+                  // router.use(assertGlobalTampered);
                   router.get(path, async function (req, res) {
                     return res.asyncEnd({
                       status: 200,
@@ -489,7 +489,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                   }
                 }
 
-                router.use(assertGlobalTampered);
+                // router.use(assertGlobalTampered);
                 router.get(path, async function (_req, res) {
                   res.asyncEnd({
                     status: 200,
@@ -551,7 +551,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                     }
                   }
 
-                  router.use(assertGlobalTampered);
+                  // router.use(assertGlobalTampered);
                   router.get(path, async function (_req, res) {
                     res.asyncEnd({
                       status: 200,
@@ -609,7 +609,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                     }
                   }
 
-                  router.use(assertGlobalTampered);
+                  // router.use(assertGlobalTampered);
                   router.get(path, async function (_req, res) {
                     res.asyncEnd({
                       status: 200,
@@ -647,7 +647,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
     await Promise.all(tR);
     tR = [];
   }
-  router.use(assertGlobalTampered);
+  // router.use(assertGlobalTampered);
   return {
     routeFileMap,
     router,

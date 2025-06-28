@@ -1,4 +1,4 @@
-import { APIRoute } from "@miqro/core";
+import { APIRoute, JSONParser } from "@miqro/core";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative, resolve, sep } from "node:path";
 import { BASE_PATH } from "../../../../../common/constants.server.js";
@@ -24,7 +24,7 @@ export default {
   method: "GET",
   path: "/scan",
   description: "admin editor file scan endpoint",
-  middleware: [server.middleware.json()],
+  middleware: [JSONParser()],
   request: {
     body: false
   },

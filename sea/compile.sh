@@ -11,8 +11,8 @@ ESBUILD_BIN="sh sea/esbuild.sh"
 TSC_BIN="sh sea/tsc.sh"
 
 #types.json
-sh sea/copy-types.sh
-$NODE_BIN sea/generate-global-types-asset-json.js
+# sh sea/copy-types.sh
+# $NODE_BIN sea/generate-global-types-asset-json.js
 
 #version.tag
 $NODE_BIN sea/version.tag.js
@@ -43,20 +43,20 @@ cp sea/editor-assets/style.css build/style.css
 cp node_modules/@miqro/jsx-dom/build/jsx-dom.esm.bundle.js build/jsx.dom.js
 
 # postject.js
-$ESBUILD_BIN node_modules/postject/dist/cli.js --log-level=silent --bundle --platform=node --outfile=build/postject.cjs
+$ESBUILD_BIN node_modules/postject/dist/cli.js --bundle --platform=node --outfile=build/postject.cjs
 $NODE_BIN sea/base64.js build/postject.cjs > build/postject.base64.cjs
 $NODE_BIN sea/base64.js sea/basic-compile.sh > sea/basic-compile.base64.sh
 POSTJECT_BIN="${NODE_BIN} build/postject.cjs"
 
 # editor.bundle.js
-$ESBUILD_BIN --log-level=silent --external:node:process --external:node:path --platform=neutral --bundle --loader:.js=jsx --jsx-factory=jsx.createElement --jsx-fragment=jsx.Fragment sea/editor-assets/editor.bundle.in.mjs --outfile=build/editor.bundle.js
+$ESBUILD_BIN --external:node:process --external:node:path --bundle --loader:.js=jsx --jsx-factory=jsx.createElement --jsx-fragment=jsx.Fragment sea/editor-assets/editor.bundle.in.mjs --outfile=build/editor.bundle.js
 
 # main.js
-$ESBUILD_BIN src/main.ts --log-level=silent --bundle --platform=node --outfile=build/main.js --external:sqlite3 --external:pg --external:esbuild
+$ESBUILD_BIN src/main.ts --bundle --platform=node --outfile=build/main.js --external:sqlite3 --external:pg --external:esbuild
 #cp build/main.js build/main.bundle.cjs
 
 #lib.js
-$ESBUILD_BIN src/lib.ts --log-level=silent --bundle --platform=node --outfile=build/lib.cjs --external:sqlite3 --external:pg --external:esbuild --external:node:assert --external:node:util --external:node:path
+$ESBUILD_BIN src/lib.ts --bundle --platform=node --outfile=build/lib.cjs --external:sqlite3 --external:pg --external:esbuild --external:node:assert --external:node:util --external:node:path
 
 # sea-config.blob
 

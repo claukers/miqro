@@ -1,3 +1,6 @@
+import * as jsx from "@miqro/jsx";
+import JSX from "@miqro/jsx";
+
 import { SUPPORTED_LANGUAGES } from "../common/constants.js";
 
 interface FileEditorToolbar {

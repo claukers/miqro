@@ -1,3 +1,6 @@
+import * as jsx from "@miqro/jsx";
+import JSX from "@miqro/jsx";
+
 import { LogSocket } from "../common/log-socket.js";
 
 function getUniqueIdentifiers(lines: {

@@ -3,12 +3,12 @@ import { strictEqual } from "assert";
 import { createElement } from "@miqro/jsx";
 import { Editor } from "../../build/esm/editor/components/editor.js";
 import { createNodeRuntime, HTMLEncode } from "@miqro/jsx-node";
-import { initGlobals } from "../../build/esm/src/lib.js";
+//import { initGlobals } from "../../build/esm/src/lib.js";
 import { randomUUID } from "crypto";
 
 describe("simple editor toolbar button hide tests", () => {
   before(async () => {
-    initGlobals();
+    //initGlobals();
   });
   after(async () => {
   });

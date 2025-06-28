@@ -1,3 +1,7 @@
+
+import * as jsx from "@miqro/jsx";
+import JSX from "@miqro/jsx";
+
 let queryTimeout2: any = null;
 
 export function useFilterQuery(): [string, (newFilter: string, inmediate?: boolean) => void] {

@@ -8,7 +8,7 @@ import { APIRouteSchema, SessionHandlerOptionsSchema } from "@miqro/core";
 import { cwd } from "node:process";
 
 import { esBuild } from "./esbuild.js";
-import { assertGlobalTampered, browserJSXGlobals } from "../services/globals.js";
+// import { assertGlobalTampered, browserJSXGlobals } from "../services/globals.js";
 import { APIOptions, ServerConfig, WSConfig, AuthConfig, DBConfig, LogConfig, MiddlewareConfig, ErrorConfig, DocConfig } from "../types.js";
 import { getJSXJSPath, JSX_TMP_DIR } from "./paths.js";
 import { CLEAR_JSX_CACHE } from "./constants.js";
@@ -50,16 +50,24 @@ export interface InflateOptions {
   embemedJSX: boolean;
   minify: boolean;
   useExport: boolean;
-  platform?: string | boolean;
+  platform?: string;
+  mainFields?: string;
   logger?: Logger | Console;
 }
 
 const DEFAULT_ESOPTION = {
   platform: "neutral",
+  mainFields: "module,main",
+  // platform: "node",
   bundle: true,
   jsxFactory: "JSX.createElement",
   jsxFragment: "JSX.Fragment"
 };
+
+function browserJSXGlobals(inFile: string, jsxPath: string | false = false, useExport = true): string {
+  const PRE = ``;
+  return `${jsxPath ? PRE : ""}\n${useExport ? `export * from "${inFile}";import * as lib from "${inFile}";export default lib.default;` : `import * as lib from "${inFile}"`}`;
+}
 
 export async function inflateJSX(inFile: string, options: InflateOptions): Promise<string> {
   const tmpBuildDir = resolve(JSX_TMP_DIR, String(process.pid), "build", Date.now() + "-" + randomUUID());
@@ -80,7 +88,8 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
         ...DEFAULT_ESOPTION,
         entryPoints: [inFileTmp],
         minify: options.minify,
-        platform: options.platform !== undefined ? options.platform : DEFAULT_ESOPTION.platform
+        platform: options.platform !== undefined ? options.platform : DEFAULT_ESOPTION.platform,
+        mainFields: options.mainFields !== undefined ? options.mainFields : DEFAULT_ESOPTION.mainFields
       });
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
@@ -100,7 +109,8 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
         ...DEFAULT_ESOPTION,
         entryPoints: [inFileTmp],
         minify: options.minify,
-        platform: options.platform !== undefined ? options.platform : DEFAULT_ESOPTION.platform
+        platform: options.platform !== undefined ? options.platform : DEFAULT_ESOPTION.platform,
+        mainFields: options.mainFields !== undefined ? options.mainFields : DEFAULT_ESOPTION.mainFields
       });
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
@@ -486,7 +496,7 @@ export async function importJSXFile(inFile: string, logger?: Logger | Console): 
     logger
   });
   const tmpBuildDir = resolve(JSX_TMP_DIR, String(process.pid), "import", Date.now() + "-" + randomUUID());
-  //const inFileTmp = resolve(tmpBuildDir, basename(inFile) + ".mjs");
+  // const inFileTmp = resolve(tmpBuildDir, basename(inFile) + ".mjs");
   const inFileTmp = resolve(tmpBuildDir, basename(inFile) + ".cjs");
   //const logger = getLogger(`${SERVER_IDENTIFIER}_JSX`);
   await mkdirASync(tmpBuildDir, {
@@ -494,11 +504,12 @@ export async function importJSXFile(inFile: string, logger?: Logger | Console): 
   });
   try {
     await writeFileASync(inFileTmp, inflatedCode);
-    assertGlobalTampered();
+    // assertGlobalTampered();
     logger?.trace("importing [%s] from [%s]. to change the import folder set JSX_TMP", relative(cwd(), inFile), dirname(relative(JSX_TMP_DIR, inFileTmp)));
     logger?.debug("importing [%s]", relative(cwd(), inFile));
     const module = await import(resolve(inFileTmp));
-    assertGlobalTampered();
+    // console.dir(module);
+    // assertGlobalTampered();
     if (CLEAR_JSX_CACHE) {
       logger?.trace("clearing cache at [%s]. to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
       await unlinkASync(inFileTmp);

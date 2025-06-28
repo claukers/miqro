@@ -1,3 +1,6 @@
+import * as jsx from "@miqro/jsx";
+import JSX from "@miqro/jsx";
+
 import { APIRoute, Response } from "@miqro/core";
 import { scanDir } from "./api/fs/scan.api.js";
 import { HTMLEncode } from "../../../common/html-encode.js";
