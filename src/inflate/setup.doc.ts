@@ -5,10 +5,10 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { cwd } from "node:process";
 import { getDocOutput } from "../bin/generate-doc.js";
-import { RouteFileMap } from "./setup-http.js";
+import { RouteFileMap, StaticFileMap } from "./setup-http.js";
 import { CONTENT_TYPE_MAP } from "../common/content-type.js";
 
-export async function setupDoc(logger: Logger, servicePath: string, service: string, mainRouter: Router, fileMap: RouteFileMap, inflateDir: string | undefined | false, errors: InflateError[]) {
+export async function setupDoc(logger: Logger, servicePath: string, service: string, mainRouter: Router, fileMap: RouteFileMap, staticFileMap: StaticFileMap, inflateDir: string | undefined | false, errors: InflateError[]) {
   const docPath = getDocConfigPath(servicePath); //resolve(process.cwd(), service, "auth.ts");
 
   if (docPath) {
@@ -20,11 +20,13 @@ export async function setupDoc(logger: Logger, servicePath: string, service: str
         for (const path of paths) {
           const config = docModule.publish[path];
 
+          const contentType = config.type === "MD" ? CONTENT_TYPE_MAP[".md"] :
+            config.type === "JSON" ? CONTENT_TYPE_MAP[".json"] : CONTENT_TYPE_MAP[".html"];
+
           const body = await getDocOutput(mainRouter, fileMap, config.all, config.type);
           mainRouter.get(path, async (_, res) => {
             switch (config.type) {
               case "MD": {
-                const contentType = CONTENT_TYPE_MAP[".md"];
                 return await res.asyncEnd({
                   headers: {
                     "content-type": contentType
@@ -51,6 +53,28 @@ export async function setupDoc(logger: Logger, servicePath: string, service: str
             });
             logger.log("writing [%s]", relative(cwd(), inflatePath));
             writeFileSync(inflatePath, body);
+
+            fileMap[docPath + path] = {
+              routes: [{
+                method: "GET",
+                path
+              }],
+              service,
+              filePath: docPath,
+              previewMethod: "html"
+            };
+
+            if (staticFileMap) {
+              staticFileMap[docPath + path] = {
+                contentType,
+                filePath: docPath,
+                previewMethod: "html",
+                method: "GET",
+                path,
+                body: Buffer.from(body),
+                inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
+              }
+            }
           }
         }
       }
