@@ -44,10 +44,11 @@ cp sea/editor-assets/style.css build/style.css
 $NODE_BIN sea/assets.js
 
 # postject.js
-$ESBUILD_BIN node_modules/postject/dist/cli.js --bundle --platform=node --outfile=build/postject.cjs
-$NODE_BIN sea/base64.js build/postject.cjs > build/postject.base64.cjs
+#$ESBUILD_BIN node_modules/postject/dist/cli.js --bundle --platform=node --outfile=build/postject.cjs
+#$NODE_BIN sea/base64.js build/postject.cjs > build/postject.base64.cjs
 $NODE_BIN sea/base64.js sea/basic-compile.sh > sea/basic-compile.base64.sh
-POSTJECT_BIN="${NODE_BIN} build/postject.cjs"
+#POSTJECT_BIN="${NODE_BIN} build/postject.cjs"
+POSTJECT_BIN=node_modules/postject/dist/cli.js
 
 # editor.bundle.js
 $ESBUILD_BIN --external:node:process --external:node:path --bundle --loader:.js=jsx --jsx-factory=jsx.createElement --jsx-fragment=jsx.Fragment sea/editor-assets/editor.bundle.in.mjs --outfile=build/editor.bundle.js

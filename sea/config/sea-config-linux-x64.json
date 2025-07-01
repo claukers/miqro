@@ -10,7 +10,6 @@
     "node.version.tag": "sea/node.version.tag",
     "esbuild.version.tag": "sea/esbuild.version.tag",
     "esbuild-binary": "sea/deps/esbuild/linux/x64/esbuild",
-    "postject.base64.cjs": "build/postject.base64.cjs",
     "sea.basic.config.json": "sea/basic-config.json",
     "node.sh": "sea/node.sh",
     "install-nodejs.sh": "sea/install-nodejs.sh",

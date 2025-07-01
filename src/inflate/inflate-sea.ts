@@ -28,7 +28,7 @@ export async function inflateSeaAssets(logger: Logger, inflateDir: string) {
     writeFile(logger, resolve(inflateDir, "sea", "esbuild"), esbuildBinaryBuffer);
     chmodSync(resolve(inflateDir, "sea", "esbuild"), constants.S_IXUSR | constants.S_IRUSR | constants.S_IWUSR);
   }
-  writeFile(logger, resolve(inflateDir, "sea", "postject.cjs"), Buffer.from(Buffer.from(getAsset("postject.base64.cjs")).toString(), "base64"));
+  // writeFile(logger, resolve(inflateDir, "sea", "postject.cjs"), Buffer.from(Buffer.from(getAsset("postject.base64.cjs")).toString(), "base64"));
   writeFile(logger, resolve(inflateDir, "sea", "config.json"), Buffer.from(getAsset("sea.basic.config.json")));
   writeFile(logger, resolve(inflateDir, "sea", "run.sh"), Buffer.from(getAsset("app.sh")));
   writeFile(logger, resolve(inflateDir, "sea", "node.sh"), Buffer.from(getAsset("node.sh")));

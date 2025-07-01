@@ -6,7 +6,7 @@ import { dirname, join, resolve } from "node:path";
 import { calculateChecksum, calculateChecksumFromBuffer } from "./checksum.js";
 import { arch, cwd, platform } from "node:process";
 import { fileURLToPath } from 'node:url';
-import { initESBuild } from "./esbuild.js";
+import { esBuild, initESBuild } from "./esbuild.js";
 import { mkdirASync, unlinkASync, writeFileASync } from "./fs.js";
 // import { initJSXJS } from "./jsx.js";
 //const require = createRequire(import.meta.url);
@@ -18,7 +18,7 @@ const ASSETS_ROUTER = {
   "version.tag": "sea/version.tag",
   "node.version.tag": "sea/node.version.tag",
   "esbuild.version.tag": "sea/esbuild.version.tag",
-  "postject.base64.cjs": "build/postject.base64.cjs",
+  // "postject.base64.cjs": "build/postject.base64.cjs",
   "sea.basic.config.json": "sea/basic-config.json",
   "node.sh": "sea/node.sh",
   "install-nodejs.sh": "sea/install-nodejs.sh",

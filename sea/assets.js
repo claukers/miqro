@@ -37,6 +37,8 @@ dirToBase64JSON("node_modules/@miqro/test", out);
 dirToBase64JSON("node_modules/@miqro/test-http", out);
 dirToBase64JSON("node_modules/@types", out);
 
+dirToBase64JSON("node_modules/postject", out);
+dirToBase64JSON("node_modules/commander", out);
 dirToBase64JSON("node_modules/jose", out);
 dirToBase64JSON("node_modules/showdown", out);
 dirToBase64JSON("build/esm", out, "node_modules/miqro");

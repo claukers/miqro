@@ -8,7 +8,7 @@ sh ./install-nodejs.sh
 NODE_BIN="sh sea/node.sh"
 SIGN_REMOVE_BIN="sh sea/sign-remove.sh"
 SIGN_ADD_BIN="sh sea/sign-add.sh"
-POSTJECT_BIN="${NODE_BIN} sea/postject.cjs"
+POSTJECT_BIN="${NODE_BIN} ../node_modules/postject/dist/cli.js"
 ESBUILD_BIN="sea/esbuild"
 
 #$ESBUILD_BIN sea/app.cjs --bundle --platform=node --external:sqlite3 --external:pg --external:esbuild --outfile=sea/app.bundle.cjs
