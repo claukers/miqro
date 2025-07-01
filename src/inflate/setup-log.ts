@@ -26,7 +26,7 @@ export async function setupLogConfig(logger: Logger, servicePath: string, servic
         });
         logger.log("writing [%s]", relative(cwd(), inflatePath));
         writeFileSync(inflatePath, await inflateJSX(logPath, {
-          embemedJSX: false,
+          // embemedJSX: false,
           minify: false,
           useExport: true,
           platform: "node",

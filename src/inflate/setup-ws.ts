@@ -29,7 +29,7 @@ export async function inflateWSConfig(logger: Logger, servicePath: string, servi
         });
         logger.log("writing [%s]", relative(cwd(), inflatePath));
         writeFileSync(inflatePath, await inflateJSX(wsPath, {
-          embemedJSX: false,
+          // embemedJSX: false,
           minify: false,
           platform: "node",
           useExport: true,

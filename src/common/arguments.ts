@@ -68,6 +68,7 @@ export interface Arguments {
   // installTypes: boolean;
   installMiqroJSON: boolean;
   installTSConfig: boolean;
+  install: boolean;
   test: boolean;
   port: string;
   inflate: boolean;
@@ -111,6 +112,7 @@ export function parseArguments(): Arguments {
     // installTypes: boolean | null;
     installMiqroJSON: boolean | null;
     installTSConfig: boolean | null;
+    install: boolean | null;
     inflate: boolean | null;
     port: string | null;
     generateDoc: boolean | null;
@@ -140,6 +142,7 @@ export function parseArguments(): Arguments {
     watch: null,
     miqroJSONPath: null,
     installMiqroJSON: null,
+    install: null,
     disableMiqroJSON: null,
     // installTypes: null,
     port: null,
@@ -212,6 +215,14 @@ export function parseArguments(): Arguments {
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
         flags.installTSConfig = true;
+        continue;
+      case "--install":
+        if (flags.inflate !== null || flags.installTSConfig !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.install = true;
         continue;
       case "--watch":
         if (flags.watch !== null) {
@@ -650,13 +661,18 @@ export function parseArguments(): Arguments {
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
+  if (flags.install && flags.inflate) {
+    console.error("bad arguments. cannot use --install with --inflate");
+    process.exit(EXIT_CODES.BAD_ARGUMENTS);
+  }
+
   if (flags.inflate && flags.editor) {
     console.error("bad arguments. cannot use --inflate with --editor");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.inflate && (/*flags.installTypes || */flags.installTSConfig || flags.installMiqroJSON)) {
-    console.error("bad arguments. cannot use --inflate with --install-types, --install-tsconfig or --install-miqrojson");
+  if (flags.inflate && (/*flags.installTypes || */flags.installTSConfig || flags.installMiqroJSON || flags.install)) {
+    console.error("bad arguments. cannot use --inflate with --install, --install-tsconfig or --install-miqrojson");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
@@ -725,6 +741,7 @@ export function parseArguments(): Arguments {
     // installTypes: flags.installTypes ? true : false,
     installMiqroJSON: flags.installMiqroJSON ? true : false,
     installTSConfig: flags.installTSConfig ? true : false,
+    install: flags.install,
     inflate: flags.inflate,
     port: flags.port ? flags.port : getPORT(),
     migrateUp: flags.migrateUp ? true : false,

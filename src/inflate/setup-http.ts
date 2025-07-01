@@ -222,7 +222,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                 };
 
                 const inflatedCode = inflateDir ? await inflateJSX(file.filePath, {
-                  embemedJSX: false,
+                  // embemedJSX: false,
                   minify: false,
                   useExport: true,
                   platform: "node",
@@ -398,9 +398,9 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                 // allow fall-through when extension is .js and .ts because is a static route without embemedJSX
                 if (file.ext !== ".js" && file.ext !== ".ts") {
                   const code = await inflateJSX(file.filePath, {
-                    embemedJSX: true,
+                    // embemedJSX: true,
                     minify: file.subExt === ".min" ? true : false,
-                    useExport: false,
+                    useExport: true,
                     logger
                   });
                   const contentType = CONTENT_TYPE_MAP[".js"];
@@ -513,9 +513,9 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                 case ".bundle":
                 case ".min": {
                   const code = await inflateJSX(file.filePath, {
-                    embemedJSX: false,
+                    // embemedJSX: false,
                     minify: file.subExt === ".min" ? true : false,
-                    useExport: false,
+                    useExport: true,
                     logger
                   });
                   const contentType = CONTENT_TYPE_MAP[".js"];

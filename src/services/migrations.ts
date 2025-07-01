@@ -25,7 +25,7 @@ export async function runMigrations(logger: Logger | undefined, db: Database | n
         });
         logger?.log("writing [%s]", relative(cwd(), inflatePath));
         writeFileSync(inflatePath, await inflateJSX(resolve(migrationsFolderPath, migration), {
-          embemedJSX: false,
+          // embemedJSX: false,
           minify: false,
           useExport: true,
           platform: "node",
@@ -55,7 +55,7 @@ export async function runMigrationsDown(logger: Logger | Console | undefined, db
         });
         logger?.log("writing [%s]", relative(cwd(), inflatePath));
         writeFileSync(inflatePath, await inflateJSX(resolve(migrationsFolderPath, migration), {
-          embemedJSX: false,
+          // embemedJSX: false,
           platform: "node",
           minify: false,
           useExport: true,

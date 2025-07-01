@@ -10,7 +10,7 @@ import { cwd } from "node:process";
 import { esBuild } from "./esbuild.js";
 // import { assertGlobalTampered, browserJSXGlobals } from "../services/globals.js";
 import { APIOptions, ServerConfig, WSConfig, AuthConfig, DBConfig, LogConfig, MiddlewareConfig, ErrorConfig, DocConfig } from "../types.js";
-import { getJSXJSPath, JSX_TMP_DIR } from "./paths.js";
+import { JSX_TMP_DIR } from "./paths.js";
 import { CLEAR_JSX_CACHE } from "./constants.js";
 import { getAsset, initAsset, validateAsset } from "./assets.js";
 import { calculateChecksumFromBuffer } from "./checksum.js";
@@ -21,7 +21,7 @@ import { mkdirASync, rmdirASync, unlinkASync, writeFileASync } from "./fs.js";
 let jsxJSBuffer: null | Buffer = null; // Buffer.from(getAsset("jsx.dom.js"));
 let jsxJSBufferChecksumPromise: null | Promise<string> = null; // calculateChecksumFromBuffer(jsxJSBuffer);
 
-export async function initJSXJS(logger: Logger) {
+/*export async function initJSXJS(logger: Logger) {
   jsxJSBuffer = jsxJSBuffer ? jsxJSBuffer : Buffer.from(getAsset("jsx.dom.js"));
   jsxJSBufferChecksumPromise = jsxJSBufferChecksumPromise ? jsxJSBufferChecksumPromise : calculateChecksumFromBuffer(jsxJSBuffer);
   return initAsset(logger, getJSXJSPath(), jsxJSBuffer, true, jsxJSBufferChecksumPromise, false);
@@ -33,7 +33,7 @@ export async function validateJSXJS(logger: Logger) {
     throw new Error("error calculating checksum");
   }
   return validateAsset(logger, getJSXJSPath(), checksum);
-}
+}*/
 
 export interface Dict<T> {
   [key: string]: T | Dict<T>;
@@ -47,11 +47,12 @@ export interface InflateError {
 }
 
 export interface InflateOptions {
-  embemedJSX: boolean;
+  // embemedJSX: boolean;
   minify: boolean;
   useExport: boolean;
   platform?: string;
   mainFields?: string;
+  external?: string[];
   logger?: Logger | Console;
 }
 
@@ -64,45 +65,47 @@ const DEFAULT_ESOPTION = {
   jsxFragment: "JSX.Fragment"
 };
 
-function browserJSXGlobals(inFile: string, jsxPath: string | false = false, useExport = true): string {
-  const PRE = ``;
-  return `${jsxPath ? PRE : ""}\n${useExport ? `export * from "${inFile}";import * as lib from "${inFile}";export default lib.default;` : `import * as lib from "${inFile}"`}`;
+function JSXTemplate(inFile: string/*, jsxPath: string | false = false*/, useExport = true): string {
+  // const PRE = ``;
+  // return `${jsxPath ? PRE : ""}\n${useExport ? `export * from "${inFile}";import * as lib from "${inFile}";export default lib.default;` : `import * as lib from "${inFile}"`}`;
+  return `${useExport ? `export * from "${inFile}";import * as lib from "${inFile}";export default lib.default;` : `import * as lib from "${inFile}"`}`;
 }
 
 export async function inflateJSX(inFile: string, options: InflateOptions): Promise<string> {
   const tmpBuildDir = resolve(JSX_TMP_DIR, String(process.pid), "build", Date.now() + "-" + randomUUID());
   const inFileTmp = resolve(tmpBuildDir, basename(inFile) + ".mjs");
-  const jsxJSPath = getJSXJSPath();//resolve(tmpBuildDir, "jsx.js");
+  //const jsxJSPath = getJSXJSPath();//resolve(tmpBuildDir, "jsx.js");
   const logger = options.logger; //getLogger(`${SERVER_IDENTIFIER}_JSX`);
 
   try {
 
-    if (!options.embemedJSX) {
-      await mkdirASync(tmpBuildDir, {
-        recursive: true
-      });
-      await writeFileASync(inFileTmp, browserJSXGlobals(inFile, false, options.useExport));
-      //await writeFileASync(inFileTmp, browserJSXGlobals(relative(tmpBuildDir, inFile), false));
-      logger?.trace("inflating [%s] from [%s]. to change the import folder set JSX_TMP", relative(cwd(), inFile), dirname(relative(JSX_TMP_DIR, inFileTmp)));
-      const { outputFiles: [{ contents }] } = await esBuild({
-        ...DEFAULT_ESOPTION,
-        entryPoints: [inFileTmp],
-        minify: options.minify,
-        platform: options.platform !== undefined ? options.platform : DEFAULT_ESOPTION.platform,
-        mainFields: options.mainFields !== undefined ? options.mainFields : DEFAULT_ESOPTION.mainFields
-      });
-      if (CLEAR_JSX_CACHE) {
-        logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
-        await unlinkASync(inFileTmp);
-        await rmdirASync(tmpBuildDir);
-      }
-      return contents;
-    } else {
+    // if (!options.embemedJSX) {
+    await mkdirASync(tmpBuildDir, {
+      recursive: true
+    });
+    await writeFileASync(inFileTmp, JSXTemplate(inFile/*, false*/, options.useExport));
+    //await writeFileASync(inFileTmp, browserJSXGlobals(relative(tmpBuildDir, inFile), false));
+    logger?.trace("inflating [%s] from [%s]. to change the import folder set JSX_TMP", relative(cwd(), inFile), dirname(relative(JSX_TMP_DIR, inFileTmp)));
+    const { outputFiles: [{ contents }] } = await esBuild({
+      ...DEFAULT_ESOPTION,
+      entryPoints: [inFileTmp],
+      minify: options.minify,
+      platform: options.platform !== undefined ? options.platform : DEFAULT_ESOPTION.platform,
+      mainFields: options.mainFields !== undefined ? options.mainFields : DEFAULT_ESOPTION.mainFields,
+      external: options.external ? options.external : undefined,
+    });
+    if (CLEAR_JSX_CACHE) {
+      logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
+      await unlinkASync(inFileTmp);
+      await rmdirASync(tmpBuildDir);
+    }
+    return contents;
+    /*} else {
       await mkdirASync(tmpBuildDir, {
         recursive: true
       });
       //await writeFileASync(jsxJSPath, Buffer.from(getAsset("jsx-dom-bundle")));
-      await writeFileASync(inFileTmp, browserJSXGlobals(inFile, jsxJSPath));
+      await writeFileASync(inFileTmp, browserJSXGlobals(inFile, false));
       //await writeFileASync(inFileTmp, browserJSXGlobals(relative(tmpBuildDir, inFile), relative(tmpBuildDir, jsxJSPath)));
       logger?.trace("inflating [%s] from [%s] with jsx.js embedded. to change the import folder set JSX_TMP", relative(cwd(), inFile), dirname(relative(JSX_TMP_DIR, inFileTmp)));
       const { outputFiles: [{ contents }] } = await esBuild({
@@ -110,7 +113,8 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
         entryPoints: [inFileTmp],
         minify: options.minify,
         platform: options.platform !== undefined ? options.platform : DEFAULT_ESOPTION.platform,
-        mainFields: options.mainFields !== undefined ? options.mainFields : DEFAULT_ESOPTION.mainFields
+        mainFields: options.mainFields !== undefined ? options.mainFields : DEFAULT_ESOPTION.mainFields,
+        external: options.external ? options.external : undefined
       });
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
@@ -119,11 +123,11 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
         await rmdirASync(tmpBuildDir);
       }
       return contents;
-    }
+    }*/
   } catch (e) {
     logger?.error("error with: " + inFile);
     logger?.error(e);
-    if (options.embemedJSX) {
+    /*if (options.embemedJSX) {
       if (CLEAR_JSX_CACHE) {
         logger?.trace("clearing cache at [%s] to change this behaivor set CLEAR_JSX_CACHE to 0", tmpBuildDir);
         await unlinkASync(inFileTmp);
@@ -134,7 +138,7 @@ export async function inflateJSX(inFile: string, options: InflateOptions): Promi
         logger?.error("error with: %s", inFileTmp);
         logger?.trace("NOT clearing cache. to change this behaivor set CLEAR_JSX_CACHE to 1", tmpBuildDir);
       }
-    }
+    }*/
     throw e;
   }
 }
@@ -489,7 +493,7 @@ export async function importServerConfigModule(inFile: string, logger?: Logger) 
 
 export async function importJSXFile(inFile: string, logger?: Logger | Console): Promise<any> {
   const inflatedCode = await inflateJSX(inFile, {
-    embemedJSX: false,
+    // embemedJSX: false,
     minify: false,
     useExport: true,
     platform: "node",

@@ -101,7 +101,7 @@ export function getESBuildBinaryPath() {
   }
 }
 
-export function getJSXJSPath() {
+/*export function getJSXJSPath() {
   return resolve(JSX_TMP_DIR, String(process.pid), "jsx.js");
-}
+}*/
 

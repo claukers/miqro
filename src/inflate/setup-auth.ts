@@ -21,7 +21,7 @@ export async function setupAUTH(logger: Logger, servicePath: string, service: st
         });
         logger.log("writing [%s]", relative(cwd(), inflatePath));
         writeFileSync(inflatePath, await inflateJSX(authPath, {
-          embemedJSX: false,
+          // embemedJSX: false,
           minify: false,
           useExport: true,
           platform: "node",

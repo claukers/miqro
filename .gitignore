@@ -31,3 +31,4 @@ app/
 API.md
 API.json
 *.sqlite3
+sea/assets.base64.json

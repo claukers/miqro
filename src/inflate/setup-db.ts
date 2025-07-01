@@ -36,7 +36,7 @@ export async function inflateDBConfig(logger: Logger, service: string, dbConfigL
           });
           logger.log("writing [%s]", relative(cwd(), inflatePath));
           writeFileSync(inflatePath, await inflateJSX(dbConfigPath, {
-            embemedJSX: false,
+            // embemedJSX: false,
             minify: false,
             useExport: true,
             platform: "node",
@@ -91,7 +91,7 @@ export async function inflateDBMigrations(logger: Logger, service: string, dbNam
           });
           logger?.log("writing [%s]", relative(cwd(), inflatePath));
           writeFileSync(inflatePath, await inflateJSX(resolve(migrationsFolderPath, migrationName), {
-            embemedJSX: false,
+            // embemedJSX: false,
             minify: false,
             useExport: true,
             platform: "node",

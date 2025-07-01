@@ -21,7 +21,7 @@ export async function setupCORS(logger: Logger, servicePath: string, service: st
         });
         logger.log("writing [%s]", relative(cwd(), inflatePath));
         writeFileSync(inflatePath, await inflateJSX(corsPath, {
-          embemedJSX: false,
+          // embemedJSX: false,
           minify: false,
           useExport: true,
           platform: "node",

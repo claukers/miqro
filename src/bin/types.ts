@@ -4,6 +4,7 @@ import { Arguments } from "../common/arguments.js";
 import { existsSync, writeFileSync } from "node:fs";
 import { TEMPLATES } from "../../editor/common/templates.js";
 import { EXIT_CODES } from "../common/constants.js";
+import { installAsset } from "../common/assets.js";
 
 export async function installTypings(args: Arguments, logger: MinimalLogger) {
   /*if (args.installTypes) {
@@ -11,6 +12,10 @@ export async function installTypings(args: Arguments, logger: MinimalLogger) {
     // install typing for typescript only if argument --install-types is set
     await initTypes(logger);
   }*/
+  if (args.install) {
+    logger.debug("writing node_modules");
+    await installAsset(logger, ["node_modules/"]);
+  }
   if (args.installTSConfig && !existsSync("tsconfig.json")) {
     logger.info("writing tsconfig.json");
     writeFileSync("tsconfig.json", TEMPLATES["TSCONFIGJSON"].template("", ""));

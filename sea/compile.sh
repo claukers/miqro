@@ -40,7 +40,8 @@ cp sea/editor-assets/font.ttf build/font.ttf
 cp sea/editor-assets/style.css build/style.css
 
 # jsx.js
-cp node_modules/@miqro/jsx-dom/build/jsx-dom.esm.bundle.js build/jsx.dom.js
+# cp node_modules/@miqro/jsx-dom/build/jsx-dom.esm.bundle.js build/jsx.dom.js
+$NODE_BIN sea/assets.js
 
 # postject.js
 $ESBUILD_BIN node_modules/postject/dist/cli.js --bundle --platform=node --outfile=build/postject.cjs

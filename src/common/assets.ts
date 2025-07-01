@@ -1,13 +1,14 @@
 //import { createRequire } from 'node:module';
 import { Logger, MinimalLogger } from "@miqro/core";
-import { chmodSync, constants, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, constants, existsSync, lstatSync, mkdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { getAsset as seaGetAsset, isSea } from "node:sea";
-import { dirname, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { calculateChecksum, calculateChecksumFromBuffer } from "./checksum.js";
 import { arch, cwd, platform } from "node:process";
 import { fileURLToPath } from 'node:url';
 import { initESBuild } from "./esbuild.js";
-import { initJSXJS } from "./jsx.js";
+import { mkdirASync, unlinkASync, writeFileASync } from "./fs.js";
+// import { initJSXJS } from "./jsx.js";
 //const require = createRequire(import.meta.url);
 
 export const __package_dirname = import.meta.url ? resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..") : null;
@@ -25,8 +26,9 @@ const ASSETS_ROUTER = {
   "sign-remove.sh": "sea/sign-remove.sh",
   "sign-add.sh": "sea/sign-add.sh",
   "app.sh": "sea/app.sh",
-  "jsx.dom.js": "build/jsx.dom.js",
+  // "jsx.dom.js": "build/jsx.dom.js",
   // "types.json": "sea/types.json",
+  "assets.base64.json": "sea/assets.base64.json",
   "editor-assets/editor.bundle.js": "build/editor.bundle.js",
   "editor-assets/style.css": "build/style.css",
   "editor-assets/font.ttf": "build/font.ttf"
@@ -72,7 +74,8 @@ export async function initAssets(logger: Logger) {
     logger.debug("esbuild version [%s]", ESBUILD_VERSION);
   }
   logger.debug("platform [%s-%s]", platform, arch);
-  await Promise.all([initJSXJS(logger), initESBuild(logger)]);
+  // await Promise.all([initJSXJS(logger), initESBuild(logger)]);
+  await Promise.all([initESBuild(logger)]);
 }
 
 /*export async function initTypes(logger: MinimalLogger) {
@@ -81,6 +84,18 @@ export async function initAssets(logger: Logger) {
     initAsset(logger, resolve(cwd(), "." + typeFile), Buffer.from(typesJSON[typeFile], "base64"))
   ));
 }*/
+
+export async function installAsset(logger: MinimalLogger, include: string[]) {
+  const assetsJSON = JSON.parse(Buffer.from(getAsset("assets.base64.json")).toString("utf-8"));
+  await Promise.all(assetsJSON.map(asset => {
+    for (const i of include) {
+      if (asset.path.indexOf(i) === 0) {
+        return initAsset(logger, join(cwd(), asset.path), Buffer.from(asset.content, "base64"))
+      }
+    }
+    return Promise.resolve();
+  }));
+}
 
 export async function validateAsset(logger: MinimalLogger | undefined, path: string, internalChecksum: string): Promise<boolean> {
   mkdirSync(dirname(path), {
@@ -108,8 +123,13 @@ export async function initAsset(logger: MinimalLogger, path: string, buffer: Buf
   if (existsSync(path)) {
     if (!valid) {
       logger.info("updating [%s]", path);
-      unlinkSync(path);
-      writeFileSync(path, buffer);
+      await unlinkASync(path);
+      if (!statSync(dirname(path)).isDirectory()) {
+        await mkdirASync(dirname(path), {
+          recursive: true
+        });
+      }
+      await writeFileASync(path, buffer);
       if (executable) {
         chmodSync(path, constants.S_IXUSR | constants.S_IRUSR | constants.S_IWUSR);
       }
@@ -120,7 +140,7 @@ export async function initAsset(logger: MinimalLogger, path: string, buffer: Buf
     } else {
       logger.info("installing [%s]", path);
     }
-    writeFileSync(path, buffer);
+    await writeFileASync(path, buffer);
     if (executable) {
       chmodSync(path, constants.S_IXUSR | constants.S_IRUSR | constants.S_IWUSR);
     }

@@ -1,6 +1,6 @@
 import { existsSync, rmdirSync, unlinkSync } from "node:fs";
 //import { notifiyServerStop, notifiyServerUnLoad } from "../services/server.js";
-import { getESBuildBinaryPath, getJSXJSPath, JSX_TMP_DIR } from "./paths.js";
+import { getESBuildBinaryPath/*, getJSXJSPath*/, JSX_TMP_DIR } from "./paths.js";
 import { CLEAR_JSX_CACHE } from "./constants.js";
 import { resolve } from "node:path";
 import { EXIT_CODES } from "./constants.js";
@@ -12,10 +12,10 @@ function cleanJSX(app: Miqro) {
     unlinkSync(getESBuildBinaryPath());
   }
   if (CLEAR_JSX_CACHE) {
-    app.logger?.trace("trying to clean up jsx.js installation at [%s]", getJSXJSPath());
+    /*app.logger?.trace("trying to clean up jsx.js installation at [%s]", getJSXJSPath());
     if (existsSync(getJSXJSPath())) {
       unlinkSync(getJSXJSPath());
-    }
+    }*/
     const buildParendDir = resolve(JSX_TMP_DIR, String(process.pid));
     app.logger?.trace("trying to clean up jsx build/import folders at [%s]", buildParendDir);
     const buildDir = resolve(buildParendDir, "build");

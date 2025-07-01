@@ -76,7 +76,7 @@ export async function inflateApp({ inflateParallel, serverInterface, logger, hot
       ...serviceRouteFileMap
     };
 
-    await setupDoc(logger, servicePath, service, router, routeFileMap, inflateDir, errors);
+    await setupDoc(logger, servicePath, service, router, routeFileMap, serviceStaticFileMap, inflateDir, errors);
 
     await inflateWSConfig(logger, servicePath, service, wsConfigList, inflateSea ? inflateDir : undefined, errors);
 

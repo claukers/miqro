@@ -29,7 +29,7 @@ export async function setupServerConfig(logger: Logger, servicePath: string, ser
         });
         logger.log("writing [%s]", relative(cwd(), inflatePath));
         writeFileSync(inflatePath, await inflateJSX(serverPath, {
-          embemedJSX: false,
+          // embemedJSX: false,
           minify: false,
           platform: "node",
           useExport: true,
