@@ -92,7 +92,14 @@ async function main() {
 
   ${!WSLIST ? "" : `\n  webSocketManager.replaceALLWS(await Promise.all([${WSLIST}]))`}
   const app = new App({
-    onUpgrade: webSocketManager.onUpgrade
+    onUpgrade: (req, socket, head) => {
+      try {
+        req.server = serverInterface;
+        return webSocketManager.onUpgrade(req, socket, head);
+      } catch(e) {
+       console.error(e);
+      }
+    }
   });
   ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].filter(config=>config.preload).map(config=>config.preload(serverInterface)));\n` : ""}
   app.use(ServerRequestHandler(serverInterface));

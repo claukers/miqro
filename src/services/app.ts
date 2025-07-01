@@ -439,8 +439,12 @@ export class Miqro {
     await this.dbManager.connectAll();
     this.server = new App({
       onUpgrade: (req: ServerRequest, socket, head) => {
-        req.server = this.serverInterface;
-        return this.webSocketManager.onUpgrade(req, socket, head);
+        try {
+          req.server = this.serverInterface;
+          return this.webSocketManager.onUpgrade(req, socket, head);
+        } catch (e) {
+          this.logger?.error(e);
+        }
       },
       loggerFactory: this.loggerProvider.requestLoggerFactory,
       serverOptions: this.options?.serverOptions,
