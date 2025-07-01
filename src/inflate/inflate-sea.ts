@@ -82,7 +82,7 @@ async function main() {
     cache,
     localCache,
     loggerProvider,
-    wsManager: webSocketManager,
+    webSocketManager,
     logger: loggerProvider.getLogger("server"),
     dbManager,
     port: PORT
