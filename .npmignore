@@ -39,8 +39,8 @@ sea/copy-types.sh
 sea/copy-types.sh
 sea/release-tar.sh
 sea/tsc.sh
-editor/
-src/
+#editor/
+#src/
 bin/miqro
 sea/assets.base64.json
 sea/jsx-assets.js
