@@ -90,6 +90,8 @@ async function main() {
 
   await Promise.all([${DBCONFIGLIST}]);
 
+  ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].filter(config=>config.preload).map(config=>config.preload(serverInterface)));\n` : ""}
+
   ${!WSLIST ? "" : `\n  webSocketManager.replaceALLWS(await Promise.all([${WSLIST}]))`}
   const app = new App({
     onUpgrade: (req, socket, head) => {
@@ -101,7 +103,7 @@ async function main() {
       }
     }
   });
-  ${SERVERCONFIGLIST ? `\n  await Promise.all([${SERVERCONFIGLIST}].filter(config=>config.preload).map(config=>config.preload(serverInterface)));\n` : ""}
+
   app.use(ServerRequestHandler(serverInterface));
   app.use(LoggerHandler());
   ${services.map(service => `app.use(await (await require("./${join(service, "router.cjs")}")).setupRouter());`).join("\n")}
