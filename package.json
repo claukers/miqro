@@ -1,6 +1,6 @@
 {
   "name": "miqro",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "",
   "type": "module",
   "main": "build/esm/src/lib.js",
