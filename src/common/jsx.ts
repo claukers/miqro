@@ -59,6 +59,7 @@ export interface InflateOptions {
 const DEFAULT_ESOPTION = {
   platform: "neutral",
   mainFields: "module,main",
+  keepNames: true,
   // platform: "node",
   bundle: true,
   jsxFactory: "JSX.createElement",
