@@ -4,7 +4,7 @@ import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import { cwd, platform } from "node:process";
 
 import { RouteFileMap, StaticFileMap } from "./setup-http.js";
-import { getAuthConfigPath, getCORSConfigPath, getDBConfigPath, getErrorConfigPath, getMiddlewareConfigPath, getMigrationsPath, getMiqroJSONPath, getServerConfigPath, getServicePath, getWSConfigPath } from "../common/paths.js";
+import { getAuthConfigPath, getCORSConfigPath, getDBConfigPath, getErrorConfigPath, getLogConfigPath, getMiddlewareConfigPath, getMigrationsPath, getMiqroJSONPath, getServerConfigPath, getServicePath, getWSConfigPath } from "../common/paths.js";
 import { getAsset } from "../common/assets.js";
 import { migration } from "@miqro/query";
 import { esBuild } from "../common/esbuild.js";
@@ -48,7 +48,11 @@ export async function inflateAppForSea(logger: Logger, inflateDir: string, servi
 
   const WSLIST = services.filter(service => getWSConfigPath(resolve(cwd(), service))).map(service => {
     return `(await require("../${service}/ws.cjs")).default`;
-  }).join(",")
+  }).join(",");
+
+  const LOGCONFIGLIST = services.filter(service => getLogConfigPath(resolve(cwd(), service))).map(service => {
+    return `{config: (await require("../${service}/log.cjs")).default, service: "${service}" }`;
+  }).join(",");
 
   const SERVERCONFIGLIST = services.filter(service => getServerConfigPath(resolve(cwd(), service))).map(service => {
     return `(await require("../${service}/server.cjs")).default`;
@@ -69,21 +73,38 @@ export async function inflateAppForSea(logger: Logger, inflateDir: string, servi
 
   writeFile(logger, join(inflateDir, "sea", "package.json"), `{ "type": "module", "private": true }`);
 
-  writeFile(logger, join(inflateDir, "sea", "app.cjs"), `const { createServerInterface, ServerRequestHandler, WebSocketManager, DBManager, App, LoggerHandler, LogProvider, LocalCache, ClusterCache } = require("./lib.cjs");
+  writeFile(logger, join(inflateDir, "sea", "app.cjs"), `const { createLogProviderOptions, createServerInterface, ServerRequestHandler, WebSocketManager, DBManager, App, LoggerHandler, LogProvider, LocalCache, ClusterCache } = require("./lib.cjs");
 
 async function main() {
-  const PORT = "${PORT}"; 
-  const loggerProvider = new LogProvider();
+  const PORT = "${PORT}";
+
+  const logConfigList = await Promise.all([${LOGCONFIGLIST}]);
+
+  const loggerProvider = new LogProvider(createLogProviderOptions({
+    inflated: {
+      logConfigMap: logConfigList.reduce((ret, config)=>{
+        ret[config.service] = config.config;
+        return ret;
+      }, {})
+    }
+  }));
+  const logger = loggerProvider.getLogger("SERVER");
   const localCache = new LocalCache();
   const cache = new ClusterCache();
-  const webSocketManager = new WebSocketManager();
-  const dbManager = new DBManager();
+  const webSocketManager = new WebSocketManager({
+    loggerProvider,
+    logger
+  });
+  const dbManager = new DBManager({
+    loggerProvider,
+    logger
+  });
   const serverInterface = createServerInterface({
     cache,
     localCache,
     loggerProvider,
     webSocketManager,
-    logger: loggerProvider.getLogger("server"),
+    logger,
     dbManager,
     port: PORT
   });
@@ -94,6 +115,7 @@ async function main() {
 
   ${!WSLIST ? "" : `\n  webSocketManager.replaceALLWS(await Promise.all([${WSLIST}]))`}
   const app = new App({
+    loggerFactory: loggerProvider.requestLoggerFactory,
     onUpgrade: (req, socket, head) => {
       try {
         req.server = serverInterface;

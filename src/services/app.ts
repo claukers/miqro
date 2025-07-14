@@ -1,5 +1,5 @@
 import cluster from "node:cluster";
-import { App, Router, Logger, LoggerHandler } from "@miqro/core";
+import { App, Router, Logger, LoggerHandler, LogLevel } from "@miqro/core";
 import { migration } from "@miqro/query";
 import { WebSocketManager } from "./utils/websocketmanager.js";
 import { DBManager } from "./utils/db-manager.js";
@@ -8,7 +8,7 @@ import { InflateError } from "../common/jsx.js";
 import { DBConfig, MigrateOptions, ServerInterface, ServerRequest, WSConfig } from "../types.js";
 import { RouteFileMap } from "../inflate/setup-http.js";
 import { ServerConfigMap, setupServerConfig } from "../inflate/setup-server-config.js";
-import { BASEEDITOR_PATH, LOG_SOCKET_PATH } from "../../editor/common/constants.js";
+import { BASEEDITOR_PATH, LOG_SOCKET_PATH, LOG_WRITE_EVENT } from "../../editor/common/constants.js";
 import editorWSConfig from "../../editor/ws.js";
 import editorServerConfig from "../../editor/server.js";
 
@@ -107,7 +107,11 @@ export class Miqro {
       services: [],
       ...(options ? options : {})
     };
-    this.loggerProvider = new LogProvider(createLogProviderOptions(this));
+
+    const loggerOptions = createLogProviderOptions(this);
+    loggerOptions.transports.push(createEditorLoggerTransport(this));
+    this.loggerProvider = new LogProvider(loggerOptions);
+
     //if (!this.options.logger) {
     const SERVER_IDENTIFIER = cluster.isPrimary ?
       "" :
@@ -699,5 +703,33 @@ export function notifiyServerConfigSync(app: Miqro, method: "unload" | "stop") {
         app.logger?.error(e);
       }
     });
+  }
+}
+
+function createEditorLoggerTransport(app: Miqro) {
+  return {
+    level: "trace" as LogLevel,
+    write: async (args) => {
+      try {
+        if (app.options.editor) {
+          try {
+            const ws = app.webSocketManager.getWS(LOG_SOCKET_PATH);
+            if (ws) {
+              //console.log("\n\n" + process.pid + " broadcasting " + LOG_SOCKET_PATH + "\n\n\n")
+              await ws.broadcast(JSON.stringify({
+                type: LOG_WRITE_EVENT,
+                level: args.level,
+                identifier: args.identifier,
+                out: args.out
+              }));
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }
 }

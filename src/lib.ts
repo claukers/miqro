@@ -16,6 +16,7 @@ export { Miqro, MiqroOptions, ServerRequestHandler } from "./services/app.js";
 export { jsx2HTML } from "./common/jsx.js";
 
 //exported for --inflate-sea
+export { createLogProviderOptions } from "./services/utils/log-transport.js";
 export { appendAPIModule } from "./inflate/utils/sea-utils.js";
 export { createServerInterface, ServerInterfaceImplOptions } from "./services/utils/server-interface.js";
 export { App, LoggerHandler, Router } from "@miqro/core";
