@@ -47,15 +47,15 @@ export async function inflateAppForSea(logger: Logger, inflateDir: string, servi
   writeFile(logger, resolve(inflateDir, "sea", "lib.cjs"), Buffer.from(getAsset("lib.cjs")));
 
   const WSLIST = services.filter(service => getWSConfigPath(resolve(cwd(), service))).map(service => {
-    return `(await require("../${service}/ws.cjs")).default`;
+    return `(await require("./../${service}/ws.cjs")).default`;
   }).join(",");
 
   const LOGCONFIGLIST = services.filter(service => getLogConfigPath(resolve(cwd(), service))).map(service => {
-    return `{config: (await require("../${service}/log.cjs")).default, service: "${service}" }`;
+    return `{config: (await require("./../${service}/log.cjs")).default, service: "${service}" }`;
   }).join(",");
 
   const SERVERCONFIGLIST = services.filter(service => getServerConfigPath(resolve(cwd(), service))).map(service => {
-    return `(await require("../${service}/server.cjs")).default`;
+    return `(await require("./../${service}/server.cjs")).default`;
   }).join(",\n");
 
   const DBCONFIGLIST = services.filter(service => getDBConfigPath(resolve(cwd(), service))).map(service => {
@@ -159,20 +159,20 @@ export async function inflateServiceForSea(logger: Logger, inflateDir: string, s
   const migrationsFolderPath = getMigrationsPath(servicePath);
 
   const serviceMigrations: string[] = migrationsFolderPath ? migration.getSortedMigrations(migrationsFolderPath) : [];
-  writeFile(logger, join(inflateDir, "sea", service, "router.cjs"), `const { appendAPIModule, Router, middleware } = require("./../lib.cjs");\n
+  writeFile(logger, join(inflateDir, "sea", service, "router.cjs"), `const { appendAPIModule, Router, middleware } = require("./${relative(service, "")}/lib.cjs");\n
 async function setupRouter() {
   const router = new Router();
 ${getErrorConfigPath(servicePath) ? `
-  const errorConfig = (await require("../../${service}/catch.cjs")).default;
+  const errorConfig = (await require("../${relative(service, "")}/${service}/catch.cjs")).default;
   if(errorConfig && errorConfig.catch) {
     for(const m of errorConfig.catch) {
       router.catch(m);
     }
   }` : ""}
-${getCORSConfigPath(servicePath) ? `  router.use(middleware.cors((await require("../../${service}/cors.cjs")).default));` : ""}
-${getAuthConfigPath(servicePath) ? `  router.use(middleware.session((await require("../../${service}/auth.cjs")).default));` : ""}
+${getCORSConfigPath(servicePath) ? `  router.use(middleware.cors((await require("../${relative(service, "")}/${service}/cors.cjs")).default));` : ""}
+${getAuthConfigPath(servicePath) ? `  router.use(middleware.session((await require("../${relative(service, "")}/${service}/auth.cjs")).default));` : ""}
 ${getMiddlewareConfigPath(servicePath) ? `
-  const middlewareConfig = (await require("../../${service}/middleware.cjs")).default;
+  const middlewareConfig = (await require("../${relative(service, "")}/${service}/middleware.cjs")).default;
   if(middlewareConfig && middlewareConfig.middleware) {
     for(const m of middlewareConfig.middleware) {
       router.use(m);
@@ -185,8 +185,8 @@ ${Object.keys(serviceRouteFileMap)
         const rPath = join(relative(cwd(), dirname(data.filePath)), basename(data.filePath));
         if (rPath) {
           const rPathExt = extname(rPath);
-          const apiInflatedPath = join("..", "..", rPath.substring(0, rPath.length - rPathExt.length) + ".cjs");
-          return `  await appendAPIModule(router, "../../${service}/http", "./${apiInflatedPath}", (await require("./${apiInflatedPath}")).default);`;
+          const apiInflatedPath = join("..", relative(service, ""), rPath.substring(0, rPath.length - rPathExt.length) + ".cjs");
+          return `  await appendAPIModule(router, "../${relative(service, "")}/${service}/http", "./${apiInflatedPath}", (await require("./${apiInflatedPath}")).default);`;
         } else {
           return "";
         }
@@ -207,24 +207,24 @@ module.exports = {
   setupRouter
 }`);
 
-  writeFile(logger, join(inflateDir, "sea", service, "migration-up.cjs"), `const { migration } = require("./../lib.cjs");\n
+  writeFile(logger, join(inflateDir, "sea", service, "migration-up.cjs"), `const { migration } = require("./${relative(service, "")}/lib.cjs");\n
 async function runMigrations(db) {
   await migration.init(db);
 ${serviceMigrations.map(file => {
     const name = `${file.substring(0, file.length - extname(file).length)}`;
-    return `  await migration.up.module(db, "${file}", (await require("../../${service}/migration/${name}.cjs")).default)`;
+    return `  await migration.up.module(db, "${file}", (await require("../${relative(service, "")}/${service}/migration/${name}.cjs")).default)`;
   }).join("\n")}
 }
 module.exports = {
   runMigrations
 }`);
 
-  writeFile(logger, join(inflateDir, "sea", service, "migration-down.cjs"), `const { migration } = require("./../lib.cjs");\n
+  writeFile(logger, join(inflateDir, "sea", service, "migration-down.cjs"), `const { migration } = require("./${relative(service, "")}/lib.cjs");\n
 async function runMigrations(db) {
   await migration.init(db);
 ${serviceMigrations.reverse().map(file => {
     const name = `${file.substring(0, file.length - extname(file).length)}`;
-    return `  await migration.down.module(db, "${file}", (await require("../../${service}/migration/${name}.cjs")).default)`;
+    return `  await migration.down.module(db, "${file}", (await require("../${relative(service, "")}/${service}/migration/${name}.cjs")).default)`;
   }).join("\n")}
 }
 module.exports = {
@@ -235,7 +235,7 @@ module.exports = {
   /*if (staticFiles.length !== 0) {
     writeFile(logger, join(inflateDir, "sea", service, "static.base64.json"), JSON.stringify(serviceStaticFileMap));
   }*/
-  writeFile(logger, join(inflateDir, "sea", service, "static-router.cjs"), `const { appendAPIModule, Router } = require("./../lib.cjs");\n
+  writeFile(logger, join(inflateDir, "sea", service, "static-router.cjs"), `const { appendAPIModule, Router } = require("./${relative(service, "")}/lib.cjs");\n
 async function setupRouter() {
   const router = new Router();
   ${staticFiles.length === 0 ? "" : `
