@@ -34,6 +34,7 @@ export const help = `
 --no-build\n\tdisables calling esbuild during imports in runtime. Notice that to use jsx you will need to run tsc or esbuild on your jsx files to transpile them to js.
 --no-minify\n\tdisables calling minifing min.js files.
 --inflate-only-assets\n\tinflates ONLY the application assets. must be used with --inflate.
+--inflate-flat\n\tinflates files into the inflate-dir directly.
 --inflate-sea\n\tinflates the application with sea compilation scripts.
 --install-tsconfig\n\tcreates a tsconfig.json configured to use with --install-types.
 --install-miqrojson\n\tcreates a default miqro.json file.
