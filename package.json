@@ -50,7 +50,7 @@
     "@miqro/runner": "^2.0.1",
     "@miqro/test": "^0.2.9",
     "@miqro/test-http": "^0.1.2",
-    "esbuild": "0.25.9  ",
+    "esbuild": "0.25.11",
     "jose": "6.1.0",
     "showdown": "2.1.0"
   }
