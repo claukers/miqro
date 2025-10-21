@@ -215,6 +215,11 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                 return resolve();
               case ".api": {
 
+                if (inflateJSXOptions.inflateOnlyAssets) {
+                  logger.warn("ignoring [%s]", file.filePath);
+                  return resolve();
+                }
+
                 const module = await importAPIRoute(file.filePath, importOptions, logger);
 
                 const routes = getRoutes(join("/", dirname(relative(dir, file.filePath))), file.subName, module);
@@ -226,7 +231,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                   previewMethod: "api"
                 };
 
-                const inflatedCode = inflateDir && inflateSea && (!inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)? await inflateJSX(file.filePath, {
+                const inflatedCode = inflateDir && inflateSea && (!inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined) ? await inflateJSX(file.filePath, {
                   // embemedJSX: false,
                   minify: false,
                   useExport: true,
@@ -330,6 +335,11 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                 return resolve();
               }
               case ".html": {
+
+                if (inflateJSXOptions.inflateOnlyAssets) {
+                  logger.warn("ignoring [%s]", file.filePath);
+                  return resolve();
+                }
 
                 const module = await importHTMLModule(file.filePath, importOptions, logger);
 
