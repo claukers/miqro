@@ -668,7 +668,7 @@ export function parseArguments(): Arguments {
     }
     if (!flags.inflateDir && flags.inflate) {
       if (miqroRC.inflateDir) {
-        flags.inflateDir = miqroRC.inflateDir;
+        flags.inflateDir = join(relative(cwd(), dirname(miqroJSONPath)), miqroRC.inflateDir);
       }
     }
     if (flags.name === null) {
