@@ -4,7 +4,7 @@ import { migration } from "@miqro/query";
 import { WebSocketManager } from "./utils/websocketmanager.js";
 import { DBManager } from "./utils/db-manager.js";
 import { inflateApp } from "../inflate/inflate.js";
-import { InflateError } from "../common/jsx.js";
+import { ImportJSXFileOptions, InflateError } from "../common/jsx.js";
 import { DBConfig, MigrateOptions, ServerInterface, ServerRequest, WSConfig } from "../types.js";
 import { RouteFileMap } from "../inflate/setup-http.js";
 import { ServerConfigMap, setupServerConfig } from "../inflate/setup-server-config.js";
@@ -33,7 +33,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { cwd } from "node:process";
 import { ServerOptions } from "node:https";
 
-export interface MiqroOptions {
+export interface MiqroOptions extends ImportJSXFileOptions {
   name: string;
   logger?: Logger;
   logProviderOptions?: LogProviderOptions;
@@ -101,8 +101,10 @@ export class Miqro {
 
   constructor(options?: Partial<MiqroOptions>) {
     this.options = {
+      noMinify: false,
       editor: false,
       name: "server",
+      noBuild: false,
       port: getPORT(),
       services: [],
       ...(options ? options : {})
@@ -187,6 +189,7 @@ export class Miqro {
       name: miqroJSON.name ? miqroJSON.name : undefined,
       port: miqroJSON.port ? String(miqroJSON.port) : undefined,
       services: miqroJSON.services ? miqroJSON.services.map(s => join(relative(cwd(), miqroJSONDir), s)) : undefined,
+      noBuild: miqroJSON.noBuild !== undefined ? miqroJSON.noBuild : false,
       ...(options ? options : {}),
     });
     await app.inflate({
@@ -244,7 +247,7 @@ export class Miqro {
     const errors: InflateError[] = [];
     for (const service of this.options.services) {
       const servicePath = getServicePath(service);
-      await setupServerConfig(this.logger, servicePath, service, serverConfigMap, options && options.inflateSea ? options.inflateDir : undefined, errors);
+      await setupServerConfig(this.logger, servicePath, service, serverConfigMap, options && options.inflateSea ? options.inflateDir : undefined, errors, this.options);
     }
     return {
       serverConfigMap,
@@ -267,9 +270,9 @@ export class Miqro {
     }[] = [];
     const dbConfigListALL: DBConfig[] = [];
     for (const service of this.options.services) {
-      const dbConfig = await inflateDBConfig(this.logger, service, dbConfigListALL, options?.inflateSea ? options?.inflateDir : undefined, errors);
+      const dbConfig = await inflateDBConfig(this.logger, service, dbConfigListALL, options?.inflateSea ? options?.inflateDir : undefined, this.options, errors);
       if (dbConfig) {
-        const migrations = await inflateDBMigrations(this.logger, service, dbConfig.name, options?.inflateSea ? options?.inflateDir : undefined, errors);
+        const migrations = await inflateDBMigrations(this.logger, service, dbConfig.name, options?.inflateSea ? options?.inflateDir : undefined, this.options, errors);
         dbList.push({
           service,
           dbConfig,
@@ -330,7 +333,7 @@ export class Miqro {
       // block others from inflating while inflateApp is running
       this.inflated = undefined;
       // init assets only once for all ApplicationServer's
-      if (Miqro.initAssetsPromise === null) {
+      if (Miqro.initAssetsPromise === null && (this.options.noBuild === false || this.options.noMinify === false)) {
         // init globals only once for all inflations
         // initGlobals();
         Miqro.initAssetsPromise = initAssets(this.logger);
@@ -378,7 +381,9 @@ export class Miqro {
         inflateSea: options?.inflateSea ? true : false,
         //inflateTests: options?.inflateTests ? true : false,
         hotreload: this.options?.hotreload ? true : false,
-        inflateParallel: options?.inflateParallel
+        inflateParallel: options?.inflateParallel,
+        noBuild: this.options?.noBuild,
+        noMinify: this.options?.noMinify
       });
 
       wsConfigList.push(...serviceWSConfigList);

@@ -1,17 +1,18 @@
 import { mkdirSync, writeFileSync } from "node:fs";
-import { importCORSModule, InflateError, inflateJSX } from "../common/jsx.js";
+import { importCORSModule, ImportJSXFileOptions, InflateError, inflateJSX } from "../common/jsx.js";
 import { getCORSConfigPath } from "../common/paths.js";
 import { CORS, Logger, Router } from "@miqro/core";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { cwd } from "node:process";
 
-export async function setupCORS(logger: Logger, servicePath: string, service: string, mainRouter: Router, inflateDir: string | undefined | false, inflateSea: boolean, errors: InflateError[]) {
+export async function setupCORS(logger: Logger, servicePath: string, service: string, mainRouter: Router, inflateDir: string | undefined | false, inflateSea: boolean, options: ImportJSXFileOptions, errors: InflateError[]) {
   const corsPath = getCORSConfigPath(servicePath);
 
   if (corsPath) {
     try {
-      const corsOptions = await importCORSModule(corsPath, logger);
       logger.debug("setting up cors from [%s]", join(service, basename(corsPath)));
+      const corsOptions = await importCORSModule(corsPath, options, logger);
+
       mainRouter.use(CORS(corsOptions));
 
       if (inflateDir && inflateSea) {

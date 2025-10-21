@@ -28,6 +28,8 @@ interface MiqroJSON {
   serverOptions?: ServerOptions;
   httpsRedirect?: number;
   inflateParallel?: number;
+  noBuild?: boolean;
+  noMinify?: boolean;
 }
 
 const MiqroJSONSchema: Schema<MiqroJSON> = {
@@ -35,6 +37,8 @@ const MiqroJSONSchema: Schema<MiqroJSON> = {
   properties: {
     name: "string?",
     services: "string[]?",
+    noBuild: "boolean?",
+    noMinify: "boolean?",
     port: "number?|string?",
     inflateDir: "string?",
     browser: "boolean?|string?",
@@ -63,6 +67,8 @@ export function getPORT() {
 
 export interface Arguments {
   name?: string;
+  noBuild?: boolean;
+  noMinify?: boolean;
   browser?: string | boolean;
   logFile?: string | boolean;
   // installTypes: boolean;
@@ -130,6 +136,8 @@ export function parseArguments(): Arguments {
     inflateDir?: string | null;
     hotreload?: boolean | null;
     watch?: boolean | null;
+    noBuild?: boolean | null;
+    noMinify?: boolean | null;
   } = {
     inflateParallel: null,
     httpsRedirect: null,
@@ -151,6 +159,8 @@ export function parseArguments(): Arguments {
     migrateDown: null,
     inflateSEA: null,
     compile: null,
+    noBuild: null,
+    noMinify: null,
     test: null,
     inflate: null,
     generateDoc: null,
@@ -207,6 +217,22 @@ export function parseArguments(): Arguments {
           flags.miqroJSONPath = cPath;
         }
         i++;
+        continue;
+      case "--no-minify":
+        if (flags.noMinify !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.noMinify = true;
+        continue;
+      case "--no-build":
+        if (flags.noBuild !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.noBuild = true;
         continue;
       case "--install-tsconfig":
         if (flags.inflate !== null || flags.installTSConfig !== null) {
@@ -562,6 +588,16 @@ export function parseArguments(): Arguments {
         }
       }
     }
+    if (flags.noBuild === null) {
+      if (miqroRC.noBuild !== undefined) {
+        flags.noBuild = miqroRC.noBuild;
+      }
+    }
+    if (flags.noMinify === null) {
+      if (miqroRC.noMinify !== undefined) {
+        flags.noMinify = miqroRC.noMinify;
+      }
+    }
     if (flags.https === null) {
       if (miqroRC.https) {
         flags.https = miqroRC.https;
@@ -729,6 +765,8 @@ export function parseArguments(): Arguments {
   }
 
   return {
+    noMinify: flags.noMinify === null ? false : flags.noMinify,
+    noBuild: flags.noBuild === null ? false: flags.noBuild,
     inflateParallel: flags.inflateParallel ? flags.inflateParallel : undefined,
     name: flags.name ? flags.name : undefined,
     browser: flags.browser !== null ? flags.browser : undefined,

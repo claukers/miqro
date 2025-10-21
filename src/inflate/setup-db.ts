@@ -1,6 +1,6 @@
 import { Logger } from "@miqro/core";
 import { Migration, migration } from "@miqro/query";
-import { importDBConfigModule, importMigrationModule, InflateError, inflateJSX } from "../common/jsx.js";
+import { importDBConfigModule, ImportJSXFileOptions, importMigrationModule, InflateError, inflateJSX } from "../common/jsx.js";
 import { getDBConfigPath, getMigrationsPath, getServicePath } from "../common/paths.js";
 import { dirname, extname, relative, resolve } from "node:path";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -11,15 +11,15 @@ export interface MigrationModule extends Migration, NamedMigration {
 
 }
 
-export async function inflateDBConfig(logger: Logger, service: string, dbConfigList: DBConfig[] | undefined, inflateDir: string | undefined | false, errors: InflateError[]) {
+export async function inflateDBConfig(logger: Logger, service: string, dbConfigList: DBConfig[] | undefined, inflateDir: string | undefined | false, options: ImportJSXFileOptions, errors: InflateError[]) {
   const servicePath = getServicePath(service);
   const dbConfigPath = getDBConfigPath(servicePath);
   if (dbConfigPath) {
     try {
       //logger.debug("loading DBConfig for service[%s]", service);
-      const config = await importDBConfigModule(dbConfigPath, logger);
+      const config = await importDBConfigModule(dbConfigPath, options, logger);
       if (config && dbConfigList && dbConfigList.filter(c => c.name === config.name).length > 0) {
-        throw new Error(`ws path [${config.name}] already defined! error from [${dbConfigPath}]`);
+        throw new Error(`db name [${config.name}] already defined! error from [${dbConfigPath}]`);
       } else if (config) {
         //logger.debug("DBConfig [%s] loaded from service [%s]", config.name, service);
         if (dbConfigList) {
@@ -62,7 +62,7 @@ export async function inflateDBConfig(logger: Logger, service: string, dbConfigL
   return false;
 }
 
-export async function inflateDBMigrations(logger: Logger, service: string, dbName: string, inflateDir: string | undefined | false, errors: InflateError[]) {
+export async function inflateDBMigrations(logger: Logger, service: string, dbName: string, inflateDir: string | undefined | false, options: ImportJSXFileOptions, errors: InflateError[]) {
   const servicePath = getServicePath(service);
   const migrationsFolderPath = getMigrationsPath(servicePath);
   if (migrationsFolderPath) {
@@ -76,7 +76,7 @@ export async function inflateDBMigrations(logger: Logger, service: string, dbNam
     for (const migrationName of serviceMigrations) {
       const migrationPath = resolve(migrationsFolderPath, migrationName);
       try {
-        const migrationModule = await importMigrationModule(migrationPath);
+        const migrationModule = await importMigrationModule(migrationPath, options, logger);
         migrationModules.push({
           name: migrationName,
           service,

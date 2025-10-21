@@ -1,5 +1,5 @@
 import { Logger, Router } from "@miqro/core";
-import { importDocConfigModule, InflateError, inflateJSX } from "../common/jsx.js";
+import { importDocConfigModule, ImportJSXFileOptions, InflateError, inflateJSX } from "../common/jsx.js";
 import { getDocConfigPath } from "../common/paths.js";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -8,12 +8,12 @@ import { getDocOutput } from "../bin/generate-doc.js";
 import { RouteFileMap, StaticFileMap } from "./setup-http.js";
 import { CONTENT_TYPE_MAP } from "../common/content-type.js";
 
-export async function setupDoc(logger: Logger, servicePath: string, service: string, mainRouter: Router, fileMap: RouteFileMap, staticFileMap: StaticFileMap, inflateDir: string | undefined | false, errors: InflateError[]) {
+export async function setupDoc(logger: Logger, servicePath: string, service: string, mainRouter: Router, fileMap: RouteFileMap, staticFileMap: StaticFileMap, inflateDir: string | undefined | false, errors: InflateError[], options: ImportJSXFileOptions) {
   const docPath = getDocConfigPath(servicePath); //resolve(process.cwd(), service, "auth.ts");
 
   if (docPath) {
     try {
-      const docModule = await importDocConfigModule(docPath, logger);
+      const docModule = await importDocConfigModule(docPath, options, logger);
       logger.debug("setting up error handling from [%s]", join(service, basename(docPath)));
       if (docModule && docModule.publish) {
         const paths = Object.keys(docModule.publish);

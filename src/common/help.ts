@@ -31,6 +31,8 @@ export const help = `
 --generate-doc-type\n\tthe format of the generated documentation. it can be JSON or MD. default value is MD.
 --generate-doc-all\n\toutputs all the server routes in the documentation output.
 --compile\n\tinflates the application and tries to create a NODE SEA binary.
+--no-build\n\tdisables calling esbuild.
+--no-minify\n\tdisables calling min.js files.
 --inflate-sea\n\tinflates the application with sea compilation scripts.
 --install-tsconfig\n\tcreates a tsconfig.json configured to use with --install-types.
 --install-miqrojson\n\tcreates a default miqro.json file.

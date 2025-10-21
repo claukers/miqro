@@ -26,7 +26,9 @@ async function main(args: Arguments) {
       watch: args.test ? false : args.watch,
       https: args.test ? false : args.https,
       serverOptions: args.serverOptions,
-      httpRedirect: args.test ? undefined : args.httpsRedirect
+      httpRedirect: args.test ? undefined : args.httpsRedirect,
+      noBuild: args.noBuild,
+      noMinify: args.noMinify
     });
     // check arguments
     if (args.generateDoc) {
@@ -51,7 +53,10 @@ async function main(args: Arguments) {
         inflateParallel: args.inflateParallel
       });
       await app.start();
-      await testMain(app);
+      await testMain(app, {
+        noBuild: args.noBuild,
+        noMinify: args.noMinify
+      });
       await app.stop();
       await app.dbManager.closeAll();
       await app.webSocketManager.disconnectAll();

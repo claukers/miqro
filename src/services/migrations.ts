@@ -5,16 +5,16 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { cwd } from "node:process";
 
 import { getMigrationsPath } from "../common/paths.js";
-import { importJSXFile, inflateJSX } from "../common/jsx.js";
+import { importJSXFile, ImportJSXFileOptions, inflateJSX } from "../common/jsx.js";
 
-export async function runMigrations(logger: Logger | undefined, db: Database | null, servicePath: string, service: string, inflateDir: string | undefined | false, migrations: string[]) {
+export async function runMigrations(logger: Logger | undefined, db: Database | null, servicePath: string, service: string, inflateDir: string | undefined | false, migrations: string[], options: ImportJSXFileOptions) {
   const migrationsFolderPath = getMigrationsPath(servicePath);
   if (migrationsFolderPath) {
     logger?.debug("running migrations from [%s]", service);
     if (!db) {
       throw new Error("cannot run migrations with the database disabled!");
     }
-    const serviceMigrations = await migration.up.folder(db as any, migrationsFolderPath, logger as DatabaseLogger, (inFile: string) => importJSXFile(inFile, logger));
+    const serviceMigrations = await migration.up.folder(db as any, migrationsFolderPath, logger as DatabaseLogger, (inFile: string) => importJSXFile(inFile, options, logger));
     migrations.push(...serviceMigrations);
 
     if (inflateDir) {
@@ -37,14 +37,14 @@ export async function runMigrations(logger: Logger | undefined, db: Database | n
   return migrations;
 }
 
-export async function runMigrationsDown(logger: Logger | Console | undefined, db: Database | null, servicePath: string, service: string, inflateDir: string | undefined, migrations: string[]) {
+export async function runMigrationsDown(logger: Logger | Console | undefined, db: Database | null, servicePath: string, service: string, inflateDir: string | undefined, migrations: string[], options: ImportJSXFileOptions) {
   const migrationsFolderPath = getMigrationsPath(servicePath)
   if (migrationsFolderPath) {
     logger?.debug("running migrations from [%s]", service);
     if (!db) {
       throw new Error("cannot run migrations with the database disabled!");
     }
-    const serviceMigrations = await migration.down.folder(db as any, migrationsFolderPath, logger as DatabaseLogger, (inFile: string) => importJSXFile(inFile, logger));
+    const serviceMigrations = await migration.down.folder(db as any, migrationsFolderPath, logger as DatabaseLogger, (inFile: string) => importJSXFile(inFile, options, logger));
     migrations.push(...serviceMigrations);
 
     if (inflateDir) {

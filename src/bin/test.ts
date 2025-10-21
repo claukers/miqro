@@ -8,8 +8,9 @@ import { RuntimeOptions, RuntimeShadowRootInit, RuntimeURL } from "@miqro/jsx";
 import { EXIT_CODES } from "../common/constants.js";
 import { Miqro } from "../services/app.js";
 import { setupTests } from "../inflate/setup-test.js";
+import { ImportJSXFileOptions } from "../common/jsx.js";
 
-export async function testMain(app: Miqro) {
+export async function testMain(app: Miqro, options: ImportJSXFileOptions) {
   const startMS = Date.now();
   //resetTests();
   resetGlobals();
@@ -51,7 +52,7 @@ export async function testMain(app: Miqro) {
 
   for (const service of app.options.services) {
     const servicePath = getServicePath(service);
-    await setupTests(app.logger, servicePath);
+    await setupTests(app.logger, servicePath, options);
   }
 
   console.log("");

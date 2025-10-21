@@ -1,16 +1,16 @@
 import { Logger, Router } from "@miqro/core";
-import { importErrorConfigModule, InflateError, inflateJSX } from "../common/jsx.js";
+import { importErrorConfigModule, ImportJSXFileOptions, InflateError, inflateJSX } from "../common/jsx.js";
 import { getErrorConfigPath } from "../common/paths.js";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { cwd } from "node:process";
 
-export async function setupError(logger: Logger, servicePath: string, service: string, mainRouter: Router, inflateDir: string | undefined | false, inflateSea: boolean, errors: InflateError[]): Promise<void> {
+export async function setupError(logger: Logger, servicePath: string, service: string, mainRouter: Router, inflateDir: string | undefined | false, inflateSea: boolean, options: ImportJSXFileOptions, errors: InflateError[]): Promise<void> {
   const errorPath = getErrorConfigPath(servicePath); //resolve(process.cwd(), service, "auth.ts");
 
   if (errorPath) {
     try {
-      const errorModule = await importErrorConfigModule(errorPath, logger);
+      const errorModule = await importErrorConfigModule(errorPath, options, logger);
       logger.debug("setting up error handling from [%s]", join(service, basename(errorPath)));
       if (errorModule && errorModule.catch) {
         for (const m of errorModule.catch) {

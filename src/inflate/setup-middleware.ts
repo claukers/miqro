@@ -1,17 +1,17 @@
 import { Logger, Router } from "@miqro/core";
-import { importMiddlewareConfigModule, InflateError, inflateJSX } from "../common/jsx.js";
+import { ImportJSXFileOptions, importMiddlewareConfigModule, InflateError, inflateJSX } from "../common/jsx.js";
 import { getMiddlewareConfigPath } from "../common/paths.js";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { cwd } from "node:process";
 import { MiddlewareConfig } from "../types.js";
 
-export async function setupMiddleware(logger: Logger, servicePath: string, service: string, mainRouter: Router, inflateDir: string | undefined | false, inflateSea: boolean, errors: InflateError[]): Promise<MiddlewareConfig | null> {
+export async function setupMiddleware(logger: Logger, servicePath: string, service: string, mainRouter: Router, inflateDir: string | undefined | false, inflateSea: boolean, options: ImportJSXFileOptions, errors: InflateError[]): Promise<MiddlewareConfig | null> {
   const middlewarePath = getMiddlewareConfigPath(servicePath); //resolve(process.cwd(), service, "auth.ts");
 
   if (middlewarePath) {
     try {
-      const middewareModule = await importMiddlewareConfigModule(middlewarePath, logger);
+      const middewareModule = await importMiddlewareConfigModule(middlewarePath, options, logger);
       logger.debug("setting up middleware from [%s]", join(service, basename(middlewarePath)));
       if (middewareModule && middewareModule.middleware) {
         for (const m of middewareModule.middleware) {

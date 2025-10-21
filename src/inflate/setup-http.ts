@@ -3,7 +3,7 @@ import { existsSync, mkdir, readFile, readFileSync, readdirSync, statSync } from
 import { dirname, join, relative, resolve as pathResolve } from "node:path";
 
 import { CONTENT_TYPE_MAP, DEFAULT_CONTENT_TYPE } from "../common/content-type.js";
-import { InflateError, importHTMLModule, importAPIRoute, inflateJSX, importJSONModule, JSONModuleValue, jsx2HTML } from "../common/jsx.js";
+import { InflateError, importHTMLModule, importAPIRoute, inflateJSX, importJSONModule, JSONModuleValue, jsx2HTML, ImportJSXFileOptions } from "../common/jsx.js";
 import { createNodeRuntime } from "@miqro/jsx-node";
 import { getHotReloadScript } from "../services/hot-reload.js";
 import { RuntimeURL } from "@miqro/jsx";
@@ -45,20 +45,20 @@ export interface StaticFileMap {
   }
 }
 
-export async function setupHTTPRouter(server: ServerInterface, logger: Logger, hotreload: boolean, servicePath: string, service: string, routeFileMap: RouteFileMap, staticFileMap: StaticFileMap | null, inflateDir: string | undefined | false, inflateSea: boolean, errors: InflateError[], inflateParallel?: number) {
+export async function setupHTTPRouter(importOptions: ImportJSXFileOptions, server: ServerInterface, logger: Logger, hotreload: boolean, servicePath: string, service: string, routeFileMap: RouteFileMap, staticFileMap: StaticFileMap | null, inflateDir: string | undefined | false, inflateSea: boolean, options: ImportJSXFileOptions, errors: InflateError[], inflateParallel?: number) {
   const mainRouter = new Router();
   const apiRouterPath = getHTTPRouterPath(servicePath); //resolve(process.cwd(), service, "http");
   let middlewareConfig: MiddlewareConfig | null = null;
 
-  await setupError(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
+  await setupError(logger, servicePath, service, mainRouter, inflateDir, inflateSea, options, errors);
 
-  await setupCORS(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
-  await setupAUTH(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
-  middlewareConfig = await setupMiddleware(logger, servicePath, service, mainRouter, inflateDir, inflateSea, errors);
+  await setupCORS(logger, servicePath, service, mainRouter, inflateDir, inflateSea, options, errors);
+  await setupAUTH(logger, servicePath, service, mainRouter, inflateDir, inflateSea, options, errors);
+  middlewareConfig = await setupMiddleware(logger, servicePath, service, mainRouter, inflateDir, inflateSea, options, errors);
 
   if (apiRouterPath) {
     logger.trace("setting up http routes from [%s]", service);
-    const { router: httpRouter } = await createRouterFromDirectory(server, hotreload, service, logger, apiRouterPath, errors, routeFileMap, staticFileMap, inflateDir, inflateSea, inflateParallel);
+    const { router: httpRouter } = await createRouterFromDirectory(importOptions, server, hotreload, service, logger, apiRouterPath, errors, routeFileMap, staticFileMap, inflateDir, inflateSea, inflateParallel);
     mainRouter.use(httpRouter);
   }
 
@@ -182,7 +182,7 @@ async function createStaticRouterFromDirectory(service: string, logger: Logger, 
   return router;
 }
 
-async function createRouterFromDirectory(server: ServerInterface, hotreload: boolean, service: string, logger: Logger, dir: string, errors: InflateError[] = [], routeFileMap: RouteFileMap = {}, staticFileMap: StaticFileMap | null = null, inflateDir: string | undefined | false, inflateSea: boolean, inflateParallel?: number): Promise<{
+async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, server: ServerInterface, hotreload: boolean, service: string, logger: Logger, dir: string, errors: InflateError[] = [], routeFileMap: RouteFileMap = {}, staticFileMap: StaticFileMap | null = null, inflateDir: string | undefined | false, inflateSea: boolean, inflateParallel?: number): Promise<{
   router: Router;
   errors: InflateError[];
   routeFileMap: RouteFileMap;
@@ -210,7 +210,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                 return resolve();
               case ".api": {
 
-                const module = await importAPIRoute(file.filePath, logger);
+                const module = await importAPIRoute(file.filePath, importOptions, logger);
 
                 const routes = getRoutes(join("/", dirname(relative(dir, file.filePath))), file.subName, module);
 
@@ -258,7 +258,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                 return resolve();
               }
               case ".json": {
-                const module = await importJSONModule(file.filePath, logger);
+                const module = await importJSONModule(file.filePath, importOptions, logger);
                 const routes = getRoutes(join("/", dirname(relative(dir, file.filePath))), file.subName + ".json", module.apiOptions as Partial<APIRoute>);
 
                 routeFileMap[file.filePath] = {
@@ -326,7 +326,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
               }
               case ".html": {
 
-                const module = await importHTMLModule(file.filePath, logger);
+                const module = await importHTMLModule(file.filePath, importOptions, logger);
 
                 const routes = getRoutes(join("/", dirname(relative(dir, file.filePath))), file.subName + ".html", module.apiOptions as Partial<APIRoute>);
 
@@ -397,7 +397,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
               default: {
                 // allow fall-through when extension is .js and .ts because is a static route without embemedJSX
                 if (file.ext !== ".js" && file.ext !== ".ts") {
-                  const code = await inflateJSX(file.filePath, {
+                  const code = importOptions.noMinify ? readFileSync(file.filePath).toString() : await inflateJSX(file.filePath, {
                     // embemedJSX: true,
                     minify: file.subExt === ".min" ? true : false,
                     useExport: true,
@@ -512,7 +512,7 @@ async function createRouterFromDirectory(server: ServerInterface, hotreload: boo
                 }
                 case ".bundle":
                 case ".min": {
-                  const code = await inflateJSX(file.filePath, {
+                  const code = importOptions.noMinify ? readFileSync(file.filePath).toString() : await inflateJSX(file.filePath, {
                     // embemedJSX: false,
                     minify: file.subExt === ".min" ? true : false,
                     useExport: true,

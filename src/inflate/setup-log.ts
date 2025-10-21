@@ -1,5 +1,5 @@
 import { Logger } from "@miqro/core";
-import { importLogConfigModule, InflateError, inflateJSX } from "../common/jsx.js";
+import { ImportJSXFileOptions, importLogConfigModule, InflateError, inflateJSX } from "../common/jsx.js";
 import { getLogConfigPath } from "../common/paths.js";
 import { dirname, relative, resolve } from "node:path";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -10,13 +10,13 @@ export interface LogConfigMap {
   [service: string]: LogConfig | undefined;
 }
 
-export async function setupLogConfig(logger: Logger, servicePath: string, service: string, logConfigMap: LogConfigMap, inflateDir: string | undefined | false, errors: InflateError[]) {
+export async function setupLogConfig(logger: Logger, servicePath: string, service: string, logConfigMap: LogConfigMap, inflateDir: string | undefined | false, options: ImportJSXFileOptions, errors: InflateError[]) {
   const logPath = getLogConfigPath(servicePath); // resolve(process.cwd(), service, "server.ts");
   if (logPath) {
     try {
       //logger.debug("setting up server config from [%s]", join(service, basename(serverPath)));
 
-      const logConfig = await importLogConfigModule(logPath, logger);
+      const logConfig = await importLogConfigModule(logPath, options, logger);
       logConfigMap[service] = logConfig;
 
       if (inflateDir) {
