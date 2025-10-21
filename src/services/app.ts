@@ -56,6 +56,7 @@ export interface InflateOptions {
   inflateSea?: boolean;
   inflateOnlyAssets?: boolean;
   inflateParallel?: number;
+  inflateFlat?: boolean;
 }
 
 export interface InflatedResult {
@@ -391,7 +392,8 @@ export class Miqro {
         inflateParallel: options?.inflateParallel,
         noBuild: this.options?.noBuild,
         noMinify: this.options?.noMinify,
-        inflateOnlyAssets: options?.inflateOnlyAssets
+        inflateOnlyAssets: options?.inflateOnlyAssets,
+        inflateFlat: options?.inflateFlat
       });
 
       wsConfigList.push(...serviceWSConfigList);

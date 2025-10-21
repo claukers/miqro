@@ -1,5 +1,5 @@
 import { Logger, Router } from "@miqro/core";
-import { importDocConfigModule, ImportJSXFileOptions, InflateError, inflateJSX } from "../common/jsx.js";
+import { importDocConfigModule, ImportJSXFileOptions, InflateError } from "../common/jsx.js";
 import { getDocConfigPath } from "../common/paths.js";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { getDocOutput } from "../bin/generate-doc.js";
 import { RouteFileMap, StaticFileMap } from "./setup-http.js";
 import { CONTENT_TYPE_MAP } from "../common/content-type.js";
 
-export async function setupDoc(logger: Logger, servicePath: string, service: string, mainRouter: Router, fileMap: RouteFileMap, staticFileMap: StaticFileMap, inflateDir: string | undefined | false, errors: InflateError[], options: ImportJSXFileOptions) {
+export async function setupDoc(logger: Logger, servicePath: string, service: string, mainRouter: Router, fileMap: RouteFileMap, staticFileMap: StaticFileMap, inflateDir: string | undefined | false, errors: InflateError[], options: ImportJSXFileOptions, inflateFlat: boolean) {
   const docPath = getDocConfigPath(servicePath); //resolve(process.cwd(), service, "auth.ts");
 
   if (docPath) {
@@ -47,7 +47,7 @@ export async function setupDoc(logger: Logger, servicePath: string, service: str
           });
 
           if (inflateDir) {
-            const inflatePath = join(inflateDir, service, "static", path);
+            const inflatePath = join(inflateDir, !inflateFlat ? service : "", "static", path);
             mkdirSync(dirname(inflatePath), {
               recursive: true
             });
@@ -72,7 +72,7 @@ export async function setupDoc(logger: Logger, servicePath: string, service: str
                 method: "GET",
                 path,
                 body: Buffer.from(body),
-                inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
+                inflatePath: inflateDir ? join(inflateDir, !inflateFlat ? service : "", "static", path) : undefined
               }
             }
           }

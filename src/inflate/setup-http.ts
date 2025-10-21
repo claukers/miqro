@@ -101,7 +101,7 @@ async function createStaticRoute(inflateJSXOptions: InflateJSXFileOptions, servi
       };
 
       if (inflateDir && (inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)) {
-        const inflatePath = join(inflateDir, service, "static", path);
+        const inflatePath = join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", path);
         mkdir(dirname(inflatePath), {
           recursive: true
         }, (err) => {
@@ -121,7 +121,7 @@ async function createStaticRoute(inflateJSXOptions: InflateJSXFileOptions, servi
             method: "GET",
             path: normalizePath(path),
             body: Buffer.from(body),
-            inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
+            inflatePath: inflateDir ? join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", path) : undefined
           }
         }
       }
@@ -185,6 +185,7 @@ async function createStaticRouterFromDirectory(inflateOptions: InflateJSXFileOpt
 interface InflateJSXFileOptions {
   noMinify?: boolean;
   inflateOnlyAssets?: boolean;
+  inflateFlat?: boolean;
 }
 
 async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, inflateJSXOptions: InflateJSXFileOptions, server: ServerInterface, hotreload: boolean, service: string, logger: Logger, dir: string, errors: InflateError[] = [], routeFileMap: RouteFileMap = {}, staticFileMap: StaticFileMap | null = null, inflateDir: string | undefined | false, inflateSea: boolean, inflateParallel?: number): Promise<{
@@ -253,7 +254,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
 
                   if (inflateDir && r.defaultInflatePath && inflateSea) {
                     const rPath = r.defaultInflatePath;
-                    const inflatePath = join(inflateDir, service, "http", rPath + ".api.cjs");
+                    const inflatePath = join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "http", rPath + ".api.cjs");
                     await mkdirASync(dirname(inflatePath), {
                       recursive: true
                     });
@@ -289,7 +290,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                     if (r.inflatePath) {
                       //if (r.method === "GET" || r.method === "get") {
                       const rPath = r.inflatePath;
-                      const inflatePath = join(inflateDir, service, "static", rPath);
+                      const inflatePath = join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", rPath);
                       await mkdirASync(dirname(inflatePath), {
                         recursive: true
                       });
@@ -311,7 +312,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                           previewMethod: "html",
                           path: r.path,
                           body: Buffer.from(JSON_STATIC),
-                          inflatePath: inflateDir ? join(inflateDir, service, "static", r.inflatePath) : undefined
+                          inflatePath: inflateDir ? join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", r.inflatePath) : undefined
                         }
                       }
                     }
@@ -361,7 +362,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                     if (r.inflatePath) {
                       //if (r.method === "GET" || r.method === "get") {
                       const rPath = r.inflatePath;
-                      const inflatePath = join(inflateDir, service, "static", rPath);
+                      const inflatePath = join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", rPath);
                       await mkdirASync(dirname(inflatePath), {
                         recursive: true
                       });
@@ -385,7 +386,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                           previewMethod: "html",
                           path: r.path,
                           body: Buffer.from(HTML_STATIC),
-                          inflatePath: inflateDir ? join(inflateDir, service, "static", r.inflatePath) : undefined
+                          inflatePath: inflateDir ? join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", r.inflatePath) : undefined
                         }
                       }
                     }
@@ -432,7 +433,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                   };
 
                   if (inflateDir && (inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)) {
-                    const inflatePath = join(inflateDir, service, "static", path);
+                    const inflatePath = join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", path);
                     await mkdirASync(dirname(inflatePath), {
                       recursive: true
                     });
@@ -448,7 +449,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                         previewMethod: "html",
                         path,
                         body: Buffer.from(code),
-                        inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
+                        inflatePath: inflateDir ? join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", path) : undefined
                       }
                     }
                   }
@@ -485,7 +486,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                 };
 
                 if (inflateDir && (inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)) {
-                  const inflatePath = join(inflateDir, service, "static", path);
+                  const inflatePath = join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", path);
                   await mkdirASync(dirname(inflatePath), {
                     recursive: true
                   });
@@ -499,7 +500,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                       previewMethod: "html",
                       path,
                       body: Buffer.from(code),
-                      inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
+                      inflatePath: inflateDir ? join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", path) : undefined
                     }
                   }
                 }
@@ -546,7 +547,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                   };
 
                   if (inflateDir && (inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)) {
-                    const inflatePath = join(inflateDir, service, "static", path);
+                    const inflatePath = join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", path);
                     await mkdirASync(dirname(inflatePath), {
                       recursive: true
                     });
@@ -560,7 +561,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                         previewMethod: "html",
                         path,
                         body: Buffer.from(code),
-                        inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
+                        inflatePath: inflateDir ? join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", path) : undefined
                       }
                     }
                   }
@@ -604,7 +605,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                   };
 
                   if (inflateDir && (inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)) {
-                    const inflatePath = join(inflateDir, service, "static", path);
+                    const inflatePath = join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", path);
                     await mkdirASync(dirname(inflatePath), {
                       recursive: true
                     });
@@ -618,7 +619,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                         previewMethod: "html",
                         path,
                         body: Buffer.from(code),
-                        inflatePath: inflateDir ? join(inflateDir, service, "static", path) : undefined
+                        inflatePath: inflateDir ? join(inflateDir, !inflateJSXOptions.inflateFlat ? service : "", "static", path) : undefined
                       }
                     }
                   }
@@ -699,16 +700,16 @@ export function scanFiles(path: string, ret: ScannedFile[] = []): ScannedFile[] 
 
 
 function getHTML(hotreload: boolean, req: ServerRequest, res: Response | null, url: RuntimeURL, basePath: string | undefined, out: JSX.Element): string {
-  let HTML = `<!DOCTYPE html>\n${jsx2HTML(out, createNodeRuntime({
+  let HTML = `<!DOCTYPE html>\n${hotreload ? `${getHotReloadScript()}\n` : ""}${jsx2HTML(out, createNodeRuntime({
     url,
     basePath
   }))}`;
 
   //console.log("GET_HTML[%s] [%o]", HTML, out);
 
-  if (hotreload) {
+  /*if (hotreload) {
     HTML += getHotReloadScript()
-  }
+  }*/
   return HTML;
 }
 

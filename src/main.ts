@@ -76,6 +76,7 @@ async function main(args: Arguments) {
       // loadApp with inflateDir arg to inflate inflatable files
       await app.inflate({
         inflateOnlyAssets: args.inflateOnlyAssets,
+        inflateFlat: args.inflateFlat,      
         inflateDir: args.inflateDir,
         inflateSea: args.inflateSEA,
         inflateParallel: args.inflateParallel

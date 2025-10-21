@@ -31,6 +31,7 @@ interface MiqroJSON {
   noBuild?: boolean;
   noMinify?: boolean;
   inflateOnlyAssets?: boolean;
+  inflateFlat?: boolean;
 }
 
 const MiqroJSONSchema: Schema<MiqroJSON> = {
@@ -41,6 +42,7 @@ const MiqroJSONSchema: Schema<MiqroJSON> = {
     noBuild: "boolean?",
     noMinify: "boolean?",
     inflateOnlyAssets: "boolean?",
+    inflateFlat: "boolean?",
     port: "number?|string?",
     inflateDir: "string?",
     browser: "boolean?|string?",
@@ -69,6 +71,7 @@ export function getPORT() {
 
 export interface Arguments {
   inflateOnlyAssets?: boolean;
+  inflateFlat?: boolean;
   name?: string;
   noBuild?: boolean;
   noMinify?: boolean;
@@ -142,7 +145,9 @@ export function parseArguments(): Arguments {
     noBuild?: boolean | null;
     noMinify?: boolean | null;
     inflateOnlyAssets?: boolean | null;
+    inflateFlat?: boolean | null;
   } = {
+    inflateFlat: null,
     inflateOnlyAssets: null,
     inflateParallel: null,
     httpsRedirect: null,
@@ -230,6 +235,14 @@ export function parseArguments(): Arguments {
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
         flags.inflateOnlyAssets = true;
+        continue;
+      case "--inflate-flat":
+        if (flags.inflateFlat !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.inflateFlat = true;
         continue;
       case "--no-minify":
         if (flags.noMinify !== null) {
@@ -606,6 +619,11 @@ export function parseArguments(): Arguments {
         flags.noBuild = miqroRC.noBuild;
       }
     }
+    if (flags.inflateFlat === null) {
+      if (miqroRC.inflateFlat !== undefined) {
+        flags.inflateFlat = miqroRC.inflateFlat;
+      }
+    }
     if (flags.inflateOnlyAssets === null) {
       if (miqroRC.inflateOnlyAssets !== undefined) {
         flags.inflateOnlyAssets = miqroRC.inflateOnlyAssets;
@@ -735,6 +753,11 @@ export function parseArguments(): Arguments {
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
+  if (flags.inflateFlat && !flags.inflate) {
+    console.error("bad arguments. cannot use --inflate-flat without --inflate");
+    process.exit(EXIT_CODES.BAD_ARGUMENTS);
+  }
+
   if (flags.inflateOnlyAssets && !flags.inflate) {
     console.error("bad arguments. cannot use --inflate-only-assets without --inflate");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
@@ -793,9 +816,10 @@ export function parseArguments(): Arguments {
   }
 
   return {
+    inflateFlat: flags.inflateFlat === null ? false : flags.inflateFlat,
     inflateOnlyAssets: flags.inflateOnlyAssets === null ? undefined : flags.inflateOnlyAssets,
     noMinify: flags.noMinify === null ? false : flags.noMinify,
-    noBuild: flags.noBuild === null ? false: flags.noBuild,
+    noBuild: flags.noBuild === null ? false : flags.noBuild,
     inflateParallel: flags.inflateParallel ? flags.inflateParallel : undefined,
     name: flags.name ? flags.name : undefined,
     browser: flags.browser !== null ? flags.browser : undefined,
