@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2022",
     "noEmit": false,
-    "sourceMap": false,
+    "sourceMap": true,
     "declaration": true,
     "outDir": "./build/esm",
     "strict": false,

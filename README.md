@@ -508,6 +508,12 @@ to change the number of nodes use ```CLUSTER_COUNT=10```for example to set the c
 
 ```CLUSTER_COUNT=10 npx miqro-cluster --service app/```
 
+## Using TSC or another transpiler insted of esbuild on runtime
+
+```miqro --no-build ...```
+
+for this to work you will need to run ```tsc``` or another transpiler to transform your JSX files.
+
 ## cli usage
 
 ### start a project
@@ -570,33 +576,95 @@ CLUSTER_COUNT=10 miqro-cluster --service api/
 
 ==flags==
 
--v, --version		outputs the version number
--h, --help		outputs this page.
---watch			use to enable the hot-reload functionality.
---test			run the tests for a service.
---migrate-up		migrations up.
---migrate-down		migrations down.
---inflate		inflates the application.
---inflate-dir		to set the output directory of the --inflate command. default value is inflated/.
---editor		runs the application with a built-in editor.
---generate-doc		generates a documentation for the api endpoints of the service.
---generate-doc-out	the output file for the generated documentation. default value is API.md.
---generate-doc-type	the format of the generated documentation. it can be JSON or MD. default value is MD.
---generate-doc-all	outputs all the server routes in the documentation output.
---compile		inflates the application and tries to create a NODE SEA binary.
---inflate-sea		inflates the application with sea compilation scripts.
---install-tsconfig	creates a tsconfig.json configured to use with --install-types.
+-v, --version
+        outputs the version number
+-h, --help
+        outputs this page.
+--watch
+        use to auto reload the server when files change.
+--hot-reload
+        enables the hot-reload functionality use with --watch.
+--test
+        run the tests for a service.
+--migrate-up
+        migrations up.
+--migrate-down
+        migrations down.
+--inflate
+        inflates the application into a directory using esbuild.
+--inflate-dir
+        to set the output directory of the --inflate command. default value is inflated/.
+--editor
+        runs the application with a built-in editor.
+--generate-doc
+        generates a documentation for the api endpoints of the service.
+--generate-doc-out
+        the output file for the generated documentation. default value is API.md.
+--generate-doc-type
+        the format of the generated documentation. it can be JSON or MD. default value is MD.
+--generate-doc-all
+        outputs all the server routes in the documentation output.
+--compile
+        inflates the application and tries to create a NODE SEA binary.
+--no-build
+        disables calling esbuild during imports in runtime. Notice that to use jsx you will need to run tsc or esbuild on your jsx files to transpile them to js.
+--no-minify
+        disables calling minifing min.js files.
+--inflate-only-assets
+        inflates ONLY the application assets. must be used with --inflate.
+--inflate-flat
+        inflates files into the inflate-dir directly.
+--inflate-sea
+        inflates the application with sea compilation scripts.
+--install-tsconfig
+        creates a tsconfig.json configured to use with --install-types.
+--install-miqrojson
+        creates a default miqro.json file.
+--install
+        creates a node_modules folder from binary cache (only available in sea binary).
+--disable-miqrojson
+        disables the load of miqro.json file.
+--log-file
+        overrides the default log file from LOG_FILE.
+--browser
+        overrides the default browser from BROWSER.
+--config
+        overrides the default miqro.json path.
+--port
+        overrides the default port from PORT.
+--name
+        overrides the default name of the server.
+--https
+        serves the server in https instead of http
+--https-key
+        point to a server.key file for https.
+--https-cert
+        point to a server.cert file for https.
+--https-redirect
+        serves an aditional http server that redirects to https. it needs a port number.
+--inflate-parallel
+        sets the max parallel esbuild instances. defaults to 1.
 
 ==environment variables==
 
-PORT			override the default 8080 port.
-LOG_FILE		override the default ./server.log file
-DB			enable the server.db features
-DB_STORAGE		override the default local db location ./db.sqlite3
-DB_DIALECT		override the default node:sqlite
-DB_CONNECTION		override the default connection url
-CLEAR_JSX_CACHE		set to 1 or 0 to enable or disable the clearing of the esbuild cache defaults to 1.
-JSX_TMP			set custom location of esbuild builds defaults to /tmp/jsx_tmp.
+PORT
+        override the default 8080 port.
+BROWSER
+        override the default browser. change to none to disable.".
+LOG_FILE
+        override the default ./server.log file
+DB
+        enable the server.db features
+DB_STORAGE
+        override the default local db location ./db.sqlite3
+DB_DIALECT
+        override the default node:sqlite
+DB_CONNECTION
+        override the default connection url
+CLEAR_JSX_CACHE
+        set to 1 or 0 to enable or disable the clearing of the esbuild cache defaults to 1.
+JSX_TMP
+        set custom location of esbuild builds defaults to /tmp/jsx_tmp.
 ```
 
 ## development
