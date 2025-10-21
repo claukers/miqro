@@ -34,9 +34,9 @@ const ASSETS_ROUTER = {
   "editor-assets/font.ttf": "build/font.ttf"
 }
 
-export function getAsset(key: string): ArrayBuffer {
+export function getAsset(key: string): Buffer {
   if (isSea()) {
-    return seaGetAsset(key);
+    return Buffer.from(seaGetAsset(key));
   } else {
     if (!ASSETS_ROUTER[key]) {
       if (key === "esbuild-binary") {

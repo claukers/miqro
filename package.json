@@ -34,10 +34,10 @@
     "miqro-cluster": "build/esm/src/cluster.js"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
+    "@types/node": "^24.9.1",
     "@types/showdown": "2.0.6",
     "highlight.js": "11.11.1",
-    "typescript": "^5.7.2"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "postject": "1.0.0-alpha.6",
