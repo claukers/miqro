@@ -1,9 +1,8 @@
 //import { checkEnvVariable } from "@miqro/core";
 
-import { HOT_RELOAD_PATH } from "../common/constants.js";
+import { HOT_RELOAD_PATH, HOT_RELOAD_SCRIPT_PATH } from "../common/constants.js";
 
-export function getHotReloadScript() {
-  const HOT_RELOAD_JS_SCRIPT = `
+export const HOT_RELOAD_JS_SCRIPT = `
 // Create WebSocket connection.
 
 function getSocket() {
@@ -13,13 +12,14 @@ function getSocket() {
 const socket = getSocket();
 
 let timeout;
+let reloadtimeout;
 
 function tryConnection() {
     try {
         const newSocket = getSocket();
         newSocket.addEventListener("open", (event) => {
             console.log("reloading");
-            setTimeout(()=>{
+            reloadtimeout = setTimeout(()=>{
               window.location.reload();
             }, 500);
             
@@ -37,13 +37,17 @@ function tryConnection() {
 // Connection closed
 socket.addEventListener("close", (event) => {
     clearTimeout(timeout);
+    clearTimeout(reloadtimeout);
     timeout = setTimeout(tryConnection, 500);
 });
 
 socket.addEventListener("error", (err) => {
+    clearTimeout(reloadtimeout);
     console.error(err);
 });`;
-  return `<script>${HOT_RELOAD_JS_SCRIPT}</script>`;
+
+export function getHotReloadScript() {
+  return `<script src="${HOT_RELOAD_SCRIPT_PATH}"></script>`;
 }
 
 /*export function isHotReloadEnabled() {

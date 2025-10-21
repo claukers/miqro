@@ -30,6 +30,7 @@ interface MiqroJSON {
   inflateParallel?: number;
   noBuild?: boolean;
   noMinify?: boolean;
+  inflateOnlyAssets?: boolean;
 }
 
 const MiqroJSONSchema: Schema<MiqroJSON> = {
@@ -39,6 +40,7 @@ const MiqroJSONSchema: Schema<MiqroJSON> = {
     services: "string[]?",
     noBuild: "boolean?",
     noMinify: "boolean?",
+    inflateOnlyAssets: "boolean?",
     port: "number?|string?",
     inflateDir: "string?",
     browser: "boolean?|string?",
@@ -66,6 +68,7 @@ export function getPORT() {
 }
 
 export interface Arguments {
+  inflateOnlyAssets?: boolean;
   name?: string;
   noBuild?: boolean;
   noMinify?: boolean;
@@ -138,7 +141,9 @@ export function parseArguments(): Arguments {
     watch?: boolean | null;
     noBuild?: boolean | null;
     noMinify?: boolean | null;
+    inflateOnlyAssets?: boolean | null;
   } = {
+    inflateOnlyAssets: null,
     inflateParallel: null,
     httpsRedirect: null,
     https: null,
@@ -217,6 +222,14 @@ export function parseArguments(): Arguments {
           flags.miqroJSONPath = cPath;
         }
         i++;
+        continue;
+      case "--inflate-only-assets":
+        if (flags.inflateOnlyAssets !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.inflateOnlyAssets = true;
         continue;
       case "--no-minify":
         if (flags.noMinify !== null) {
@@ -593,6 +606,11 @@ export function parseArguments(): Arguments {
         flags.noBuild = miqroRC.noBuild;
       }
     }
+    if (flags.inflateOnlyAssets === null) {
+      if (miqroRC.inflateOnlyAssets !== undefined) {
+        flags.inflateOnlyAssets = miqroRC.inflateOnlyAssets;
+      }
+    }
     if (flags.noMinify === null) {
       if (miqroRC.noMinify !== undefined) {
         flags.noMinify = miqroRC.noMinify;
@@ -717,6 +735,11 @@ export function parseArguments(): Arguments {
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
+  if (flags.inflateOnlyAssets && !flags.inflate) {
+    console.error("bad arguments. cannot use --inflate-only-assets without --inflate");
+    process.exit(EXIT_CODES.BAD_ARGUMENTS);
+  }
+
   if (flags.editor && (/*flags.installTypes || */flags.installTSConfig || flags.installMiqroJSON)) {
     console.error("bad arguments. cannot use --editor with--install-types, --install-tsconfig or --install-miqrojson");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
@@ -765,6 +788,7 @@ export function parseArguments(): Arguments {
   }
 
   return {
+    inflateOnlyAssets: flags.inflateOnlyAssets === null ? undefined : flags.inflateOnlyAssets,
     noMinify: flags.noMinify === null ? false : flags.noMinify,
     noBuild: flags.noBuild === null ? false: flags.noBuild,
     inflateParallel: flags.inflateParallel ? flags.inflateParallel : undefined,

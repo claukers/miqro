@@ -5,7 +5,7 @@ import { WebSocketManager } from "./utils/websocketmanager.js";
 import { DBManager } from "./utils/db-manager.js";
 import { inflateApp } from "../inflate/inflate.js";
 import { ImportJSXFileOptions, InflateError } from "../common/jsx.js";
-import { DBConfig, MigrateOptions, ServerInterface, ServerRequest, WSConfig } from "../types.js";
+import { DBConfig, MigrateOptions, ServerInterface, ServerRequest, ServerResponse, WSConfig } from "../types.js";
 import { RouteFileMap } from "../inflate/setup-http.js";
 import { ServerConfigMap, setupServerConfig } from "../inflate/setup-server-config.js";
 import { BASEEDITOR_PATH, LOG_SOCKET_PATH, LOG_WRITE_EVENT } from "../../editor/common/constants.js";
@@ -14,7 +14,7 @@ import editorServerConfig from "../../editor/server.js";
 
 import { ClusterCache } from "./utils/cluster-cache.js";
 import { createEditorRouter } from "./editor.js";
-import { EDITOR_CONFIG_KEY, HOT_RELOAD_PATH } from "../common/constants.js";
+import { EDITOR_CONFIG_KEY, HOT_RELOAD_PATH, HOT_RELOAD_SCRIPT_PATH } from "../common/constants.js";
 import { watchAndServer } from "../common/watch.js";
 import { LocalCache } from "./utils/cache.js";
 // import { initGlobals } from "./globals.js";
@@ -32,6 +32,7 @@ import { createAdminInterface } from "./utils/admin-interface.js";
 import { dirname, join, relative, resolve } from "node:path";
 import { cwd } from "node:process";
 import { ServerOptions } from "node:https";
+import { HOT_RELOAD_JS_SCRIPT } from "./hot-reload.js";
 
 export interface MiqroOptions extends ImportJSXFileOptions {
   name: string;
@@ -47,11 +48,13 @@ export interface MiqroOptions extends ImportJSXFileOptions {
   serverOptions?: ServerOptions<any, any>;
   https?: boolean;
   httpRedirect?: number;
+  noMinify?: boolean;
 }
 
 export interface InflateOptions {
   inflateDir?: string;
   inflateSea?: boolean;
+  inflateOnlyAssets?: boolean;
   inflateParallel?: number;
 }
 
@@ -366,6 +369,10 @@ export class Miqro {
         wsConfigList.push({
           path: HOT_RELOAD_PATH
         });
+        this.logger?.debug("setting up hot-reload script on [%s]", HOT_RELOAD_SCRIPT_PATH);
+        const hotReloadScriptRouter = new Router();
+        hotReloadScriptRouter.get(HOT_RELOAD_SCRIPT_PATH, async (req, res) => res.js(HOT_RELOAD_JS_SCRIPT));
+        router.use(hotReloadScriptRouter);
       }
 
       await notifiyServerConfig(this.logger, this.serverInterface, this.adminInterface, serverConfigMap, "preload");
@@ -383,7 +390,8 @@ export class Miqro {
         hotreload: this.options?.hotreload ? true : false,
         inflateParallel: options?.inflateParallel,
         noBuild: this.options?.noBuild,
-        noMinify: this.options?.noMinify
+        noMinify: this.options?.noMinify,
+        inflateOnlyAssets: options?.inflateOnlyAssets
       });
 
       wsConfigList.push(...serviceWSConfigList);

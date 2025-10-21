@@ -54,8 +54,7 @@ async function main(args: Arguments) {
       });
       await app.start();
       await testMain(app, {
-        noBuild: args.noBuild,
-        noMinify: args.noMinify
+        noBuild: args.noBuild
       });
       await app.stop();
       await app.dbManager.closeAll();
@@ -76,6 +75,7 @@ async function main(args: Arguments) {
       // --inflate and --inflate-sea
       // loadApp with inflateDir arg to inflate inflatable files
       await app.inflate({
+        inflateOnlyAssets: args.inflateOnlyAssets,
         inflateDir: args.inflateDir,
         inflateSea: args.inflateSEA,
         inflateParallel: args.inflateParallel

@@ -46,7 +46,7 @@ export interface InflateError {
   error: Error;
 }
 
-export interface InflateOptions {
+interface InflateOptions {
   // embemedJSX: boolean;
   minify: boolean;
   useExport: boolean;
@@ -494,7 +494,6 @@ export async function importServerConfigModule(inFile: string, options: ImportJS
 
 export interface ImportJSXFileOptions {
   noBuild: boolean;
-  noMinify: boolean;
 }
 
 export async function importJSXFile(inFile: string, options: ImportJSXFileOptions, logger?: Logger | Console): Promise<any> {

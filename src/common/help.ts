@@ -23,7 +23,7 @@ export const help = `
 --test\n\trun the tests for a service.
 --migrate-up\n\tmigrations up.
 --migrate-down\n\tmigrations down.
---inflate\n\tinflates the application.
+--inflate\n\tinflates the application into a directory using esbuild.
 --inflate-dir\n\tto set the output directory of the --inflate command. default value is inflated/.
 --editor\n\truns the application with a built-in editor.
 --generate-doc\n\tgenerates a documentation for the api endpoints of the service.
@@ -31,8 +31,9 @@ export const help = `
 --generate-doc-type\n\tthe format of the generated documentation. it can be JSON or MD. default value is MD.
 --generate-doc-all\n\toutputs all the server routes in the documentation output.
 --compile\n\tinflates the application and tries to create a NODE SEA binary.
---no-build\n\tdisables calling esbuild.
---no-minify\n\tdisables calling min.js files.
+--no-build\n\tdisables calling esbuild during imports in runtime. Notice that to use jsx you will need to run tsc or esbuild on your jsx files to transpile them to js.
+--no-minify\n\tdisables calling minifing min.js files.
+--inflate-only-assets\n\tinflates ONLY the application assets. must be used with --inflate.
 --inflate-sea\n\tinflates the application with sea compilation scripts.
 --install-tsconfig\n\tcreates a tsconfig.json configured to use with --install-types.
 --install-miqrojson\n\tcreates a default miqro.json file.

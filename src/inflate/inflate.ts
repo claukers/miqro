@@ -25,9 +25,10 @@ export interface InflateAppOptions {
   inflateParallel?: number;
   noBuild?: boolean;
   noMinify?: boolean;
+  inflateOnlyAssets?: boolean;
 }
 
-export async function inflateApp({ inflateParallel, serverInterface, logger, hotreload, services/*, dbManager*/, inflateDir, inflateSea/*, editor, inflateTests*/, port, noBuild, noMinify }: InflateAppOptions): Promise<[Router, InflateError[] | null, RouteFileMap, WSConfig[]/*, ServerConfigMap*/, LogConfigMap]> {
+export async function inflateApp({ inflateParallel, serverInterface, logger, hotreload, services/*, dbManager*/, inflateDir, inflateSea/*, editor, inflateTests*/, port, noBuild, noMinify, inflateOnlyAssets }: InflateAppOptions): Promise<[Router, InflateError[] | null, RouteFileMap, WSConfig[]/*, ServerConfigMap*/, LogConfigMap]> {
   logger.trace("inflateApp");
   const errors: InflateError[] = [];
   //const migrations: string[] = [];
@@ -70,17 +71,17 @@ export async function inflateApp({ inflateParallel, serverInterface, logger, hot
 
     //await setupDB(logger, service, dbConfigList, inflateDir);
 
-    await setupLogConfig(logger, servicePath, service, logConfigMap, inflateSea ? inflateDir : false, { noBuild, noMinify }, errors);
+    await setupLogConfig(logger, servicePath, service, logConfigMap, inflateSea ? inflateDir : false, { noBuild }, errors);
 
-    router.use(await setupHTTPRouter({ noBuild, noMinify }, serverInterface, logger, hotreload ? hotreload : false, servicePath, service, serviceRouteFileMap, serviceStaticFileMap, inflateDir, inflateSea, { noBuild, noMinify }, errors, inflateParallel));
+    router.use(await setupHTTPRouter({ noBuild }, { noMinify, inflateOnlyAssets }, serverInterface, logger, hotreload ? hotreload : false, servicePath, service, serviceRouteFileMap, serviceStaticFileMap, inflateDir, inflateSea, errors, inflateParallel));
     routeFileMap = {
       ...routeFileMap,
       ...serviceRouteFileMap
     };
 
-    await setupDoc(logger, servicePath, service, router, routeFileMap, serviceStaticFileMap, inflateDir, errors, { noBuild, noMinify });
+    await setupDoc(logger, servicePath, service, router, routeFileMap, serviceStaticFileMap, inflateDir, errors, { noBuild });
 
-    await inflateWSConfig(logger, servicePath, service, wsConfigList, inflateSea ? inflateDir : undefined, errors, { noBuild, noMinify });
+    await inflateWSConfig(logger, servicePath, service, wsConfigList, inflateSea ? inflateDir : undefined, errors, { noBuild });
 
     //await setupServerConfig(logger, servicePath, service, serverConfigMap, inflateSea ? inflateDir : undefined, errors);
 

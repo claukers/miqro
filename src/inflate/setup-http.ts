@@ -45,27 +45,27 @@ export interface StaticFileMap {
   }
 }
 
-export async function setupHTTPRouter(importOptions: ImportJSXFileOptions, server: ServerInterface, logger: Logger, hotreload: boolean, servicePath: string, service: string, routeFileMap: RouteFileMap, staticFileMap: StaticFileMap | null, inflateDir: string | undefined | false, inflateSea: boolean, options: ImportJSXFileOptions, errors: InflateError[], inflateParallel?: number) {
+export async function setupHTTPRouter(importOptions: ImportJSXFileOptions, inflateOptions: InflateJSXFileOptions, server: ServerInterface, logger: Logger, hotreload: boolean, servicePath: string, service: string, routeFileMap: RouteFileMap, staticFileMap: StaticFileMap | null, inflateDir: string | undefined | false, inflateSea: boolean, errors: InflateError[], inflateParallel?: number) {
   const mainRouter = new Router();
   const apiRouterPath = getHTTPRouterPath(servicePath); //resolve(process.cwd(), service, "http");
   let middlewareConfig: MiddlewareConfig | null = null;
 
-  await setupError(logger, servicePath, service, mainRouter, inflateDir, inflateSea, options, errors);
+  await setupError(logger, servicePath, service, mainRouter, inflateDir, inflateSea, importOptions, errors);
 
-  await setupCORS(logger, servicePath, service, mainRouter, inflateDir, inflateSea, options, errors);
-  await setupAUTH(logger, servicePath, service, mainRouter, inflateDir, inflateSea, options, errors);
-  middlewareConfig = await setupMiddleware(logger, servicePath, service, mainRouter, inflateDir, inflateSea, options, errors);
+  await setupCORS(logger, servicePath, service, mainRouter, inflateDir, inflateSea, importOptions, errors);
+  await setupAUTH(logger, servicePath, service, mainRouter, inflateDir, inflateSea, importOptions, errors);
+  middlewareConfig = await setupMiddleware(logger, servicePath, service, mainRouter, inflateDir, inflateSea, importOptions, errors);
 
   if (apiRouterPath) {
     logger.trace("setting up http routes from [%s]", service);
-    const { router: httpRouter } = await createRouterFromDirectory(importOptions, server, hotreload, service, logger, apiRouterPath, errors, routeFileMap, staticFileMap, inflateDir, inflateSea, inflateParallel);
+    const { router: httpRouter } = await createRouterFromDirectory(importOptions, inflateOptions, server, hotreload, service, logger, apiRouterPath, errors, routeFileMap, staticFileMap, inflateDir, inflateSea, inflateParallel);
     mainRouter.use(httpRouter);
   }
 
   const staticFilesPath = getStaticFilesPath(servicePath); //resolve(process.cwd(), service, "static");
   if (staticFilesPath) {
     logger.trace("setting up static file routes from [%s]", service);
-    const staticRouter = await createStaticRouterFromDirectory(service, logger, staticFilesPath, inflateDir, routeFileMap, staticFileMap, inflateParallel);
+    const staticRouter = await createStaticRouterFromDirectory(inflateOptions, service, logger, staticFilesPath, inflateDir, routeFileMap, staticFileMap, inflateParallel);
     mainRouter.use(staticRouter);
   }
 
@@ -78,7 +78,7 @@ export async function setupHTTPRouter(importOptions: ImportJSXFileOptions, serve
   return mainRouter;
 }
 
-async function createStaticRoute(service: string, logger: Logger, router: Router, dir: string, file: ScannedFile, inflateDir?: string | undefined | false, routeFileMap?: RouteFileMap, staticFileMap?: StaticFileMap) {
+async function createStaticRoute(inflateJSXOptions: InflateJSXFileOptions, service: string, logger: Logger, router: Router, dir: string, file: ScannedFile, inflateDir?: string | undefined | false, routeFileMap?: RouteFileMap, staticFileMap?: StaticFileMap) {
   return new Promise<void>(async (resolve, reject) => {
     try {
       logger.trace("creating static route for [%s]", file.filePath);
@@ -100,7 +100,7 @@ async function createStaticRoute(service: string, logger: Logger, router: Router
         previewMethod: "html"
       };
 
-      if (inflateDir) {
+      if (inflateDir && (inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)) {
         const inflatePath = join(inflateDir, service, "static", path);
         mkdir(dirname(inflatePath), {
           recursive: true
@@ -162,14 +162,14 @@ async function createStaticRoute(service: string, logger: Logger, router: Router
   });
 }
 
-async function createStaticRouterFromDirectory(service: string, logger: Logger, dir: string, inflateDir: string | false | undefined, routeFileMap: RouteFileMap | undefined, staticFileMap: StaticFileMap | null, inflateParallel?: number): Promise<Router> {
+async function createStaticRouterFromDirectory(inflateOptions: InflateJSXFileOptions, service: string, logger: Logger, dir: string, inflateDir: string | false | undefined, routeFileMap: RouteFileMap | undefined, staticFileMap: StaticFileMap | null, inflateParallel?: number): Promise<Router> {
   const router = new Router();
   const maxParallel = inflateParallel ? inflateParallel : 1;
   logger.debug("loading static directory with parallel [%s]", maxParallel);
   let tR = [];
   const files = scanFiles(dir);
   for (const file of files) {
-    tR.push(await createStaticRoute(service, logger, router, dir, file, inflateDir, routeFileMap, staticFileMap));
+    tR.push(await createStaticRoute(inflateOptions, service, logger, router, dir, file, inflateDir, routeFileMap, staticFileMap));
     if (tR.length >= maxParallel) {
       await Promise.all(tR);
       tR = [];
@@ -182,7 +182,12 @@ async function createStaticRouterFromDirectory(service: string, logger: Logger, 
   return router;
 }
 
-async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, server: ServerInterface, hotreload: boolean, service: string, logger: Logger, dir: string, errors: InflateError[] = [], routeFileMap: RouteFileMap = {}, staticFileMap: StaticFileMap | null = null, inflateDir: string | undefined | false, inflateSea: boolean, inflateParallel?: number): Promise<{
+interface InflateJSXFileOptions {
+  noMinify?: boolean;
+  inflateOnlyAssets?: boolean;
+}
+
+async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, inflateJSXOptions: InflateJSXFileOptions, server: ServerInterface, hotreload: boolean, service: string, logger: Logger, dir: string, errors: InflateError[] = [], routeFileMap: RouteFileMap = {}, staticFileMap: StaticFileMap | null = null, inflateDir: string | undefined | false, inflateSea: boolean, inflateParallel?: number): Promise<{
   router: Router;
   errors: InflateError[];
   routeFileMap: RouteFileMap;
@@ -221,7 +226,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, se
                   previewMethod: "api"
                 };
 
-                const inflatedCode = inflateDir ? await inflateJSX(file.filePath, {
+                const inflatedCode = inflateDir && inflateSea && (!inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)? await inflateJSX(file.filePath, {
                   // embemedJSX: false,
                   minify: false,
                   useExport: true,
@@ -274,7 +279,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, se
 
 
 
-                  if (inflateDir) {
+                  if (inflateDir && (inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)) {
 
                     if (r.inflatePath) {
                       //if (r.method === "GET" || r.method === "get") {
@@ -341,7 +346,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, se
 
                   const contentType = CONTENT_TYPE_MAP[".html"] ? CONTENT_TYPE_MAP[".html"] : DEFAULT_CONTENT_TYPE;
 
-                  if (inflateDir) {
+                  if (inflateDir && (!inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)) {
 
                     if (r.inflatePath) {
                       //if (r.method === "GET" || r.method === "get") {
@@ -362,7 +367,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, se
                       //}
 
 
-                      if (staticFileMap && inflateSea) {
+                      if (staticFileMap && inflateSea && (!inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)) {
                         staticFileMap[file.filePath + r.method + r.path] = {
                           filePath: file.filePath,
                           contentType,
@@ -397,7 +402,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, se
               default: {
                 // allow fall-through when extension is .js and .ts because is a static route without embemedJSX
                 if (file.ext !== ".js" && file.ext !== ".ts") {
-                  const code = importOptions.noMinify ? readFileSync(file.filePath).toString() : await inflateJSX(file.filePath, {
+                  const code = inflateJSXOptions.noMinify ? readFileSync(file.filePath).toString() : await inflateJSX(file.filePath, {
                     // embemedJSX: true,
                     minify: file.subExt === ".min" ? true : false,
                     useExport: true,
@@ -416,7 +421,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, se
                     previewMethod: "html"
                   };
 
-                  if (inflateDir) {
+                  if (inflateDir && (inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)) {
                     const inflatePath = join(inflateDir, service, "static", path);
                     await mkdirASync(dirname(inflatePath), {
                       recursive: true
@@ -469,7 +474,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, se
                   previewMethod: "html"
                 };
 
-                if (inflateDir) {
+                if (inflateDir && (inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)) {
                   const inflatePath = join(inflateDir, service, "static", path);
                   await mkdirASync(dirname(inflatePath), {
                     recursive: true
@@ -512,7 +517,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, se
                 }
                 case ".bundle":
                 case ".min": {
-                  const code = importOptions.noMinify ? readFileSync(file.filePath).toString() : await inflateJSX(file.filePath, {
+                  const code = inflateJSXOptions.noMinify ? readFileSync(file.filePath).toString() : await inflateJSX(file.filePath, {
                     // embemedJSX: false,
                     minify: file.subExt === ".min" ? true : false,
                     useExport: true,
@@ -530,7 +535,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, se
                     previewMethod: "html"
                   };
 
-                  if (inflateDir) {
+                  if (inflateDir && (inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)) {
                     const inflatePath = join(inflateDir, service, "static", path);
                     await mkdirASync(dirname(inflatePath), {
                       recursive: true
@@ -588,7 +593,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, se
                     previewMethod: "html"
                   };
 
-                  if (inflateDir) {
+                  if (inflateDir && (inflateJSXOptions.inflateOnlyAssets || inflateJSXOptions.inflateOnlyAssets === undefined)) {
                     const inflatePath = join(inflateDir, service, "static", path);
                     await mkdirASync(dirname(inflatePath), {
                       recursive: true
@@ -622,7 +627,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, se
                 }
               }
             }
-            await createStaticRoute(service, logger, router, dir, file, inflateDir, routeFileMap, staticFileMap);
+            await createStaticRoute(inflateJSXOptions, service, logger, router, dir, file, inflateDir, routeFileMap, staticFileMap);
             return resolve();
 
         }

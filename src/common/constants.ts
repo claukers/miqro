@@ -12,6 +12,7 @@ export const CLEAR_JSX_CACHE = (process.env["CLEAR_JSX_CACHE"] !== undefined ? p
 export const EDITOR_CONFIG_KEY = "$$editor$$";
 
 export const HOT_RELOAD_PATH = "/hot-reload";
+export const HOT_RELOAD_SCRIPT_PATH = "/hot-reload.js";
 
 //export const SERVER_IDENTIFIER = cluster.isPrimary ? "SERVER" : process.env["CLUSTER_NODE_NUMBER"] ? `WORKER_${process.env["CLUSTER_NODE_NUMBER"]}` : "WORKER";
 
