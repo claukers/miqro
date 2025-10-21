@@ -740,6 +740,11 @@ export function parseArguments(): Arguments {
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
+  if (flags.inflateOnlyAssets && flags.inflateSEA) {
+    console.error("bad arguments. cannot use --inflate-only-assets with --inflate-sea");
+    process.exit(EXIT_CODES.BAD_ARGUMENTS);
+  }
+
   if (flags.editor && (/*flags.installTypes || */flags.installTSConfig || flags.installMiqroJSON)) {
     console.error("bad arguments. cannot use --editor with--install-types, --install-tsconfig or --install-miqrojson");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
