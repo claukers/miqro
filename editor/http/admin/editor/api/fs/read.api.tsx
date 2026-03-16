@@ -1,5 +1,5 @@
 import { APIRoute, JSONParser } from "@miqro/core";
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
 import { SUPPORTED_LANGUAGES } from "../../../../../common/constants.js";
 import { relative, resolve } from "node:path";
 import { getLanguage } from "./scan.api.js";
@@ -45,7 +45,7 @@ export function readFile(path: string) {
 }
 
 export function getPath(path: string) {
-  const realPath = resolve(BASE_PATH, path);
+  const realPath = realpathSync(resolve(BASE_PATH, path));
 
   if (relative(BASE_PATH, realPath).startsWith("..")) {
     throw new Error("invalid path! [" + path + "]");

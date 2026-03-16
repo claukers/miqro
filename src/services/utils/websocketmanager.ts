@@ -28,7 +28,8 @@ export class WebSocketManager {
   public deleteWS(path: string) {
     const ws = this.runningGlobalWSMap.get(path);
     this.disconnectAllFrom(path);
-    ws.dispose();
+    if (ws)
+      ws.dispose();
     this.runningGlobalWSMap.delete(path);
   }
 

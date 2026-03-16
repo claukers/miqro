@@ -10,6 +10,6 @@ export default {
     
     const KEY = cache.get("AUTH_KEY");
     const cookieToken = req.cookies["auth"];
-    return cookieToken === KEY ? true : false;
+    return cookieToken && KEY && cookieToken === KEY ? true : false;
   },
 } as WSConfig;

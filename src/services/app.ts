@@ -133,8 +133,8 @@ export class Miqro {
           msg &&
           msg.action &&
           msg.type === MiqroApplicationMessageType &&
-          msg.target === this.options.name,
-          msg.fromPID !== process.pid,
+          msg.target === this.options.name &&
+          msg.fromPID !== process.pid &&
           (msg.action === "reload" || msg.action === "restart")) {
           this.logger?.debug("remote server message from [%s] [%s]", msg.fromPID, msg.action);
           switch (msg.action) {
@@ -145,7 +145,7 @@ export class Miqro {
               await this.restart(true);
               break;
             default:
-              throw new Error("unsopported message for ApplicaitonServer");
+              throw new Error("unsupported message for ApplicationServer");
           }
         }
       } catch (e) {

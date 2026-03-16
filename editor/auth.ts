@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { AuthConfig, ServerRequest } from "../src/types.js";
 import { AdminRequest } from "./common/admin-interface.js";
 
@@ -27,7 +28,7 @@ export default {
       //console.log("\n\nqueryToken[%s] cookieToken[%s] KEY[%s]\n\n", queryToken, cookieToken, KEY);
 
       if (queryToken) {
-        if (queryToken === KEY) {
+        if (typeof queryToken === "string" && timingSafeEqual(Buffer.from(queryToken), Buffer.from(KEY))) {
           args.res.setCookie(ADMIN_EDITOR_AUTH_COOKIE, KEY, {
             expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 31 * 12 * 500),
             httpOnly: true,

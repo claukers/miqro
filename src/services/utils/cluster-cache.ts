@@ -6,7 +6,7 @@ const ClusterCacheType = "$$$$$$$$$$$ClusterCacheType$$$$$$$$$$$";
 interface ClusterCacheMessage {
   type: typeof ClusterCacheType;
   target: string;
-  action: "set" | "unset" | "set_add" | "set_delete" | "array_push";
+  action: "set" | "unset" | "set_add" | "set_delete" | "array_push" | "set_clear" | "array_clear";
   fromPID: number;
   key: string;
   value?: string;
@@ -28,11 +28,29 @@ export class ClusterCache implements CacheInterface {
           msg.key &&
           msg.action &&
           msg.type === ClusterCacheType &&
-          msg.fromPID !== process.pid,
-          (msg.action === "set_add" || msg.action === "set" || msg.action === "unset" || msg.action === "set_delete" || msg.action === "array_push") &&
+          msg.fromPID !== process.pid &&
+          (msg.action === "set_clear" || msg.action === "array_clear" || msg.action === "set_add" || msg.action === "set" || msg.action === "unset" || msg.action === "set_delete" || msg.action === "array_push") &&
           msg.target === this.name) {
           this.logger?.debug("remote cluster cache message from [%s] [%s] [%s] [%s]", msg.fromPID, msg.target, msg.action, msg.key);
           switch (msg.action) {
+            case "set_clear": {
+              const list = this.localCache.has(msg.key) ? this.localCache.get(msg.key) : new Set<string>();
+              if (!(list instanceof Set)) {
+                throw new Error("cannot apply clear on non set");
+              }
+              list.clear();
+              this.localCache.set(msg.key, list);
+              break;
+            }
+            case "array_clear": {
+              //this.localCache.set(msg.key, msg.value);
+              const list = this.localCache.has(msg.key) ? this.localCache.get(msg.key) : [];
+              if (!(list instanceof Array)) {
+                throw new Error("cannot apply clear on non array");
+              }
+              this.localCache.set(msg.key, []);
+              break;
+            }
             case "unset":
               this.localCache.delete(msg.key);
               break;
@@ -43,7 +61,7 @@ export class ClusterCache implements CacheInterface {
               //this.localCache.set(msg.key, msg.value);
               const list = this.localCache.has(msg.key) ? this.localCache.get(msg.key) : new Set<string>();
               if (!(list instanceof Set)) {
-                throw new Error("cannot apply push on non array");
+                throw new Error("cannot apply add on non set");
               }
               if (!list.has(msg.value)) {
                 list.add(msg.value);
@@ -55,7 +73,7 @@ export class ClusterCache implements CacheInterface {
               //this.localCache.set(msg.key, msg.value);
               const list = this.localCache.has(msg.key) ? this.localCache.get(msg.key) : new Set<string>();
               if (!(list instanceof Set)) {
-                throw new Error("cannot apply push on non array");
+                throw new Error("cannot apply delete on non set");
               }
               if (list.has(msg.value)) {
                 list.delete(msg.value);
@@ -100,33 +118,25 @@ export class ClusterCache implements CacheInterface {
   set(key: string, value: unknown): void {
     this.localCache.set(key, value);
     this.logger?.trace("set(%s, ...)", key);
-    if (process.send) {
-      setTimeout(() => {
-        process.send({
-          type: ClusterCacheType,
-          action: "set",
-          target: this.name,
-          fromPID: process.pid,
-          key,
-          value
-        } as ClusterCacheMessage);
-      }, 10);
-    }
+    sendTimeout({
+      type: ClusterCacheType,
+      action: "set",
+      target: this.name,
+      fromPID: process.pid,
+      key,
+      value
+    } as ClusterCacheMessage);
   }
   unset(key: string): void {
     this.logger?.trace("unset(%s)", key);
     this.localCache.delete(key);
-    if (process.send) {
-      setTimeout(() => {
-        process.send({
-          type: ClusterCacheType,
-          target: this.name,
-          action: "unset",
-          fromPID: process.pid,
-          key
-        } as ClusterCacheMessage);
-      }, 10);
-    }
+    sendTimeout({
+      type: ClusterCacheType,
+      target: this.name,
+      action: "unset",
+      fromPID: process.pid,
+      key
+    } as ClusterCacheMessage);
   }
   has(key: string): boolean {
     this.logger?.trace("has(%s)", key);
@@ -143,19 +153,14 @@ export class ClusterCache implements CacheInterface {
       list.add(value);
     }
     this.localCache.set(key, list);
-
-    if (process.send) {
-      setTimeout(() => {
-        process.send({
-          type: ClusterCacheType,
-          target: this.name,
-          action: "set_add",
-          fromPID: process.pid,
-          key,
-          value
-        } as ClusterCacheMessage);
-      }, 10);
-    }
+    sendTimeout({
+      type: ClusterCacheType,
+      target: this.name,
+      action: "set_add",
+      fromPID: process.pid,
+      key,
+      value
+    } as ClusterCacheMessage);
   }
   set_delete(key: string, value: unknown): void {
     this.logger?.trace("delete(%s)", key);
@@ -167,18 +172,14 @@ export class ClusterCache implements CacheInterface {
       list.delete(value);
     }
     this.localCache.set(key, list);
-    if (process.send) {
-      setTimeout(() => {
-        process.send({
-          type: ClusterCacheType,
-          target: this.name,
-          action: "set_delete",
-          fromPID: process.pid,
-          key,
-          value
-        } as ClusterCacheMessage);
-      }, 10);
-    }
+    sendTimeout({
+      type: ClusterCacheType,
+      target: this.name,
+      action: "set_delete",
+      fromPID: process.pid,
+      key,
+      value
+    } as ClusterCacheMessage);
   }
   set_has(key: string, value: unknown): boolean {
     this.logger?.trace("set_has(%s)", key);
@@ -198,6 +199,13 @@ export class ClusterCache implements CacheInterface {
     }
     list.clear();
     this.localCache.set(key, list);
+    sendTimeout({
+      type: ClusterCacheType,
+      target: this.name,
+      action: "set_clear",
+      fromPID: process.pid,
+      key
+    } as ClusterCacheMessage);
   }
   array_push(key: string, value: unknown): void {
     this.logger?.trace("array_push(%s)", key);
@@ -207,18 +215,14 @@ export class ClusterCache implements CacheInterface {
     }
     list.push(value);
     this.localCache.set(key, list);
-    if (process.send) {
-      setTimeout(() => {
-        process.send({
-          type: ClusterCacheType,
-          target: this.name,
-          action: "array_push",
-          fromPID: process.pid,
-          key,
-          value
-        } as ClusterCacheMessage);
-      }, 10);
-    }
+    sendTimeout({
+      type: ClusterCacheType,
+      target: this.name,
+      action: "array_push",
+      fromPID: process.pid,
+      key,
+      value
+    } as ClusterCacheMessage);
   }
   array_clear(key: string): void {
     this.logger?.trace("array_clear(%s)", key);
@@ -226,5 +230,26 @@ export class ClusterCache implements CacheInterface {
       throw new Error("cannot apply on non Array");
     }
     this.localCache.set(key, []);
+    sendTimeout({
+      type: ClusterCacheType,
+      target: this.name,
+      action: "array_clear",
+      fromPID: process.pid,
+      key
+    } as ClusterCacheMessage);
+  }
+}
+
+function sendTimeout(msg: ClusterCacheMessage) {
+  if (process.send) {
+    setTimeout(() => {
+      try {
+        if (process.send) {
+          process.send(msg);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }, 10);
   }
 }

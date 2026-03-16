@@ -41,17 +41,17 @@
   },
   "dependencies": {
     "postject": "1.0.0-alpha.6",
-    "@miqro/core": "^5.0.16",
+    "@miqro/core": "^5.0.17",
     "@miqro/jsx": "^1.0.1",
     "@miqro/jsx-dom": "^1.0.4",
     "@miqro/jsx-node": "^1.0.6",
-    "@miqro/parser": "^2.0.4",
-    "@miqro/query": "^0.0.4",
-    "@miqro/runner": "^2.0.1",
+    "@miqro/parser": "^2.0.5",
+    "@miqro/query": "^0.0.5",
+    "@miqro/runner": "^2.0.2",
     "@miqro/test": "^0.2.9",
-    "@miqro/test-http": "^0.1.2",
-    "esbuild": "0.25.11",
-    "jose": "6.1.0",
+    "@miqro/test-http": "^0.1.3",
+    "esbuild": "0.27.4",
+    "jose": "6.2.1",
     "showdown": "2.1.0"
   }
 }
