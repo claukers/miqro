@@ -212,7 +212,7 @@ async function runMigrations(db) {
   await migration.init(db);
 ${serviceMigrations.map(file => {
     const name = `${file.substring(0, file.length - extname(file).length)}`;
-    return `  await migration.up.module(db, "${file}", (await require("../${relative(service, "")}/${service}/migration/${name}.cjs")).default)`;
+    return `  await migration.up.module(db, (await require("../${relative(service, "")}/${service}/migration/${name}.cjs")).default.name ?? "${file}", (await require("../${relative(service, "")}/${service}/migration/${name}.cjs")).default)`;
   }).join("\n")}
 }
 module.exports = {
@@ -224,7 +224,7 @@ async function runMigrations(db) {
   await migration.init(db);
 ${serviceMigrations.reverse().map(file => {
     const name = `${file.substring(0, file.length - extname(file).length)}`;
-    return `  await migration.down.module(db, "${file}", (await require("../${relative(service, "")}/${service}/migration/${name}.cjs")).default)`;
+    return `  await migration.down.module(db, (await require("../${relative(service, "")}/${service}/migration/${name}.cjs")).default.name ?? "${file}", (await require("../${relative(service, "")}/${service}/migration/${name}.cjs")).default)`;
   }).join("\n")}
 }
 module.exports = {
