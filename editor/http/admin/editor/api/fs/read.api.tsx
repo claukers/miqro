@@ -1,11 +1,11 @@
-import { APIRoute, JSONParser } from "@miqro/core";
+import { APIRoute, defineRoute, JSONParser } from "@miqro/core";
 import { readFileSync, realpathSync } from "node:fs";
 import { SUPPORTED_LANGUAGES } from "../../../../../common/constants.js";
 import { relative, resolve } from "node:path";
 import { getLanguage } from "./scan.api.js";
 import { BASE_PATH } from "../../../../../common/constants.server.js";
 
-export default {
+export default defineRoute({
   method: "POST",
   path: "/read",
   description: "admin editor file read endpoint",
@@ -30,7 +30,7 @@ export default {
       path
     });
   }
-} as APIRoute;
+});
 
 export function readFile(path: string) {
   const filePath = getPath(path);

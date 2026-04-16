@@ -1,66 +1,133 @@
 # miqro
 
-**experimental** development cli for **static web site generation** using JSX.
+**experimental** Node.js web framework built from scratch with minimal runtime dependencies.
 
-it uses ```esbuild``` for faster transpilation.
+fully typed TypeScript · REST · WebSocket · SQL · JWT · HTTP
 
-but also can
+runtime dependencies: `jose`, `esbuild`, `cookie`, `showdown`
 
-- can create **javascript native** ```WebComponents``` using ```JSX``` with ```@miqro/jsx```.
+- **Web Components** using JSX — server-rendered and client-side
+- **static site generation** — `.html.tsx` handlers run against a live DB at build time
+- **REST API** endpoints with request/response validation
+- **database** — `sqlite3`, `node:sqlite`, `postgres` with migrations
+- **cluster** — multi-worker with shared cache and hot reload
+- **NODE:SEA** — single binary, no Node.js required on target machine
+- **built-in editor**, **test runner**, **API doc generation**
 
-- can transform ```markdown``` to **html** using ```showdown```.
+## packages
 
-- can also host custom **API** endpoints with a complete web framework if more than a static web site generator is needed.
+```
+miqro
+├── @miqro/core       router, middleware, session, CORS, logger
+├── @miqro/jsx        vDOM, hooks, SSR runtime
+├── @miqro/jsx-dom    Web Component define, browser runtime
+├── @miqro/jsx-node   node SSR runtime
+├── @miqro/query      query builder, ORM, migrations
+├── @miqro/parser     schema validation
+├── @miqro/request    http client
+├── @miqro/runner     cluster manager
+├── @miqro/test       test runner
+└── @miqro/test-http  http test helper
+```
 
-- can provide a database connection to ```sqlite3```, ```postgres``` and ```sql server``` using ```@miqro/query```. by default it uses the native ```node:sqlite3``` **experimental** module for ```Node.js >=20.x``` but can also use ```sqlite3```, ```pg``` and others.
+`@miqro/test` and `@miqro/request` are being phased out in favor of `node:test` and built-in `fetch`.
 
-- can manage **database migrations** for your **app** or **static site** build using a database as source.
+package docs: [@miqro/core](core-README.md) · [@miqro/query](query-README.md) · [@miqro/jsx](jsx-README.md) · [@miqro/jsx-dom](jsx-dom-README.md) · [@miqro/jsx-node](jsx-node-README.md) · [@miqro/request](request-README.md) · [@miqro/runner](runner-README.md) · [@miqro/test](test-README.md) · [@miqro/test-http](test-http-README.md) · [@miqro/parser](parser-README.md)
 
-- provide built-in ```editor``` for **development** using ```highlight.js``` for **code highlight**.
+## composition
 
-- can run generate **API documentation** using **markdown** or **json**.
+services run sequentially. each service runs on every request until a route sends a response.
 
-- can run **tests** on your **app** or **static site**.
+```json
+{
+  "services": ["a/", "b/", "c/"]
+}
+```
 
-- can be installed and run **without Node.js** installed as a standalone ```NODE:SEA``` binary for ```linux-x64```, ```linux-arm64```, ```darwin-x64``` and ```darwin-arm64```.
+```
+request →
+  a/ runs (auth.ts, middleware.ts, then http/ routes)
+  if no route in a/ matched, b/ runs
+  if no route in b/ matched, c/ runs
+```
 
-- can create a standalone ```NODE:SEA``` ```binary``` of your webapp for ```linux-x64```, ```linux-arm64```, ```darwin-x64``` and ```darwin-arm64```.
+earlier services establish state. later services consume it.
+
+```
+a/auth.ts    → sets req.session
+b/db.ts      → req.server.db.get("b") available
+c/http/      → has req.session and req.server.db, handles routes
+```
+
+`req.session.account` is the tenant identifier. use it to isolate data:
+
+```ts
+// any handler in c/
+const posts = await req.server.db.get("b")
+  .select().from("posts")
+  .eq("account", req.session.account)
+  .yield();
+```
+
+seed shared state in `server.ts` using `isPrimaryWorker()`:
+
+```ts
+// a/server.ts
+export default {
+  load: async (server) => {
+    if (server.isPrimaryWorker()) {
+      const config = await server.db.get("b").select().from("config").yield();
+      server.cache.set("config", config);
+    }
+  }
+}
+```
+
+swap `a/` for a different implementation — `b/` and `c/` don't change. they read from `req.session`, not from `a/` directly.
+
+same service folders, different `miqro.json`:
+
+```json
+{ "services": ["a1/", "b/", "c/"] }   // production auth
+{ "services": ["a2/", "b/", "c/"] }   // test auth
+{ "services": ["b/", "c/"] }          // no auth
+```
+
+service folders can be npm packages:
+
+```json
+{
+  "services": [
+    "node_modules/@myorg/auth/service/",
+    "node_modules/@myorg/db/service/",
+    "services/app/"
+  ]
+}
+```
 
 ## installation
 
-### without Node.js installed as a NODE:SEA binary.
+### standalone binary (no Node.js required) ( Not Up-To-Date versions )
 
-download the standalone binary from the [releases](https://github.com/claukers/miqro/releases) page.
+download from [releases](https://github.com/claukers/miqro/releases). (diff release cycle so expect OLD versions published)
 
-### npm dependency for Node.js project
+for newer releases use the npm install and the npx miqro --compile to produce a standalone binary of the app
 
-or use it as a dependecy on your Node.js project.
-
-```npm install miqro```
-
-## getting started basic example static site generated with jsx
-
-project structure
+### npm
 
 ```
-example/
-  http/
-    about/
-      ...
-    index.html.tsx
-  static/
-    ...
+npm install miqro
 ```
 
-### 1. create an empty folder to contain the example service and files
+## getting started
 
-```mkdir -p example/http```
+```
+mkdir -p example/http
+```
 
-### 2. create a basic ```.html.tsx``` file.
+`example/http/index.html.tsx`
 
-```example/http/index.html.tsx```
-
-```typescript
+```tsx
 import JSX from "@miqro/jsx";
 
 export default (req, res) => {
@@ -72,631 +139,943 @@ export default (req, res) => {
 }
 ```
 
-to host a watch server with the example run the following command.
-
-```miqro --watch --service example/```
-
-then open a browser and go to ```http://localhost:8080/index.html``` to watch the changes you make into the file.
-
-### 3. generate static files to host with a web server
-
-to generate the static files just run the command.
-
-```miqro --inflate --inflate-dir build/ --service example/```
-
-the generated static files will be written in ```build/example/http/static````
-
-and can be served like this.
-
-```python3 -m http.server 8080 build/example/http/static```
-
-
-## Documentation
-
-### usage as a module
-
-first install as a dependency
-
-```npm install miqro --save```
-
-example loading the service created in the getting started above.
-
-```typescript
-import { Miqro } from "miqro";
-
-const app = new Miqro({
-  services: ["example/"],
-  //name: "SOME NAME", // if running inside node:cluster worker you MUST set this value to allow worker syncronization
-  //port: "3000",
-  //hotreload: false,
-  //editor: false,
-  //editor: false,
-});
-// to inflate to a dir
-await app.inflate({
-  inflateDir: "build/";
-  inflateSea: false;
-});
-// or to inflate to memory
-// await app.inflate();
-// to start the server
-// await app.start();
-// to stop the server
-// await app.stop();
-// to dispose the server and disconnect all node:cluster worker syncronization for safe exiting
-// await app.dispose();
+```
+miqro --watch --service example/
 ```
 
-### usage as cli
+open `http://localhost:8080/index.html`.
 
-#### inflate static files with the cli
+### generate static files
 
-```miqro --service example/ --inflate --inflate-dir build/```
+```
+miqro --inflate --inflate-dir build/ --service example/
+```
 
-#### watch and reload server to see the changes to the files in real-time
+output in `build/example/static/`. serve with any http server.
 
-```miqro --watch --service example/```
-
-#### start multiple services
-
-```miqro --service example/ --service api/```
-
-#### start multiple services in a node:cluster
-
-```npx miqro-cluster --service example/ --service api/```
-
-## basic service folder structure
+## service folder
 
 ```
 app/
-  http/
-    ...
-  static/
-    ...
-  migration/
-    ...
-  test/
-    ....
-  db.ts
-  ws.ts
-  auth.ts
-  server.ts
+  http/          endpoints
+  static/        files served as-is
+  migration/     db migrations
+  test/          tests
+  db.ts          database config
+  ws.ts          websocket config
+  auth.ts        session/auth config
+  server.ts      lifecycle hooks
+  log.ts         log transport config
+  middleware.ts  pre/post route middleware
+  catch.ts       error handlers
+  miqro.json     multi-service composition
 ```
 
-all files and folders are ***optional***.
+all files and folders are optional.
 
-to start the development server run
+```
+miqro --service app/
+miqro --service app/ --editor
+```
 
-```miqro --service app/```
+## http folder
 
-and with the included editor
-
-```miqro --service app/ --editor```
-
-### http folder
-
-the http folder will be recursivly scan for files to serve.
-the files will be server acording to the location in the directory. 
-
-for example.
+files are served by their path in the directory.
 
 ```
 http/
-  index.html.tsx
-  css/
-    style.css
+  index.html.tsx      → GET /index.html
+  posts/
+    index.html.tsx    → GET /posts/index.html
+    list.api.ts       → GET /posts/list
   js/
-    script.min.js
+    app.min.tsx       → GET /js/app.js (minified bundle)
 ```
 
-this will create the routes
+### .html.tsx
 
-1. /index.html
-2. /css/style.css
-3. /js/script.min.js
+server-rendered JSX. runs at request time or at build time with `--inflate`.
 
-#### .html.tsx
-
-a file with the extension ```.html.tsx``` will be rendered as an html created by a JSX expression. for example.
-
-```ìndex.html.tsx```
-```tsx
-import { MyComponent } from "./component.js";
-
-export default <html>
-  <body>
-    <MyComponent />
-  </body>
-</html>
-```
-
-you can also export a request function and customize the route by exporting a ```apiOptions``` object.
-
-```ìndex.html.tsx```
 ```tsx
 import JSX from "@miqro/jsx";
-import { ServerRequest, ServerResponse, APIOptions } from "miqro";
-import { MyComponent } from "./component.js";
 
-// export the object apiOptions to customize the paths and methods
-export const apiOptions: APIOptions = {
-  path: ["/", "/index.html"],
-  method: ["GET", "POST"]
-};
-
-export default (req: ServerRequest, res: ServerResponse) => {
+export default (req, res) => {
   return <html>
     <body>
-      <MyComponent />
+      <h1>Hello</h1>
     </body>
   </html>
 }
 ```
 
-#### .min.tsx
+with database access:
 
-a file with the extension ```.min.tsx``` will be rendered as a **minified** javascript script that bundles the ```@miqro/jsx``` module.
+```tsx
+import JSX from "@miqro/jsx";
 
-to avoid minification just use the ```.tsx``` extension inside the ```http``` folder.
+export default async (req, res) => {
+  const posts = await req.server.db.get("mydb")
+    .select().from("posts").yield();
+  
+  return <html>
+    <body>
+      {posts.map(p => <h2>{p.title}</h2>)}
+    </body>
+  </html>
+}
+```
 
-example defining a ```WebComponent``` with ```JSX``` using ```@miqro/jsx```.
+customize path/method with `apiOptions`:
 
-```script.min.tsx```
-```typescript
-import JSX, { useState, useEffect } from "@miqro/jsx";
+```tsx
+import JSX from "@miqro/jsx";
+import { APIOptions } from "miqro";
+
+export const apiOptions: APIOptions = {
+  path: ["/", "/index.html"],
+  method: ["GET"]
+};
+
+export default (req, res) => { ... }
+```
+
+### .min.tsx
+
+bundled and minified client-side JavaScript. use to define Web Components.
+
+```tsx
+import JSX, { useState } from "@miqro/jsx";
 import { define } from "@miqro/jsx-dom";
-/*
-basic dynamic component example
-*/
-export function TickerComponent() {
-  // create a state variable count
-  const [count, setCount] = useState(0);
-  // create a effect with a setTimeout that updates count after 1000ms
-  useEffect(() => {
-    // create the timeout
-    const timeout = setTimeout(() => {
-      setCount(count + 1);
-    }, 1000);
-    // return a clean up function to clear the timeout if it's running when the component is removed from the DOM.
-    return () => {
-      // clear the timeout if the effect is canceled.
-      clearTimeout(timeout);
-    }
-  }, [count]);
-  // return the jsx to be rendered
-  return <p>Count: {count}</p>;
+
+function Counter() {
+  const [n, setN] = useState(0);
+  return <button onClick={() => setN(n + 1)}>count: {n}</button>;
 }
 
-window.addEventListener("load", async (event) => {
-  /* this will define a custom element called ticker-tag with the tag
-  
-  <ticker-tag></ticker-tag>
-
-  as a standard web component.
-
-  just include this script in the page with a script tag like 
-  <script src="..."></script>
-  
-  */
-  define("ticker-tag", TickerComponent, {
-    shadowInit: false, // or { mode: "closed" | "closed" }
-    //extends: "p";
-    //observedAttributes: ["width", "height", "some-attr"]; // attribues that are observed for changes to re-render the JSX component
-  });
+define("my-counter", Counter, {
+  observedAttributes: ["initial"],
+  shadowInit: false
 });
 ```
 
-#### .api.ts
+included in HTML:
 
-a file with the extension ```.api.ts``` will be use as a custom REST API endpoint.
+```tsx
+export default (req, res) => (
+  <html>
+    <body>
+      <my-counter initial="0" />
+      <script src="/js/app.js" />
+    </body>
+  </html>
+);
+```
 
-for example
+### .api.ts
 
-```/posts/post.api.tsx```
-```typescript
+REST endpoint. file path is the route path.
+
+```ts
 export default (req, res) => {
-  return res.json({
-    someValue: 1
-  });
+  return res.json({ ok: true });
 }
 ```
 
-to costumize the route and middleware used and parse the request input before your function use export an ```APIRoute```object. 
-this example uses the ```server.middleware.json()``` to parse the request body as a json.
+full declaration with validation:
 
-```/posts/post.api.tsx```
-```typescript
-import { ServerRequest, ServerResponse } from "miqro";
-import { APIRoute } from "@miqro/core";
+```ts
+import { APIRoute, JSONParser } from "@miqro/core";
 
 export default {
-  name: "post api",
-  description: "to do posts", 
-  path: ["/", "/do"],
-  method: ["POST"],
-  middleware: [server.middleware.json()],
+  name: "create post",
+  method: "POST",
+  middleware: [JSONParser()],
   request: {
-    headers: {
-      auth: "string"
-    },
-    query: {
-      pagination: "number"
-    },
     body: {
-      inputValue: "string"
-      otherInputValues: "number[]?"
+      title: "string",
+      content: "string"
     }
   },
   response: {
-    status: [200, 400],
+    status: [200],
     body: {
-      someValue: "number"
+      id: "number"
     }
-  }
-  handler: (req: ServerRequest, res: ServerResponse) => {
-    // with req?.server?.db.get(..)? you can query the database MyDB if it's configured with a db.ts file
-    // const rows = await req?.server?.db.get("MyDB")?.select().from("....
-    return res.json({
-        someValue: 1
-    });
+  },
+  handler: async (req, res) => {
+    const post = await req.server.db.get("mydb")
+      .insert("posts")
+      .values({ title: req.body.title, content: req.body.content })
+      .returning("id")
+      .yield();
+    return res.json({ id: post[0].id });
   }
 } as APIRoute;
 ```
 
-```req.server```
+`method: "use"` registers the handler for all methods (middleware pattern):
 
-all request's have a property called ```server``` that it can be used to access server shared content. 
+```ts
+import { Router } from "@miqro/core";
 
-this is necesary because every ```service``` file is imported ```isolated``` from the others using  an ```esbuild``` ```bundle``` to **force state-less coding**.
+const router = new Router();
+router.use(myMiddleware);
 
-```ServerRequest```
-
-```typescript
-import { Request } from "@miqro/core";
-
-interface ServerRequest extends Request {
-  server?: {
-    // null values are if the feature has been disabled
-    // database connections interface
-    db: {
-      get(name: string): Database | null;
-      getMigrations(): NamedMigration[];
-      migrate(options: MigrateOptions): Promise<void>;
-    },
-    // websocket server interface
-    ws: {
-      get(path: string): WebSocketServer | undefined;
-      disconnectAll(path: string): void;
-    };
-    cache: CacheInterface; // this cache will be syncronized between all node:cluster workers
-    localCache: CacheInterface; // this cache will local to the node:cluster worker
-    logger?: Logger;
-    isPrimaryWorker: () => boolean;
-    openBrowser: (path: string) => void;
-    getLogger: (identifier: string, options?: { level?: any; transports?: any[]; formatter?: any; }) => Logger;
-  };
+export default {
+  path: "/admin",
+  method: "use",
+  handler: router
 }
 ```
 
-example using ```req.server``` to access a key in the node:cluster synced cache.
+### .html.md
 
-```typescript
-import { ServerRequest, ServerResponse } from "miqro";
+markdown file converted to HTML. served as `text/html`.
 
-export default (req: ServerRequest, res: ServerResponse) => {
-  const value = req?.cache?.get("some_key");
-  // req?.cache?.set("some_key", "value");
-  return {
-    status: 200,
-    body: {
-      some_key: value
+```
+http/
+  docs/
+    guide.html.md    → GET /docs/guide
+```
+
+`guide.html.md`:
+
+```markdown
+# Guide
+
+some **markdown** content.
+```
+
+converted using `showdown`. also works with `--inflate` — outputs static HTML.
+
+available as `req.server.inflateMDtoHTML(str)` from any handler.
+
+
+## static folder
+
+files served as-is, by path.
+
+```
+static/
+  logo.png     → GET /logo.png
+  style.css    → GET /style.css
+```
+
+## db.ts
+
+```ts
+import { DBConfig } from "miqro";
+
+export default {
+  dialect: "node:sqlite",       // node:sqlite | sqlite3 | pg
+  name: "mydb",                 // req.server.db.get("mydb")
+  storage: "./data.sqlite3",    // sqlite only
+  // connectionString: "..."    // postgres
+} as DBConfig;
+```
+
+migrations run automatically on startup (primary worker only).
+
+## migration folder
+
+files named `NNN_name.ts` run in order.
+
+```ts
+// migration/001_create_posts.ts
+import { MigrationModule } from "miqro";
+
+export default {
+  name: "001_create_posts",
+  dbName: "mydb",
+  up: async (db) => {
+    await db.createTable("posts", {
+      id: { type: "integer", primaryKey: true, autoIncrement: true },
+      title: { type: "string" },
+      content: { type: "string" }
+    }).yield();
+  }
+} as MigrationModule;
+```
+
+run manually:
+
+```
+miqro --migrate-up --service app/
+miqro --migrate-down --service app/
+```
+
+## cors.ts
+
+```ts
+import { CORSOptions } from "miqro";
+
+export default {
+  origins: ["https://myapp.com", "https://staging.myapp.com"],
+  methods: "GET,POST,PUT,DELETE"
+} as CORSOptions;
+```
+
+without `cors.ts` all origins are allowed. with it only listed origins are accepted — requests from other origins get `400 Bad Request`.
+
+
+## ORM
+
+quick reference. full docs in [@miqro/query](query-README.md).
+
+```ts
+import { defineModel } from "@miqro/query";
+
+const Post = defineModel(db, "posts", {
+  id:        { type: "integer", primaryKey: true, autoIncrement: true },
+  title:     { type: "string" },
+  published: { type: "boolean" },
+  createdAt: { type: "datetime" }
+});
+
+// create
+await Post.create({ title: "hello", published: false });
+
+// findAll
+const posts = await Post.findAll(
+  Post.where().eq("published", true).order("createdAt", "DESC"),
+  { limit: 10 }
+);
+
+// updateAll
+await Post.updateAll({ published: true }, Post.where().eq("id", 1));
+
+// deleteAll
+await Post.deleteAll(Post.where().eq("id", 1));
+
+// count
+const n = await Post.count(Post.where().eq("published", true));
+
+// sync (create table if not exists)
+await Post.sync();
+```
+
+access the db directly:
+
+```ts
+const db = req.server.db.get("mydb");
+const rows = await db.select().from("posts").eq("published", true).yield();
+const raw = await db.query("SELECT * FROM posts WHERE id = ?", [1]);
+```
+
+
+## ws.ts
+
+```ts
+import { WSConfig } from "miqro";
+
+export default {
+  path: "/updates",   // req.server.ws.get("/updates")
+  disabled: false
+} as WSConfig;
+```
+
+broadcast from a handler:
+
+```ts
+export default async (req, res) => {
+  const ws = req.server.ws.get("/updates");
+  await ws.broadcast(JSON.stringify({ type: "update", data: "..." }));
+  return res.json({ ok: true });
+}
+```
+
+### WebSocket client (.min.tsx)
+
+```tsx
+import JSX, { useState, useEffect } from "@miqro/jsx";
+import { define } from "@miqro/jsx-dom";
+
+function LiveFeed(props) {
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    const ws = new WebSocket(`ws://${location.host}/updates`);
+    ws.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      setMessages(prev => [...prev, msg]);
+    };
+    return () => ws.close();
+  }, []);
+
+  return <ul>{messages.map((m, i) => <li>{m.text}</li>)}</ul>;
+}
+
+define("live-feed", LiveFeed, { shadowInit: false });
+```
+
+broadcast from a handler:
+
+```ts
+// http/publish.api.ts
+export default async (req, res) => {
+  const ws = req.server.ws.get("/updates");
+  await ws.broadcast(JSON.stringify({ text: req.body.text }));
+  return res.json({ ok: true });
+}
+```
+
+
+## auth.ts
+
+```ts
+import { AuthConfig, jwt } from "miqro";
+import { createSecretKey } from "node:crypto";
+
+const secret = createSecretKey(Buffer.from(process.env.JWT_SECRET, "hex"));
+
+export default {
+  verify: async ({ token }) => {
+    try {
+      const payload = await jwt.verify(token, secret);
+      return {
+        account: payload.account as string,
+        username: payload.username as string,
+        groups: payload.groups as string[],
+        token
+      };
+    } catch {
+      return null;
     }
+  }
+} as AuthConfig;
+```
+
+session available on `req.session`:
+
+```ts
+req.session.account   // tenant identifier
+req.session.username
+req.session.groups
+req.session.token
+```
+
+restrict by group using `policy` on any endpoint:
+
+```ts
+export default {
+  policy: {
+    groups: ["admin"],
+    groupPolicy: "at_least_one"
+  },
+  handler: ...
+}
+```
+
+## server.ts
+
+lifecycle hooks.
+
+```ts
+import { ServerConfig } from "miqro";
+
+export default {
+  preload: async (server) => {
+    // runs before db connections
+  },
+  load: async (server) => {
+    // runs after db connections, before listening
+    // seed cache here
+    const rows = await server.db.get("mydb").select().from("config").yield();
+    server.cache.set("config", rows);
+  },
+  start: async (server) => {
+    // runs after listening
+  },
+  stop: async (server) => {
+    // runs on shutdown
+  }
+} as ServerConfig;
+```
+
+`load` runs on all workers. use `server.isPrimaryWorker()` to gate one-time operations.
+
+## middleware.ts
+
+pre and post route middleware for the service.
+
+```ts
+import { MiddlewareConfig } from "miqro";
+
+export default {
+  middleware: [
+    // runs before all routes
+    async (req, res) => {
+      req.startTime = Date.now();
+    }
+  ],
+  post: [
+    // runs after all routes
+    async (req, res) => {
+      req.logger.debug("took %dms", Date.now() - req.startTime);
+    }
+  ]
+} as MiddlewareConfig;
+```
+
+## catch.ts
+
+error handlers.
+
+```ts
+import { ErrorConfig } from "miqro";
+
+export default {
+  catch: [
+    async (err, req, res) => {
+      req.logger.error(err);
+      return res.json({ error: err.message }, {}, 500);
+    }
+  ]
+} as ErrorConfig;
+```
+
+## log.ts
+
+custom log transport. called for every log message.
+
+```ts
+import { LogConfig } from "miqro";
+
+export default {
+  level: "error",              // only receive messages at this level
+  replaceConsoleTransport: false,  // keep default console output
+  replaceFileTransport: false,     // keep default file output
+  write: async ({ out, level, identifier }) => {
+    // out       — formatted log string
+    // level     — "error" | "warn" | "info" | "debug" | "trace"
+    // identifier — route/worker identifier
+    await fetch("https://logs.example.com/ingest", {
+      method: "POST",
+      body: JSON.stringify({ out, level, identifier })
+    });
+  }
+} as LogConfig;
+```
+
+log levels: `error` → `warn` → `info` → `debug` → `trace` → `none`
+
+default output: console + `./server.log` (or `LOG_FILE` env var).
+
+per-identifier level override via env:
+
+```
+LOG_LEVEL=info
+LOG_LEVEL_POSTS_GET=debug    // debug only for GET /posts
+LOG_LEVEL_WORKER_0=trace     // trace only for worker 0
+```
+
+**cluster mode:** each worker writes to the same log file independently. at high throughput use pipes instead of `FileTransport`:
+
+```
+miqro --service app/ 2>&1 | tee app.log
+```
+
+or send to an external aggregator via `log.ts` `write`.
+
+## doc.ts
+
+publish API documentation as a static file or live endpoint.
+
+```ts
+import { DocConfig } from "miqro";
+
+export default {
+  publish: {
+    "/api/docs":   { type: "MD" },    // markdown
+    "/api/schema": { type: "JSON" },  // json
+    "/api/docs.html": { type: "HTML" } // html
+  }
+} as DocConfig;
+```
+
+with `--inflate` the docs are written to `build/` as static files.
+
+at runtime the docs are served as live endpoints — useful for development.
+
+generate docs via CLI:
+
+```
+miqro --generate-doc --generate-doc-out API.md --service app/
+miqro --generate-doc --generate-doc-type JSON --generate-doc-out api.json --service app/
+```
+
+doc output is derived from `APIRoute` declarations — `name`, `description`, `request`, `response`, `policy` fields.
+
+
+## miqro.json
+
+compose multiple services.
+
+```json
+{
+  "name": "myapp",
+  "port": "3000",
+  "services": [
+    "a/",
+    "b/",
+    "c/"
+  ],
+  "inflateDir": "build/",
+  "logFile": false,
+  "browser": true
+}
+```
+
+all fields optional except `services`.
+
+```
+name        server name — required in cluster mode
+port        default: 8080
+services    ordered list of service folders
+inflateDir  default inflate output directory
+logFile     false | true | "./path/server.log"
+browser     open browser on start (true | false | "browser-name")
+```
+
+generate default `miqro.json`:
+
+```
+miqro --install-miqrojson
+```
+
+run with miqro.json:
+
+```
+miqro
+```
+
+or override:
+
+```
+miqro --service a/ --service b/
+```
+
+swap implementations by changing the services array. same service folders work across different compositions.
+
+## req.server
+
+available on every handler.
+
+```ts
+req.server.db.get("name")          // Database | null
+req.server.ws.get("/path")         // WebSocketServer | undefined
+req.server.cache                   // ClusterCache — synced across all cluster workers via IPC
+req.server.localCache              // LocalCache — in-memory, per worker only
+req.server.cache.set("key", value)
+req.server.cache.get("key")
+req.server.cache.has("key")
+req.server.cache.unset("key")
+req.server.cache.set_add("key", value)   // set operations
+req.server.cache.set_has("key", value)
+req.server.cache.set_delete("key", value)
+
+req.server.middleware.json()       // body parser → req.body
+req.server.middleware.url()        // url-encoded body parser → req.body
+req.server.middleware.text()       // text body parser → req.body
+req.server.middleware.buffer()     // raw buffer → req.buffer
+req.server.middleware.cors(opts)   // CORS middleware
+req.server.middleware.session(opts)// auth middleware
+
+req.server.jwt.sign(payload, secret, opts)
+req.server.jwt.verify(token, secret, opts)
+req.server.jwt.decode(token)
+
+req.server.isPrimaryWorker()       // true on worker 0
+req.server.getWorkerNumber()       // 0..n
+req.server.getWorkerCount()        // total workers
+
+req.server.reload()                // hot reload
+req.server.restart()               // full restart
+req.server.stop()                  // shutdown
+
+req.server.encodeHTML(str)
+req.server.inflateMDtoHTML(str)
+req.server.newParser()
+req.server.newClusterCache(name)
+req.server.newLocalCache(name)
+req.server.getLogger(identifier)
+```
+
+## req
+
+```ts
+req.path          // normalized pathname
+req.hash          // url hash fragment
+req.searchParams  // URLSearchParams
+req.query         // parsed query string { [key]: string | string[] }
+req.params        // path parameters { [key]: string }
+req.cookies       // parsed cookies { [name]: string }
+req.body          // parsed body (requires body parser middleware)
+req.buffer        // raw body buffer (requires ReadBuffer middleware)
+req.session       // set by auth.ts
+req.session.account   // tenant identifier
+req.session.username
+req.session.groups    // string[]
+req.session.token
+req.uuid          // unique request id
+req.startMS       // request start timestamp ms
+req.logger        // per-request logger — includes path/method/uuid/remoteAddress
+req.results       // pipeline accumulator
+```
+
+## test folder
+
+test files named `*.test.ts`.
+
+```ts
+import { describe, it } from "node:test";
+import { strictEqual } from "assert";
+
+describe("posts", () => {
+  it("GET /posts returns 200", async () => {
+    const res = await test.request({
+      url: "/posts",
+      method: "GET",
+      disableThrow: true
+    });
+    strictEqual(res.status, 200);
+  });
+});
+```
+
+`test.request` hits the running miqro server via Unix socket. no port needed.
+
+test JSX components:
+
+```ts
+import JSX from "@miqro/jsx";
+import { Counter } from "./counter.js";
+
+it("renders counter", test.jsx.test(async (container, root, runtime) => {
+  container.render(JSX.createElement(Counter, { initial: 0 }));
+  strictEqual(root.innerHTML.includes("0"), true);
+}));
+```
+
+run tests:
+
+```
+miqro --test --service app/
+```
+
+## Miqro object
+
+```ts
+import { Miqro } from "miqro";
+
+const app = new Miqro({
+  services: ["app/"],
+  port: "3000",
+  name: "myapp",       // required in cluster mode
+  hotreload: false,
+  editor: false
+});
+
+await app.inflate({ inflateDir: "build/" });  // generate static files
+await app.inflate();                           // inflate to memory
+await app.start();                             // start server
+await app.stop();                              // stop server
+await app.reload();                            // hot reload
+await app.restart();                           // full restart
+await app.dispose();                           // cleanup cluster connections
+```
+
+trigger static generation from a running server:
+
+```ts
+export default {
+  path: "/publish",
+  method: "POST",
+  handler: async (req, res) => {
+    const generator = new Miqro({ services: ["app/"] });
+    await generator.inflate({ inflateDir: "build/" });
+    return res.json({ ok: true });
   }
 }
 ```
 
-#### .html.md
-
-TODO
-
-#### .min.js
-
-TODO
-
-#### .bundle.js
-
-TODO
-
-#### .css.bundle
-
-TODO
-
-### static folder
-
-the static folder will act the same as the http folder but will treath every file **as is**.
-
-the files will be server acording to the location in the directory. 
-
-for example.
-
-```
-static/
-  index.html
-  css/
-    style.css
-  js/
-    script.min.js
-```
-
-this will create the routes
-
-1. /index.html
-2. /css/style.css
-3. /js/script.min.js
-
-### migration folder
-
-TODO
-
-### test folder
-
-TODO
-
-### db.ts
-
-TODO
-
-### ws.ts
-
-TODO
-
-### auth.ts
-
-TODO
-
-### server.ts
-
-TODO
-
-### log.ts
-
-TODO
-
-### middleware.ts
-
-TODO
-
-### catch.ts
-
-TODO
-
-### miqro.json
-
-TODO
-
-### Globals
-
-TODO
-
-#### test global
-
-TODO
-
-## static web site generator
-
-you can also inflate your project to avoid rendering ```http/**/*.html.tsx``` and other files per request. this can be done pre-rendereding with the ```--inflate``` flag.
-
-```miqro --service app/ --inflate --inflate-dir build/```
-
-this will create the ```build/``` folder with the inflated app static files.
-
-you can host only the generated static ```*.html.tsx``` files with other http servers.
-
-```python3 -m http.server 8080 build/app/static/```
-
 ## cluster
 
-for this you will need to install miqro as a dependency of your project.
+```
+npx miqro-cluster --service app/
+CLUSTER_COUNT=4 npx miqro-cluster --service app/
+npx miqro-cluster
+```
 
-```npm install miqro --save```
+to run arbitrary scripts in cluster mode:
 
-```npx miqro-cluster --service app/```
+```
+npx miqro-runner server.js
+CLUSTER_COUNT=4 npx miqro-runner server.js
+```
 
-this will launch your app in a cluster mode. 
+## --no-build
 
-to change the number of nodes use ```CLUSTER_COUNT=10```for example to set the count to 10 nodes.
+use tsc instead of esbuild. run tsc first, then miqro.
 
-```CLUSTER_COUNT=10 npx miqro-cluster --service app/```
+generate a tsconfig:
 
-## Using TSC or another transpiler insted of esbuild on runtime
+```
+miqro --install-tsconfig
+```
 
-```miqro --no-build ...```
+`tsconfig.json`:
 
-for this to work you will need to run ```tsc``` or another transpiler to transform your JSX files.
+```json
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "noEmit": true,
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "lib": ["es2021", "dom"],
+    "jsx": "react",
+    "jsxFactory": "JSX.createElement",
+    "jsxFragmentFactory": "JSX.Fragment"
+  }
+}
+```
 
-## cli usage
+`noEmit: true` — tsc type-checks only, esbuild handles transpilation at runtime. remove `noEmit` and set `outDir` to use tsc output with `--no-build`.
 
-### start a project
+development with tsc + miqro:
 
-```miqro --service app/```
+```
+tsc --watch &
+miqro --no-build --watch --service app/
+```
 
-by default the project will be hosted on ```http://localhost:8080```.
+**note:** in `--no-build` mode module-level state is shared across routes within a process. the stateless coding guarantee that esbuild provides does not apply. avoid module-level mutable state.
 
-start with hot-reload disabled
-
-```miqro --watch --service app/```
-
-start on custom port
-
-```PORT=8181 miqro app/```
-
-### run migrations on the project
-
-TODO
-
-### run the project tests
-
-TODO
-
-### generate API documentation
-
-TODO
-
-### inflate project or eject from miqro
-
-to inflate all http files into static files use the ```--inflate``` with the ```--inflate-dir``` arguments.
-
-```miqro --inflate --inflate-dir build/ --service app/```
-
-this will render the ```.html.tsx``` and other files in the ```http/``` folder and the ```static/``` folder into the ```build``` folder for static serving.
-
-for example.
+## static site generator
 
 ```
 miqro --inflate --inflate-dir build/ --service app/
-cd build/
-python3 -m http.server 8080
 ```
 
-### more cli usages
-
-```miqro --help```
+`.html.tsx` handlers run with a live db connection. output is static HTML written to `build/`.
 
 ```
-usage: miqro [...FLAGS] --service app/
-
-==examples==
-
-miqro --watch --service front/
-PORT=8181 miqro --service api/ --service front/
-miqro --test --service front/
-miqro --inflate --service front/
-miqro --generate-doc --generate-doc-out API.md --service front/
-CLUSTER_COUNT=10 miqro-cluster --service api/
-
-==flags==
-
--v, --version
-        outputs the version number
--h, --help
-        outputs this page.
---watch
-        use to auto reload the server when files change.
---hot-reload
-        enables the hot-reload functionality use with --watch.
---test
-        run the tests for a service.
---migrate-up
-        migrations up.
---migrate-down
-        migrations down.
---inflate
-        inflates the application into a directory using esbuild.
---inflate-dir
-        to set the output directory of the --inflate command. default value is inflated/.
---editor
-        runs the application with a built-in editor.
---generate-doc
-        generates a documentation for the api endpoints of the service.
---generate-doc-out
-        the output file for the generated documentation. default value is API.md.
---generate-doc-type
-        the format of the generated documentation. it can be JSON or MD. default value is MD.
---generate-doc-all
-        outputs all the server routes in the documentation output.
---compile
-        inflates the application and tries to create a NODE SEA binary.
---no-build
-        disables calling esbuild during imports in runtime. Notice that to use jsx you will need to run tsc or esbuild on your jsx files to transpile them to js.
---no-minify
-        disables calling minifing min.js files.
---inflate-only-assets
-        inflates ONLY the application assets. must be used with --inflate.
---inflate-flat
-        inflates files into the inflate-dir directly.
---inflate-sea
-        inflates the application with sea compilation scripts.
---install-tsconfig
-        creates a tsconfig.json configured to use with --install-types.
---install-miqrojson
-        creates a default miqro.json file.
---install
-        creates a node_modules folder from binary cache (only available in sea binary).
---disable-miqrojson
-        disables the load of miqro.json file.
---log-file
-        overrides the default log file from LOG_FILE.
---browser
-        overrides the default browser from BROWSER.
---config
-        overrides the default miqro.json path.
---port
-        overrides the default port from PORT.
---name
-        overrides the default name of the server.
---https
-        serves the server in https instead of http
---https-key
-        point to a server.key file for https.
---https-cert
-        point to a server.cert file for https.
---https-redirect
-        serves an aditional http server that redirects to https. it needs a port number.
---inflate-parallel
-        sets the max parallel esbuild instances. defaults to 1.
-
-==environment variables==
-
-PORT
-        override the default 8080 port.
-BROWSER
-        override the default browser. change to none to disable.".
-LOG_FILE
-        override the default ./server.log file
-DB
-        enable the server.db features
-DB_STORAGE
-        override the default local db location ./db.sqlite3
-DB_DIALECT
-        override the default node:sqlite
-DB_CONNECTION
-        override the default connection url
-CLEAR_JSX_CACHE
-        set to 1 or 0 to enable or disable the clearing of the esbuild cache defaults to 1.
-JSX_TMP
-        set custom location of esbuild builds defaults to /tmp/jsx_tmp.
+miqro --inflate --inflate-dir build/ --service app/
+python3 -m http.server 8080 build/app/static/
 ```
 
-## development
+## https
 
-### build node package
+```
+miqro --https --https-key server.key --https-cert server.cert --service app/
+```
 
-1. install dependencies
+with http redirect:
 
-```npm install```
+```
+miqro --https --https-key server.key --https-cert server.cert --https-redirect 8080 --service app/
+```
 
-2. build
+starts an additional http server on port 8080 that redirects all requests to https.
 
-```npm build```
+via env or `miqro.json`:
 
-### build binary for running as standalone binary
+```json
+{
+  "https": true,
+  "httpsKey": "./server.key",
+  "httpsCert": "./server.cert",
+  "httpsRedirect": "8080"
+}
+```
 
-1. install dependencies
 
-```npm install```
+## cli
 
-2. install sea deps (esbuild and nodejs binaries)
+```
+miqro --service app/
+miqro --watch --service app/
+miqro --editor --service app/
+miqro --test --service app/
+miqro --migrate-up --service app/
+miqro --migrate-down --service app/
+miqro --inflate --inflate-dir build/ --service app/
+miqro --generate-doc --generate-doc-out API.md --service app/
+miqro --compile --service app/
+```
 
-```npm run precompile``` or ```sh ./sea/precompile.sh```
+flags:
 
-3. compile
+```
+--watch                 auto reload on file changes
+--hot-reload            enable hot-reload with --watch
+--test                  run tests
+--migrate-up            run migrations up
+--migrate-down          run migrations down
+--inflate               generate static files
+--inflate-dir           output directory (default: inflated/)
+--editor                run with built-in editor
+--generate-doc          generate API documentation
+--generate-doc-out      output file (default: API.md)
+--generate-doc-type     MD | JSON | HTML (default: MD)
+--generate-doc-all      include all routes
+--compile               build NODE:SEA binary
+--no-build              skip esbuild, use pre-compiled files
+--no-minify             skip minification
+--inflate-only-assets   inflate assets only
+--inflate-flat          inflate into dir directly
+--inflate-sea           inflate with SEA compilation scripts
+--install-tsconfig      create tsconfig.json
+--install-miqrojson     create miqro.json
+--install               install from binary cache (SEA only)
+--disable-miqrojson     ignore miqro.json
+--log-file              override LOG_FILE
+--browser               override BROWSER
+--config                override miqro.json path
+--port                  override PORT
+--name                  override server name
+--https                 serve with https
+--https-key             path to server.key
+--https-cert            path to server.cert
+--https-redirect        http redirect port
+--inflate-parallel      max parallel esbuild instances (default: 1)
+```
 
-```npm run compile``` or ```sh ./compile.sh```
+environment variables:
 
-to binaries will be produced in the ```bin/``` folder.
+```
+PORT                    default: 8080
+BROWSER                 default browser, none to disable
+LOG_FILE                default: ./server.log
+LOG_LEVEL               error | warn | info | debug | trace | none
+LOG_LEVEL_<IDENTIFIER>  per-route log level
+DB                      enable db features
+DB_STORAGE              sqlite storage path (default: ./db.sqlite3)
+DB_DIALECT              node:sqlite | sqlite3 | pg
+DB_CONNECTION           connection url (postgres)
+CLEAR_JSX_CACHE         clear esbuild cache (default: 1)
+JSX_TMP                 esbuild tmp dir (default: /tmp/jsx_tmp)
+CLUSTER_COUNT           number of cluster workers
+```
 
-example
+## build
 
-```./bin/linux-x64/miqro --help```
+```
+npm install
+npm run build
+```
 
-you can copy this binary to a computer without Node.js installed and run it to try.
+### SEA binary
+
+```
+npm install
+npm run precompile
+npm run compile
+```
+
+binaries in `bin/`.
+
+```
+./bin/linux-x64/miqro --help
+```

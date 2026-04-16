@@ -1,16 +1,8 @@
 import { Database } from "@miqro/query";
-import { WebSocketServerOptions, SessionHandlerOptions, Logger, WebSocketServer, ReadBuffer, URLEncodedParser, JSONParser, TextParser, CORS, SessionHandler, RouteOptions, Handler, Request, Response, LogLevel, LoggerTransportWriteArgs, CORSOptions, HandlerWithOptions, ErrorHandler } from "@miqro/core";
+import { WebSocketServerOptions, SessionHandlerOptions, Logger, WebSocketServer, ReadBuffer, URLEncodedParser, JSONParser, TextParser, CORS, SessionHandler, RouteOptions, Handler, Request, Response, LogLevel, LoggerTransportWriteArgs, CORSOptions, HandlerWithOptions, ErrorHandler, SchemaProperties, APIRoute as BaseAPIRoute, TypedRequest, defineRoute as baseDefineRoute } from "@miqro/core";
 import { request } from "@miqro/request";
 import { Parser, ParserInterface } from "@miqro/parser";
 import { RuntimeHTMLElement, Runtime, RuntimeContainer, RuntimeURL, RuntimeOptions, RuntimeShadowRootInit } from "@miqro/jsx";
-import {
-  RuntimeElementDefinitionOptions,
-  Component,
-  createElement,
-  Fragment,
-  enableDebugLog
-} from "@miqro/jsx";
-import * as jsxLib from "@miqro/jsx";
 import { EncryptOptions, JWTDecryptOptions, JWTDecryptResult, JWTPayload, JWTVerifyOptions, JWTVerifyResult, ProtectedHeaderParameters, SignOptions } from "jose";
 import { KeyObject } from "node:crypto";
 
@@ -33,36 +25,20 @@ export interface JWTSignOptions {
   options?: SignOptions;
 }
 
-/*declare global {
-  // jsx only for the default value of tsconfig.json
-  //var React: {};
-  var JSX: {
-    createElement: typeof createElement;
-    Fragment: typeof Fragment;
-    enableDebugLog: typeof enableDebugLog;
-  }
+export type APIRoute<
+  TBody extends SchemaProperties | string | boolean | undefined = undefined,
+  TParams extends SchemaProperties | string | boolean | undefined = undefined,
+  TQuery extends SchemaProperties | string | boolean | undefined = undefined>
+  = BaseAPIRoute<ServerRequest, TBody, TParams, TQuery>;
+
+export function defineRoute<
+  const TBody extends SchemaProperties | string | boolean | undefined = undefined,
+  const TParams extends SchemaProperties | string | boolean | undefined = undefined,
+  const TQuery extends SchemaProperties | string | boolean | undefined = undefined
+>(route: APIRoute<TBody, TParams, TQuery>) {
+  return baseDefineRoute<ServerRequest, TBody, TParams, TQuery>(route) as APIRoute;
 }
 
-declare global {
-  // only available browser side
-  var jsx: {
-    define: (tagName: string, component: Component, options?: RuntimeElementDefinitionOptions) => void;
-    useRuntime: typeof jsxLib.useRuntime;
-    usePathname: typeof jsxLib.usePathname;
-    Link: typeof jsxLib.Link;
-    Router: typeof jsxLib.Router;
-    createContext: typeof jsxLib.createContext;
-    useContext: typeof jsxLib.useContext;
-    useState: typeof jsxLib.useState;
-    useEffect: typeof jsxLib.useEffect;
-    useQuery: typeof jsxLib.useQuery;
-    useRef: typeof jsxLib.useRef;
-    useElement: typeof jsxLib.useElement;
-    useRefresh: typeof jsxLib.useRefresh;
-  }
-}*/
-
-export { APIRoute } from "@miqro/core";
 export { Migration } from "@miqro/query";
 
 export interface JWTInterface {
@@ -129,7 +105,7 @@ export interface ServerGlobal {
   newParser(): Parser;
   newClusterCache: (name: string, logger?: Logger) => CacheInterface;
   newLocalCache: (name: string, logger?: Logger) => CacheInterface;
-  
+
   getWorkerCount: () => number;
   getWorkerNumber: () => number;
   isPrimaryWorker: () => boolean;
@@ -199,7 +175,7 @@ export interface ServerInterface extends ServerGlobal {
 }
 
 export interface ServerRequest extends Request {
-  server?: ServerInterface;
+  server: ServerInterface;
 }
 
 export interface ServerResponse extends Response {
@@ -297,7 +273,11 @@ export interface DBConfig {
   name: string;
 }
 
-export interface APIOptions extends Partial<RouteOptions> {
+export interface APIOptions<
+  TBody extends SchemaProperties | string | boolean | undefined = SchemaProperties | string | boolean | undefined,
+  TParams extends SchemaProperties | string | boolean | undefined = SchemaProperties | string | boolean | undefined,
+  TQuery extends SchemaProperties | string | boolean | undefined = SchemaProperties | string | boolean | undefined
+> extends Partial<RouteOptions<TBody, TParams, TQuery>> {
   basePath?: string;
   path?: string | string[];
   method?: string | string[];

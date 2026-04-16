@@ -1,8 +1,8 @@
-import { APIRoute, JSONParser } from "@miqro/core";
+import { defineRoute, JSONParser } from "@miqro/core";
 import { unlinkSync } from "node:fs";
 import { getPath } from "./read.api.js";
 
-export default {
+export default defineRoute({
   description: "admin editor file deletion endpoint",
   method: "POST",
   path: "/delete",
@@ -25,7 +25,7 @@ export default {
       message: "OK"
     });
   }
-} as APIRoute;
+});
 
 function deleteFile(path: string) {
   unlinkSync(getPath(path));

@@ -89,7 +89,7 @@ function getHandlerOptions(router: APIRoute): RouterHandlerOptions {
   };
 }
 
-function getHandler(/*auth: Handler, */router: APIRoute): HandlerWithOptions {
+function getHandler(/*auth: Handler, */router: APIRoute<any, any, any>): HandlerWithOptions<any, any, any> {
   /*const ret = new Router();
   ret.use(auth);
   ret.use(router.handler, undefined, undefined, getHandlerOptions(router));

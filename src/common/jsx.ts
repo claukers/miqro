@@ -3,7 +3,7 @@ import { createNodeRuntime } from "@miqro/jsx-node";
 import { basename, dirname, extname, relative, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import { Request, Response, CORSOptions, Logger, APIRoute } from "@miqro/core";
-import { Parser, Schema } from "@miqro/parser";
+import { InferSchema, Parser, Schema } from "@miqro/parser";
 import { APIRouteSchema, SessionHandlerOptionsSchema } from "@miqro/core";
 import { cwd } from "node:process";
 
@@ -391,7 +391,7 @@ export async function importMiddlewareConfigModule(inFile: string, options: Impo
   const isCJS = extname(inFile) === ".cjs";
   const mod = isCJS ? (await importJSXFile(inFile, options, logger)).default.default : (await importJSXFile(inFile, options, logger)).default;
 
-  const module = parser.parse(mod, MiddlewareConfigSchema, basename(inFile));
+  const module = parser.parse(mod, MiddlewareConfigSchema, basename(inFile)) as MiddlewareConfig;
   if (module !== undefined) {
     return module;
   } else {
@@ -403,7 +403,7 @@ export async function importErrorConfigModule(inFile: string, options: ImportJSX
   const isCJS = extname(inFile) === ".cjs";
   const mod = isCJS ? (await importJSXFile(inFile, options, logger)).default.default : (await importJSXFile(inFile, options, logger)).default;
 
-  const module = parser.parse(mod, ErrorConfigSchema, basename(inFile));
+  const module = parser.parse(mod, ErrorConfigSchema, basename(inFile)) as ErrorConfig;
   if (module !== undefined) {
     return module;
   } else {

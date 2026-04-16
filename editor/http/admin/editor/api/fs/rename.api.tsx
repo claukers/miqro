@@ -1,9 +1,9 @@
-import { APIRoute, JSONParser } from "@miqro/core";
+import { APIRoute, defineRoute, JSONParser } from "@miqro/core";
 import { existsSync, mkdirSync, renameSync } from "node:fs";
 import { getPath } from "./read.api.js";
 import { dirname } from "node:path";
 
-export default {
+export default defineRoute({
   middleware: [JSONParser()],
   method: "POST",
   description: "admin editor file rename endpoint",
@@ -27,7 +27,7 @@ export default {
       message: "OK"
     });
   }
-} as APIRoute;
+});
 
 export async function rename(path: string, newName: string) {
   if (existsSync(path) && !existsSync(newName)) {

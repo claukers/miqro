@@ -1,4 +1,4 @@
-import { Router, newURL, Response, Request, RouterHandlerOptions, Logger, APIRoute, normalizePath, HandlerWithOptions, Handler } from "@miqro/core";
+import { Router, newURL, Response, Request, RouterHandlerOptions, Logger, APIRoute, normalizePath } from "@miqro/core";
 import { existsSync, mkdir, readFile, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve as pathResolve } from "node:path";
 
@@ -15,7 +15,7 @@ import { setupAUTH } from "./setup-auth.js";
 import { getRoutes } from "../services/utils/get-route.js";
 import { describeFilePath, mkdirASync, writeFileASync } from "../common/fs.js";
 import { inflateMD2HTML } from "./md.js";
-import { MiddlewareConfig, ServerInterface, ServerRequest } from "../types.js";
+import { MiddlewareConfig, ServerInterface, ServerRequest, ServerResponse } from "../types.js";
 import { setupMiddleware } from "./setup-middleware.js";
 import { setupError } from "./setup-error.js";
 
@@ -319,7 +319,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                   }
 
                   // router.use(assertGlobalTampered);
-                  router.use(async function (req: Request, res: Response) {
+                  router.use(async function (req: ServerRequest, res: ServerResponse) {
 
                     const JSON = await getJSON(req, res, newURL(req.path), module.apiOptions?.basePath, module.default);
 
@@ -393,7 +393,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                   }
 
                   // router.use(assertGlobalTampered);
-                  router.use(async function (req: Request, res: Response) {
+                  router.use(async function (req: ServerRequest, res: ServerResponse) {
                     const toRender = typeof module.default === "function" ? module.default(req, res) : module.default;
                     const HTML = await getHTML(hotreload, req, res, newURL(req.path), module.apiOptions?.basePath, await toRender);
 
