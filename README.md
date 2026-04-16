@@ -32,7 +32,7 @@ miqro
 
 `@miqro/test` and `@miqro/request` are being phased out in favor of `node:test` and built-in `fetch`.
 
-package docs: [@miqro/core](core-README.md) · [@miqro/query](query-README.md) · [@miqro/jsx](jsx-README.md) · [@miqro/jsx-dom](jsx-dom-README.md) · [@miqro/jsx-node](jsx-node-README.md) · [@miqro/request](request-README.md) · [@miqro/runner](runner-README.md) · [@miqro/test](test-README.md) · [@miqro/test-http](test-http-README.md) · [@miqro/parser](parser-README.md)
+package docs: [@miqro/core](https://www.npmjs.com/package/@miqro/core) · [@miqro/query](https://www.npmjs.com/package/@miqro/query) · [@miqro/jsx](https://www.npmjs.com/package/@miqro/jsx) · [@miqro/jsx-dom](https://www.npmjs.com/package/@miqro/jsx-dom) · [@miqro/jsx-node](https://www.npmjs.com/package/@miqro/jsx-node) · [@miqro/request](https://www.npmjs.com/package/@miqro/request) · [@miqro/runner](https://www.npmjs.com/package/@miqro/runner) · [@miqro/test](https://www.npmjs.com/package/@miqro/test) · [@miqro/test-http](https://www.npmjs.com/package/@miqro/test-http) · [@miqro/parser](https://www.npmjs.com/package/@miqro/parser)
 
 ## composition
 
