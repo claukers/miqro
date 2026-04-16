@@ -281,7 +281,39 @@ export default (req, res) => {
 }
 ```
 
-full declaration with validation:
+full declaration with validation and typing:
+
+```ts
+import { defineRoute, JSONParser } from "@miqro/core";
+
+export default defineRoute({
+  name: "create post",
+  method: "POST",
+  middleware: [JSONParser()],
+  request: {
+    body: {
+      title: "string",
+      content: "string"
+    }
+  },
+  response: {
+    status: [200],
+    body: {
+      id: "number"
+    }
+  },
+  handler: async (req, res) => {
+    const post = await req.server.db.get("mydb")
+      .insert("posts")
+      .values({ title: req.body.title, content: req.body.content })
+      .returning("id")
+      .yield();
+    return res.json({ id: post[0].id });
+  }
+});
+```
+
+full declaration with validation but no req.body typing:
 
 ```ts
 import { APIRoute, JSONParser } from "@miqro/core";
