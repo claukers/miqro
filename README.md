@@ -284,7 +284,8 @@ export default (req, res) => {
 full declaration with validation and typing:
 
 ```ts
-import { defineRoute, JSONParser } from "@miqro/core";
+import { defineRoute } from "miqro";
+import { JSONParser } from "@miqro/core";
 
 export default defineRoute({
   name: "create post",
@@ -452,7 +453,7 @@ without `cors.ts` all origins are allowed. with it only listed origins are accep
 
 ## ORM
 
-quick reference. full docs in [@miqro/query](query-README.md).
+quick reference. full docs in [@miqro/query](https://www.npmjs.com/package/@miqro/query).
 
 ```ts
 import { defineModel } from "@miqro/query";
