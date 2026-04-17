@@ -183,6 +183,8 @@ export class Miqro {
 
     this.adminInterface = createAdminInterface(this);
 
+    this.webSocketManager.adminInterface = this.adminInterface;
+
     setupExitHandlers(this);
   }
 

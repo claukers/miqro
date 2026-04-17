@@ -3,6 +3,7 @@ import { LOG_SOCKET_PATH } from "../../../editor/common/constants.js";
 import { ClusterWebSocketServer2 } from "./cluster-ws.js";
 import { WSConfig } from "../../types.js";
 import { LogProvider } from "./log.js";
+import { EditorAdminInterface } from "../../../editor/common/admin-interface.js";
 
 export interface WebSocketManagerOptions {
   logger?: Logger | Console;
@@ -14,6 +15,7 @@ export interface WebSocketManagerOptions {
 export class WebSocketManager {
   public runningGlobalWSMap = new Map<string, ClusterWebSocketServer2>();
   public logger?: Logger | Console | null = null;
+  public adminInterface?: EditorAdminInterface;
   public name: string;
   public avoidLogSocket: boolean;
   public loggerProvider: LogProvider;
@@ -140,11 +142,17 @@ export class WebSocketManager {
     try {
       const wsServer = this.getWS(req.path);
       if (wsServer) {
-        return wsServer.onUpgrade(req, socket, head);
+        if (LOG_SOCKET_PATH === req.path) {
+          req.editor = this.adminInterface;
+        }
+        const ret = wsServer.onUpgrade(req, socket, head);
+        delete req.editor;
+        return ret;
       } else {
         socket.destroy();
       }
     } catch (e) {
+      delete req.editor;
       this.logger?.error(e);
     }
   }

@@ -5,6 +5,7 @@ import { APIRoute, Response } from "@miqro/core";
 import { scanDir } from "./api/fs/scan.api.js";
 import { HTMLEncode } from "../../../common/html-encode.js";
 import { AdminRequest } from "../../../common/admin-interface.js";
+import { jsx2HTML } from "../../../../src/lib.js";
 
 export default {
   description: "ADMIN EDITOR GUI",
@@ -17,7 +18,7 @@ export default {
     const migrations = admin ? admin.getMigrations().map(m => m.name) : [];
     const services = admin ? admin.getServices() : ["."];
 
-    return res.html("<!DOCTYPE html>" + String(<html>
+    return res.html("<!DOCTYPE html>" + jsx2HTML(<html>
       <head>
         <link rel="stylesheet" href="/admin/editor/style.css" />
       </head>
