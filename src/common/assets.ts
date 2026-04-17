@@ -30,8 +30,8 @@ const ASSETS_ROUTER = {
   // "types.json": "sea/types.json",
   "assets.base64.json": "sea/assets.base64.json",
   "editor-assets/editor.bundle.js": "build/editor.bundle.js",
-  "editor-assets/style.css": "build/style.css",
-  "editor-assets/font.ttf": "build/font.ttf"
+  "editor-assets/style.css": "build/style.css"
+  //"editor-assets/font.ttf": "build/font.ttf"
 }
 
 export function getAsset(key: string): Buffer {

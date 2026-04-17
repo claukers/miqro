@@ -18,7 +18,7 @@
     "build": "tsc",
     "postbuild": "npm run postbuild:lib && npm run postbuild:sh && npm run postbuild:assets && npm run postbuild:editor && npm run postbuild:editor-assets && npm run postbuild:versiontag",
     "postbuild:versiontag": "node sea/version.tag.js",
-    "postbuild:editor-assets": "cp sea/editor-assets/font.ttf build/font.ttf && cp sea/editor-assets/style.css build/style.css",
+    "postbuild:editor-assets": "cp sea/editor-assets/style.css build/style.css",
     "postbuild:editor": "esbuild --external:node:process --external:node:path --bundle --loader:.js=jsx --jsx-factory=jsx.createElement --jsx-fragment=jsx.Fragment sea/editor-assets/editor.bundle.in.mjs --outfile=build/editor.bundle.js",
     "postbuild:assets": "node sea/assets.js",
     "postbuild:sh": "node sea/base64.js sea/basic-compile.sh > sea/basic-compile.base64.sh",

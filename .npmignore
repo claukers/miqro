@@ -45,3 +45,5 @@ bin/miqro
 sea/assets.base64.json
 sea/jsx-assets.js
 .eslintrc
+src/
+editor/

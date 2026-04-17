@@ -24,7 +24,7 @@ export async function createEditorRouter(adminInterface: EditorAdminInterface): 
     req.editor = adminInterface;
   });
 
-  const editorFont = Buffer.from(getAsset("editor-assets/font.ttf"));
+  //const editorFont = Buffer.from(getAsset("editor-assets/font.ttf"));
   const editorJS = Buffer.from(getAsset("editor-assets/editor.bundle.js")).toString().trim();
   const editorCSS = Buffer.from(getAsset("editor-assets/style.css")).toString().trim().split("\n").map(l => l.trim()).filter(l => l).join("");
 
@@ -56,7 +56,7 @@ export async function createEditorRouter(adminInterface: EditorAdminInterface): 
 
   innerRouter.post(`/api/server/reload`, getHandler(/*authHandler, */reloadAPI));
 
-  innerRouter.get(`/font.ttf`, async (_req, res) => {
+  /*innerRouter.get(`/font.ttf`, async (_req, res) => {
     return await res.asyncEnd({
       status: 200,
       headers: {
@@ -64,7 +64,7 @@ export async function createEditorRouter(adminInterface: EditorAdminInterface): 
       },
       body: editorFont
     })
-  });
+  });*/
 
   innerRouter.get("/", EditorIndex(editorCSS, editorJS, false));
 

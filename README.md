@@ -11,7 +11,7 @@ runtime dependencies: `jose`, `esbuild`, `cookie`, `showdown`
 - **REST API** endpoints with request/response validation
 - **database** — `sqlite3`, `node:sqlite`, `postgres` with migrations
 - **cluster** — multi-worker with shared cache and hot reload
-- **NODE:SEA** — single binary, no Node.js required on target machine
+- **NODE:SEA** — compile to single binary, no Node.js required on target machine
 - **built-in editor**, **test runner**, **API doc generation**
 
 ## packages
@@ -106,12 +106,6 @@ service folders can be npm packages:
 ```
 
 ## installation
-
-### standalone binary (no Node.js required) ( Not Up-To-Date versions )
-
-download from [releases](https://github.com/claukers/miqro/releases). (diff release cycle so expect OLD versions published)
-
-for newer releases use the npm install and the npx miqro --compile to produce a standalone binary of the app
 
 ### npm
 
@@ -1097,18 +1091,4 @@ CLUSTER_COUNT           number of cluster workers
 ```
 npm install
 npm run build
-```
-
-### SEA binary
-
-```
-npm install
-npm run precompile
-npm run compile
-```
-
-binaries in `bin/`.
-
-```
-./bin/linux-x64/miqro --help
 ```

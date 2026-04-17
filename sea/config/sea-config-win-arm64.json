@@ -19,7 +19,6 @@
     "app.sh": "sea/app.sh",
     "assets.base64.json": "sea/assets.base64.json",
     "editor-assets/editor.bundle.js": "build/editor.bundle.js",
-    "editor-assets/style.css": "build/style.css",
-    "editor-assets/font.ttf": "build/font.ttf"
+    "editor-assets/style.css": "build/style.css"
   }
 }
