@@ -12,7 +12,7 @@ import scanAPI from "../../editor/http/admin/editor/api/fs/scan.api.js";
 import restartAPI from "../../editor/http/admin/editor/api/server/restart.api.js";
 import reloadAPI from "../../editor/http/admin/editor/api/server/reload.api.js";*/
 
-import { AdminRequest, EditorAdminInterface } from "../../editor/common/admin-interface.js";
+import { AdminRequest, EditorAdminInterface } from "../common/admin-interface.js";
 import { CONTENT_TYPE_MAP } from "../common/content-type.js";
 
 export async function createEditorRouter(adminInterface: EditorAdminInterface): Promise<Router> {

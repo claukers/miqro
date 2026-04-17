@@ -1,6 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import { AuthConfig, ServerRequest } from "../src/types.js";
-import { AdminRequest } from "./common/admin-interface.js";
+import { AdminRequest } from "../src/common/admin-interface.js";
 
 export const ADMIN_EDITOR_AUTH_KEY = "$$ADMIN_EDITOR_AUTH_KEY$$";
 

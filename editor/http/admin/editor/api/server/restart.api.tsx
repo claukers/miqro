@@ -1,7 +1,7 @@
 import { APIRoute, JSONParser } from "@miqro/core";
 import { relative } from "node:path";
 import { BASE_PATH } from "../../../../../common/constants.server.js";
-import { AdminRequest } from "../../../../../common/admin-interface.js";
+import { AdminRequest } from "../../../../../../src/common/admin-interface.js";
 
 export default {
   method: "POST",

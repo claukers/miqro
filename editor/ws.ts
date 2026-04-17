@@ -1,6 +1,6 @@
 import { WSConfig } from "../src/types.js";
 import { LOG_SOCKET_PATH } from "./common/constants.js";
-import { AdminRequest } from "./common/admin-interface.js";
+import { AdminRequest } from "../src/common/admin-interface.js";
 import { ADMIN_EDITOR_AUTH_KEY } from "./auth.js";
 
 export default {

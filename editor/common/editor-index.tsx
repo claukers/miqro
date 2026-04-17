@@ -1,6 +1,6 @@
 import { scanDir } from "../http/admin/editor/api/fs/scan.api.js";
 import { parseInflateErrors } from "../http/admin/editor/api/server/restart.api.js";
-import { AdminRequest } from "./admin-interface.js";
+import { AdminRequest } from "../../src/common/admin-interface.js";
 import { HTMLEncode } from "./html-encode.js";
 
 export function EditorIndex(editorCSS: string, editorJS: string, enableHotReload: boolean) {

@@ -18,7 +18,7 @@ import { EDITOR_CONFIG_KEY, HOT_RELOAD_PATH, HOT_RELOAD_SCRIPT_PATH } from "../c
 import { watchAndServer } from "../common/watch.js";
 import { LocalCache } from "./utils/cache.js";
 // import { initGlobals } from "./globals.js";
-import { EditorAdminInterface } from "../../editor/common/admin-interface.js";
+import { EditorAdminInterface } from "../common/admin-interface.js";
 import { LogProvider, LogProviderOptions } from "./utils/log.js";
 import { initAssets } from "../common/assets.js";
 import { setupExitHandlers } from "../common/exit.js";

@@ -3,7 +3,7 @@ import { LOG_SOCKET_PATH } from "../../../editor/common/constants.js";
 import { ClusterWebSocketServer2 } from "./cluster-ws.js";
 import { WSConfig } from "../../types.js";
 import { LogProvider } from "./log.js";
-import { EditorAdminInterface } from "../../../editor/common/admin-interface.js";
+import { EditorAdminInterface } from "../../common/admin-interface.js";
 
 export interface WebSocketManagerOptions {
   logger?: Logger | Console;

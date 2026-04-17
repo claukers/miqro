@@ -1,4 +1,4 @@
-import { EditorAdminInterface } from "../../../editor/common/admin-interface.js";
+import { EditorAdminInterface } from "../../common/admin-interface.js";
 import { MigrationModule } from "../../inflate/setup-db.js";
 import { Miqro } from "../app.js";
 import { getHotReloadScript } from "../hot-reload.js";

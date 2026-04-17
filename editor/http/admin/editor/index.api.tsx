@@ -4,7 +4,7 @@ import JSX from "@miqro/jsx";
 import { APIRoute, Response } from "@miqro/core";
 import { scanDir } from "./api/fs/scan.api.js";
 import { HTMLEncode } from "../../../common/html-encode.js";
-import { AdminRequest } from "../../../common/admin-interface.js";
+import { AdminRequest } from "../../../../src/common/admin-interface.js";
 import { jsx2HTML } from "../../../../src/lib.js";
 
 export default {

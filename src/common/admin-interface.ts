@@ -1,6 +1,6 @@
 import { RouterHandlerOptions } from "@miqro/core";
-import { CacheInterface, ServerRequest } from "../../src/types.js";
-import { MigrationModule } from "../../src/inflate/setup-db.js";
+import { CacheInterface, ServerRequest } from "../types.js";
+import { MigrationModule } from "../inflate/setup-db.js";
 
 export interface EditorAdminInterface {
   getCache: () => CacheInterface;

@@ -4,7 +4,7 @@ import { BASEEDITOR_PATH } from "./common/constants.js";
 import { existsSync, readFileSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import { ADMIN_EDITOR_AUTH_KEY, ADMIN_EDITOR_AUTH_QUERY } from "./auth.js";
-import { EditorAdminInterface } from "./common/admin-interface.js";
+import { EditorAdminInterface } from "../src/common/admin-interface.js";
 //import { getEditorAdmin } from "./common/admin-interface.js";
 
 const ADMIN_EDITOR_BROWSER_OPEN_KEY = "ADMIN_EDITOR_BROWSER_OPEN_KEY$$";

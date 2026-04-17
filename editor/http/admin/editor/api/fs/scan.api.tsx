@@ -2,7 +2,7 @@ import { APIRoute, JSONParser } from "@miqro/core";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative, resolve, sep } from "node:path";
 import { BASE_PATH } from "../../../../../common/constants.server.js";
-import { AdminRequest } from "../../../../../common/admin-interface.js";
+import { AdminRequest } from "../../../../../../src/common/admin-interface.js";
 
 export interface ScannedFile {
   filePath: string;
