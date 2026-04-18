@@ -47,12 +47,12 @@ export function setupExitHandlers(app: Miqro) {
     }*/
     cleanJSX(app);
     if (app.server) {
-      app.stop();
+      await app.stop();
     }
     process.exit(EXIT_CODES.ABNORMAL_UNCONTROLLED);
   });
 
-  process.on('exit', async function (code) {
+  process.on('exit', function (code) {
     if (exceptionOccured) {
       app.logger?.error('Exception occured');
     } else {
@@ -67,6 +67,23 @@ export function setupExitHandlers(app: Miqro) {
         app.stop();
       }
     }
+  });
+
+  process.on('unhandledRejection', async (reason) => {
+    app.logger?.error('Unhandled rejection:');
+    app.logger?.error(reason);
+    exceptionOccured = true;
+    /*if (app.server) {
+      notifiyServerConfigSync(app, "unload");
+      notifiyServerConfigSync(app, "stop");
+      app.webSocketManager.disconnectAll();
+      app.dbManager.closeAll();
+    }*/
+    cleanJSX(app);
+    if (app.server) {
+      await app.stop();
+    }
+    process.exit(EXIT_CODES.ABNORMAL_UNCONTROLLED);
   });
 
   process.on("SIGTERM", function () {

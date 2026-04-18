@@ -36,9 +36,13 @@ export async function watchAndServer(app: Miqro) {
       try {
         stopWatch();
         setTimeout(async () => {
-          watchLogger?.debug("closed");
-          await app.reload();
-          reWatch();
+          try {
+            watchLogger?.debug("closed");
+            await app.reload();
+            reWatch();
+          } catch (e) {
+            watchLogger?.error(e);
+          }
         }, 500);
       } catch (e) {
         watchLogger?.error(e);

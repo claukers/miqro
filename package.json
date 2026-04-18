@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "postject": "1.0.0-alpha.6",
-    "@miqro/core": "^5.0.18",
+    "@miqro/core": "^5.0.20",
     "@miqro/jsx": "^1.0.2",
     "@miqro/jsx-dom": "^1.0.6",
     "@miqro/jsx-node": "^1.0.7",
