@@ -1,4 +1,4 @@
-import { EncryptJWT, EncryptOptions, JWTDecryptOptions, JWTDecryptResult, JWTPayload, JWTVerifyOptions, JWTVerifyResult, ProtectedHeaderParameters, SignJWT, SignOptions, decodeJwt, decodeProtectedHeader, jwtDecrypt as joseJWTDecrypt, jwtVerify } from "jose";
+import { EncryptJWT, JWTDecryptOptions, JWTDecryptResult, JWTPayload, JWTVerifyOptions, JWTVerifyResult, ProtectedHeaderParameters, SignJWT, decodeJwt, decodeProtectedHeader, jwtDecrypt as joseJWTDecrypt, jwtVerify } from "jose";
 import { KeyObject } from "node:crypto";
 import { EncryptJWTOptions, JWTSignOptions } from "../types.js";
 
@@ -21,7 +21,7 @@ export async function encryptJWT(payload: JWTPayload, secret: KeyObject, options
     .setAudience(options?.aud ? options?.aud : 'urn:example:audience')
     .setExpirationTime(options?.exp ? options?.exp : '2h');
 
-  return await en.encrypt(secret, options?.options);
+  return en.encrypt(secret, options?.options);
 }
 
 /**
@@ -32,7 +32,7 @@ export async function encryptJWT(payload: JWTPayload, secret: KeyObject, options
  * @returns 
  */
 export async function decryptJWT<PayloadType = JWTPayload>(jwt: string, secret: KeyObject, options?: Partial<JWTDecryptOptions>): Promise<JWTDecryptResult<PayloadType>> {
-  return await joseJWTDecrypt(jwt, secret, options)
+  return joseJWTDecrypt(jwt, secret, options)
 }
 
 /**
@@ -43,7 +43,7 @@ export async function decryptJWT<PayloadType = JWTPayload>(jwt: string, secret: 
  * @returns 
  */
 export async function verifyJWT<PayloadType = JWTPayload>(jwt: string, secret: KeyObject, options?: Partial<JWTVerifyOptions>): Promise<JWTVerifyResult<PayloadType>> {
-  return await jwtVerify(jwt, secret, options)
+  return jwtVerify(jwt, secret, options)
 }
 
 /**

@@ -46,6 +46,7 @@ export interface MiqroOptions extends ImportJSXFileOptions {
   hotreload?: boolean;
   watch?: boolean;
   serverOptions?: ServerOptions<any, any>;
+  etag?: boolean;
   https?: boolean;
   httpRedirect?: number;
   noMinify?: boolean;
@@ -106,6 +107,7 @@ export class Miqro {
   constructor(options?: Partial<MiqroOptions>) {
     this.options = {
       noMinify: false,
+      etag: true,
       editor: false,
       name: "server",
       noBuild: false,
@@ -467,6 +469,7 @@ export class Miqro {
           this.logger?.error(e);
         }
       },
+      etag: this.options?.etag ?? true,
       loggerFactory: this.loggerProvider.requestLoggerFactory,
       serverOptions: this.options?.serverOptions,
       https: this.options?.https

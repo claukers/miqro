@@ -18,6 +18,8 @@ export const help = `
 
 -v, --version\n\toutputs the version number
 -h, --help\n\toutputs this page.
+--disable-etag\n\tuse to disable etag generation by default. each route can still enable this.
+--enable-etag\n\tuse to enable etag generation by default. each route can still disable this. ( by default etag is enabled )
 --watch\n\tuse to auto reload the server when files change.
 --hot-reload\n\tenables the hot-reload functionality use with --watch.
 --test\n\trun the tests for a service.

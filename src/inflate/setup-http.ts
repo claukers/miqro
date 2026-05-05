@@ -130,21 +130,24 @@ async function createStaticRoute(inflateJSXOptions: InflateJSXFileOptions, servi
 
       // router.use(assertGlobalTampered);
       router.get(path, async function (_req, res) {
-        await new Promise<void>((resolve, reject) => {
+        return new Promise<{
+          status: number;
+          headers: any;
+          body: Buffer;
+        }>((resolve, reject) => {
           try {
             readFile(file.filePath, async (err, body) => {
               if (err) {
                 reject(err);
               } else {
                 try {
-                  await res.asyncEnd({
+                  resolve({
                     status: 200,
                     headers: {
                       ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
                     },
                     body
-                  });
-                  resolve();
+                  })
                 } catch (e) {
                   reject(e);
                 }
@@ -154,6 +157,10 @@ async function createStaticRoute(inflateJSXOptions: InflateJSXFileOptions, servi
             reject(e);
           }
         });
+      }, {
+        response: {
+          etag: true
+        }
       });
       resolve();
     } catch (e) {
@@ -323,13 +330,13 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
 
                     const JSON = await getJSON(req, res, newURL(req.path), module.apiOptions?.basePath, module.default);
 
-                    return res.asyncEnd({
+                    return {
                       status: 200,
                       headers: {
                         ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
                       },
                       body: JSON
-                    });
+                    };
                   }, r.path, r.method as any, r.options)
                 }
 
@@ -397,13 +404,13 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
                     const toRender = typeof module.default === "function" ? module.default(req, res) : module.default;
                     const HTML = await getHTML(hotreload, req, res, newURL(req.path), module.apiOptions?.basePath, await toRender);
 
-                    return res.asyncEnd({
+                    return {
                       status: 200,
                       headers: {
                         ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
                       },
                       body: HTML
-                    });
+                    };
                   }, r.path, r.method as any, r.options)
                 }
                 return resolve();
@@ -456,13 +463,17 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
 
                   // router.use(assertGlobalTampered);
                   router.get(path, async function (req, res) {
-                    return res.asyncEnd({
+                    return {
                       status: 200,
                       headers: {
                         ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
                       },
                       body: code
-                    });
+                    };
+                  }, {
+                    response: {
+                      etag: true
+                    }
                   });
                   return resolve();
                 }
@@ -507,13 +518,17 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
 
                 // router.use(assertGlobalTampered);
                 router.get(path, async function (_req, res) {
-                  res.asyncEnd({
+                  return {
                     status: 200,
                     headers: {
                       ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
                     },
                     body: code
-                  });
+                  };
+                }, {
+                  response: {
+                    etag: true
+                  }
                 });
                 return resolve();
               }
@@ -568,13 +583,17 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
 
                   // router.use(assertGlobalTampered);
                   router.get(path, async function (_req, res) {
-                    res.asyncEnd({
+                    return {
                       status: 200,
                       headers: {
                         ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
                       },
                       body: code
-                    });
+                    };
+                  }, {
+                    response: {
+                      etag: true
+                    }
                   });
                   return resolve();
                 }
@@ -626,13 +645,17 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
 
                   // router.use(assertGlobalTampered);
                   router.get(path, async function (_req, res) {
-                    res.asyncEnd({
+                    return {
                       status: 200,
                       headers: {
                         ["Content-Type"]: contentType ? contentType : DEFAULT_CONTENT_TYPE
                       },
                       body: code
-                    });
+                    };
+                  }, {
+                    response: {
+                      etag: true
+                    }
                   });
                   return resolve();
                 }

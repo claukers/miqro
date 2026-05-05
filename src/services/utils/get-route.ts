@@ -30,11 +30,13 @@ export function getRoutes(prePath: string, defaultPath: string, apiOptions?: Par
           parser: apiOptions?.parser,
           policy: apiOptions?.policy,
           request: apiOptions?.request,
-          response: apiOptions?.response,
+          response: apiOptions?.response ?? {
+            etag: true
+          },
           session: apiOptions?.session
         },
         inflatePath: defaultInflatePath,
-        defaultInflatePath, 
+        defaultInflatePath,
         method: m.toLocaleLowerCase() !== "use" ? m.toUpperCase() : undefined,
         path: undefined
       });
@@ -52,7 +54,9 @@ export function getRoutes(prePath: string, defaultPath: string, apiOptions?: Par
             parser: apiOptions?.parser,
             policy: apiOptions?.policy,
             request: apiOptions?.request,
-            response: apiOptions?.response,
+            response: apiOptions?.response ?? {
+              etag: true
+            },
             session: apiOptions?.session
           },
           inflatePath: p !== "/" ? join(prePath, p) : defaultInflatePath,

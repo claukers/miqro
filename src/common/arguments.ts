@@ -24,6 +24,7 @@ interface MiqroJSON {
   browser?: string | boolean;
   logFile?: string | boolean;
   editor?: boolean;
+  etag?: boolean;
   https?: boolean;
   serverOptions?: ServerOptions;
   httpsRedirect?: number;
@@ -38,6 +39,7 @@ const MiqroJSONSchema: Schema<MiqroJSON> = {
   type: "object",
   properties: {
     name: "string?",
+    etag: "boolean?",
     services: "string[]?",
     noBuild: "boolean?",
     noMinify: "boolean?",
@@ -74,6 +76,7 @@ export interface Arguments {
   inflateFlat?: boolean;
   name?: string;
   noBuild?: boolean;
+  etag?: boolean;
   noMinify?: boolean;
   browser?: string | boolean;
   logFile?: string | boolean;
@@ -117,6 +120,7 @@ export function parseArguments(): Arguments {
     inflateParallel: number | null;
     httpsRedirect: number | null;
     https: boolean | null;
+    etag: boolean | null;
     serverOptions: ServerOptions;
     logFile: string | boolean | null;
     browser: string | boolean | null;
@@ -148,6 +152,7 @@ export function parseArguments(): Arguments {
     inflateFlat?: boolean | null;
   } = {
     inflateFlat: null,
+    etag: null,
     inflateOnlyAssets: null,
     inflateParallel: null,
     httpsRedirect: null,
@@ -275,6 +280,22 @@ export function parseArguments(): Arguments {
           process.exit(EXIT_CODES.BAD_ARGUMENTS);
         }
         flags.install = true;
+        continue;
+      case "--disable-etag":
+        if (flags.etag !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.etag = false;
+        continue;
+      case "--enable-etag":
+        if (flags.etag !== null) {
+          console.error("bad arguments.");
+          console.error(usage);
+          process.exit(EXIT_CODES.BAD_ARGUMENTS);
+        }
+        flags.etag = true;
         continue;
       case "--watch":
         if (flags.watch !== null) {
@@ -639,6 +660,11 @@ export function parseArguments(): Arguments {
         flags.https = miqroRC.https;
       }
     }
+    if (flags.etag === null) {
+      if (miqroRC.etag !== undefined) {
+        flags.etag = miqroRC.etag;
+      }
+    }
     if (flags.httpsRedirect === null) {
       if (miqroRC.httpsRedirect && flags.https) {
         /*console.log("reading key from " + String(miqroRC.serverOptions?.key));
@@ -816,6 +842,7 @@ export function parseArguments(): Arguments {
   }
 
   return {
+    etag: flags.etag !== null ? flags.etag : true,
     inflateFlat: flags.inflateFlat === null ? false : flags.inflateFlat,
     inflateOnlyAssets: flags.inflateOnlyAssets === null ? undefined : flags.inflateOnlyAssets,
     noMinify: flags.noMinify === null ? false : flags.noMinify,
