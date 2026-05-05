@@ -11,7 +11,7 @@
     "pretest": "npm run build",
     "test": "BROWSER=none node --enable-source-maps --test test/cases/*.test.js",
     "coverage": "BROWSER=none node --enable-source-maps --experimental-test-coverage --test test/cases/*.test.js",
-    "prepare2": "npm run build",
+    "prepare": "npm run build",
     "release:package": "sh sea/release-tar.sh",
     "prerelease:package": "npm run compile",
     "prebuild": "rm -Rf build/;",
