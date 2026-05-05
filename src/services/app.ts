@@ -461,10 +461,10 @@ export class Miqro {
     this.connect();
     await this.dbManager.connectAll();
     this.server = new App({
-      onUpgrade: (req: ServerRequest, socket, head) => {
+      onUpgrade: async (req: ServerRequest, socket, head) => {
         try {
           req.server = this.serverInterface;
-          return this.webSocketManager.onUpgrade(req, socket, head);
+          return await this.webSocketManager.onUpgrade(req, socket, head);
         } catch (e) {
           this.logger?.error(e);
         }
