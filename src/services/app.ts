@@ -50,6 +50,7 @@ export interface MiqroOptions extends ImportJSXFileOptions {
   https?: boolean;
   httpRedirect?: number;
   noMinify?: boolean;
+  allowedRedirectHosts?: string[];
 }
 
 export interface InflateOptions {
@@ -477,7 +478,12 @@ export class Miqro {
     if (this.options?.httpRedirect) {
       this.httpsRedirectServer = new App();
       this.httpsRedirectServer.use(async (req: ServerRequest, res) => {
-        const hostname = req.headers.host.split(":").length > 1 ? req.headers.host.split(":")[0] : req.headers.host;
+        const hostname = req.headers.host?.split(":")[0] ?? "";
+        const allowed = this.options?.allowedRedirectHosts;
+        if (allowed && !allowed.includes(hostname)) {
+          res.writeHead(400).end("Invalid Host header");
+          return;
+        }
         return await res.redirect('https://' + hostname + ":" + this.options.port + req.url);
       });
     }

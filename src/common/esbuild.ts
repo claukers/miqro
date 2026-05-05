@@ -81,6 +81,7 @@ export async function esBuild(options: {
       } else {
         exec(esBuildCMD, {
           maxBuffer: 1024 * 1000 * 2000,
+          timeout: 60000,
           cwd: dirname(options.entryPoints[0])
         }, (err, stdout, _stderr) => {
           if (err) {

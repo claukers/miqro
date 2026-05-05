@@ -28,14 +28,15 @@ export default {
       //console.log("\n\nqueryToken[%s] cookieToken[%s] KEY[%s]\n\n", queryToken, cookieToken, KEY);
 
       if (queryToken) {
-        if (typeof queryToken === "string" && timingSafeEqual(Buffer.from(queryToken), Buffer.from(KEY))) {
+        const queryBuf = Buffer.from(String(queryToken));
+        const keyBuf = Buffer.from(KEY);
+        if (typeof queryToken === "string" && queryBuf.length === keyBuf.length && timingSafeEqual(queryBuf, keyBuf)) {
           args.res.setCookie(ADMIN_EDITOR_AUTH_COOKIE, KEY, {
-            expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 31 * 12 * 500),
+            expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
             httpOnly: true,
-
-            //secure: true,
+            //secure: args.req.secure,
+            sameSite: "strict",
             path: "/",
-            //sameSite: "strict"
           });
           args.req.searchParams.delete(ADMIN_EDITOR_AUTH_QUERY);
           const queryString = args.req.searchParams.toString();

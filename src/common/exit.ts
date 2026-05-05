@@ -86,13 +86,25 @@ export function setupExitHandlers(app: Miqro) {
     process.exit(EXIT_CODES.ABNORMAL_UNCONTROLLED);
   });
 
-  process.on("SIGTERM", function () {
+  process.on("SIGTERM", async function () {
     app.logger?.info('SIGTERM received');
+    if (app.server) {
+      await Promise.race([
+        app.stop(),
+        new Promise(r => setTimeout(r, 5000))
+      ]);
+    }
     process.exit(EXIT_CODES.ABNORMAL_UNCONTROLLED);
   });
 
-  process.on('SIGHUP', function () {
+  process.on('SIGHUP', async function () {
     app.logger?.info('SIGHUP received');
+    if (app.server) {
+      await Promise.race([
+        app.stop(),
+        new Promise(r => setTimeout(r, 5000))
+      ]);
+    }
     process.exit(EXIT_CODES.ABNORMAL_UNCONTROLLED);
   });
 
@@ -101,8 +113,14 @@ export function setupExitHandlers(app: Miqro) {
     process.exit(EXIT_CODES.ABNORMAL_UNCONTROLLED);
   });*/
 
-  process.on('SIGINT', function () {
+  process.on('SIGINT', async function () {
     app.logger?.info('SIGINT received');
+    if (app.server) {
+      await Promise.race([
+        app.stop(),
+        new Promise(r => setTimeout(r, 5000))
+      ]);
+    }
     process.exit(EXIT_CODES.ABNORMAL_UNCONTROLLED);
   });
 }
