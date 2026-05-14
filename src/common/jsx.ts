@@ -239,6 +239,29 @@ export const DBConfigSchema: Schema<DBConfig> = {
   type: "object",
   properties: {
     url: "string?",
+    executor: {
+      type: "object?",
+      properties: {
+        prepare: "function",
+        query: "function",
+        disconnect: "function",
+        connect: "function",
+        transaction: "function",
+        target: "any",
+        transformInput: "function",
+        transformOutput: "function"
+      }
+    },
+    pool: {
+      type: "object?",
+      properties: {
+        min: "number?",
+        max: "number?",
+        idleTimeoutMillis: "number?",
+        connectionTimeoutMillis: "number?",
+        maxLifetimeSeconds: "number?"
+      }
+    },
     disabled: "boolean?",
     storage: "string?",
     dialect: "string?",

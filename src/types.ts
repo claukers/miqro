@@ -1,4 +1,4 @@
-import { Database } from "@miqro/query";
+import { Database, QueryExecutor } from "@miqro/query";
 import { WebSocketServerOptions, SessionHandlerOptions, Logger, WebSocketServer, ReadBuffer, URLEncodedParser, JSONParser, TextParser, CORS, SessionHandler, RouteOptions, Handler, Request, Response, LogLevel, LoggerTransportWriteArgs, CORSOptions, HandlerWithOptions, ErrorHandler, SchemaProperties, APIRoute as BaseAPIRoute, TypedRequest, defineRoute as baseDefineRoute } from "@miqro/core";
 import { request } from "@miqro/request";
 import { Parser, ParserInterface } from "@miqro/parser";
@@ -268,9 +268,17 @@ export interface ServerConfig {
 export interface DBConfig {
   dialect?: string;
   storage?: string;
+  executor?: QueryExecutor;
   url?: string;
   disabled?: boolean;
   name: string;
+  pool?: {
+    min?: number;
+    max?: number;
+    idleTimeoutMillis?: number;
+    connectionTimeoutMillis?: number;
+    maxLifetimeSeconds?: number;
+  }
 }
 
 export interface APIOptions<

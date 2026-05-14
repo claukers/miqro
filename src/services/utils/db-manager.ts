@@ -27,9 +27,11 @@ export class DBManager {
       this.options?.logger?.debug("setting up db connection [%s]", config.name);
       this.options?.logger?.trace("creating db connection [%s]", config.name);
       const db = new Database({
+        executor: config.executor,
         dialect: config.dialect ? config.dialect as any : "node:sqlite",
         storage: config.storage ? config.storage : "./db.sqlite3",
         connectionString: config.url,
+        pool: config.pool,
         logger: this.options?.loggerProvider?.getLogger(`${DB_IDENTIFIER}_${config.name}`)
       });
 
