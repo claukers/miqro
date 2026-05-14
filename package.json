@@ -46,7 +46,7 @@
     "@miqro/jsx-dom": "^1.0.6",
     "@miqro/jsx-node": "^1.0.9",
     "@miqro/parser": "^2.0.6",
-    "@miqro/query": "^0.1.0",
+    "@miqro/query": "^0.1.1",
     "@miqro/runner": "^2.0.3",
     "@miqro/test": "^0.2.10",
     "@miqro/test-http": "^0.1.4",
