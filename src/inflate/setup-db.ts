@@ -69,7 +69,7 @@ export async function inflateDBMigrations(logger: Logger, service: string, dbNam
 
     logger?.trace("loading migrations from service [%s]", service);
 
-    const serviceMigrations = migration.getSortedMigrations(migrationsFolderPath);
+    const serviceMigrations = migration.getSortedMigrations(migrationsFolderPath).filter(n => n).filter(n => n.indexOf("d.ts") === -1 || n.indexOf("d.ts") !== n.length - "d.ts".length);
 
     const migrationModules: MigrationModule[] = [];
 

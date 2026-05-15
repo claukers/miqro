@@ -209,12 +209,16 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
     tR.push(new Promise<void>(async (resolve) => {
       try {
         switch (file.ext) {
+          case ".map": {
+            return resolve();
+          }
           case ".jsx":
           case ".cjs":
           case ".js":
           case ".ts":
           case ".tsx": {
             switch (file.subExt) {
+              case ".d":
               case ".test":
                 return resolve();
               case ".ignore":
