@@ -92,8 +92,9 @@ export interface JWTInterface {
 }
 
 export interface ServerGlobal {
+  getHTML: (out: JSX.Element, runtime?: Runtime) => string,
   encodeHTML: (str: string) => string;
-  inflateMDtoHTML: (str: string) => string;
+  inflateMDtoHTML: (str: string) => Promise<string>;
   middleware: {
     buffer: typeof ReadBuffer;
     url: typeof URLEncodedParser;

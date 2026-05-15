@@ -16,7 +16,6 @@ async function main(args: Arguments) {
     process.exit(EXIT_CODES.NORMAL_EXIT);
   } else {
     const app = new Miqro({
-      editor: args.editor,
       etag: args.etag,
       name: args.name ? args.name : undefined,
       port: args.test ? TEST_SOCKET : args.port,

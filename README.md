@@ -4,7 +4,7 @@
 
 fully typed TypeScript · REST · WebSocket · SQL · JWT · HTTP
 
-runtime dependencies: `jose`, `esbuild`, `cookie`, `showdown`
+runtime dependencies: `jose`, `esbuild`, `cookie`, `marked`
 
 - **Web Components** using JSX — server-rendered and client-side
 - **static site generation** — `.html.tsx` handlers run against a live DB at build time
@@ -12,7 +12,7 @@ runtime dependencies: `jose`, `esbuild`, `cookie`, `showdown`
 - **database** — `sqlite3`, `node:sqlite`, `postgres` with migrations
 - **cluster** — multi-worker with shared cache and hot reload
 - **NODE:SEA** — compile to single binary, no Node.js required on target machine
-- **built-in editor**, **test runner**, **API doc generation**
+- **test runner**, **API doc generation**
 
 ## packages
 
@@ -169,7 +169,6 @@ all files and folders are optional.
 
 ```
 miqro --service app/
-miqro --service app/ --editor
 ```
 
 ## http folder
@@ -899,8 +898,7 @@ const app = new Miqro({
   services: ["app/"],
   port: "3000",
   name: "myapp",       // required in cluster mode
-  hotreload: false,
-  editor: false
+  hotreload: false
 });
 
 await app.inflate({ inflateDir: "build/" });  // generate static files
@@ -1023,7 +1021,6 @@ via env or `miqro.json`:
 ```
 miqro --service app/
 miqro --watch --service app/
-miqro --editor --service app/
 miqro --test --service app/
 miqro --migrate-up --service app/
 miqro --migrate-down --service app/
@@ -1042,7 +1039,6 @@ flags:
 --migrate-down          run migrations down
 --inflate               generate static files
 --inflate-dir           output directory (default: inflated/)
---editor                run with built-in editor
 --generate-doc          generate API documentation
 --generate-doc-out      output file (default: API.md)
 --generate-doc-type     MD | JSON | HTML (default: MD)

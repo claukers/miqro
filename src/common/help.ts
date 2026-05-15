@@ -27,7 +27,6 @@ export const help = `
 --migrate-down\n\tmigrations down.
 --inflate\n\tinflates the application into a directory using esbuild.
 --inflate-dir\n\tto set the output directory of the --inflate command. default value is inflated/.
---editor\n\truns the application with a built-in editor.
 --generate-doc\n\tgenerates a documentation for the api endpoints of the service.
 --generate-doc-out\n\tthe output file for the generated documentation. default value is API.md.
 --generate-doc-type\n\tthe format of the generated documentation. it can be JSON or MD. default value is MD.

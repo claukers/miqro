@@ -1,6 +1,6 @@
 import { describe, it, beforeEach as before, afterEach as after } from "node:test";
 import { strictEqual } from "assert";
-import { Miqro } from "../../build/esm/src/lib.js";
+import { Miqro } from "../../build/esm/lib.js";
 
 describe("simple html inflate", () => {
 

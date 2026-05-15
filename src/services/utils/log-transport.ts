@@ -1,9 +1,6 @@
 import { ConsoleTransport, FileTransport, LoggerTransport, LoggerTransportWriteArgs, LogLevel, WriteArgs } from "@miqro/core";
 import { format } from "node:util";
-import { LOG_SOCKET_PATH, LOG_WRITE_EVENT } from "../../../editor/common/constants.js";
-import { Miqro } from "../app.js";
 import { LogConfigMap } from "../../inflate/setup-log.js";
-// import { WebSocketManager } from "./websocketmanager.js";
 import { LogProviderOptions } from "./log.js";
 
 export function createLogProviderOptions(app?: {

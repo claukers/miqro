@@ -2,8 +2,7 @@ import { MinimalLogger } from "@miqro/core";
 import { Arguments } from "../common/arguments.js";
 // import { initTypes } from "../common/assets.js";
 import { existsSync, writeFileSync } from "node:fs";
-import { TEMPLATES } from "../../editor/common/templates.js";
-import { EXIT_CODES } from "../common/constants.js";
+import { EXIT_CODES, TEMPLATES } from "../common/constants.js";
 import { installAsset } from "../common/assets.js";
 
 export async function installTypings(args: Arguments, logger: MinimalLogger) {

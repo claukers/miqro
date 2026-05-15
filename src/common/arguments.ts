@@ -23,7 +23,6 @@ interface MiqroJSON {
   name?: string;
   browser?: string | boolean;
   logFile?: string | boolean;
-  editor?: boolean;
   etag?: boolean;
   https?: boolean;
   serverOptions?: ServerOptions;
@@ -49,7 +48,6 @@ const MiqroJSONSchema: Schema<MiqroJSON> = {
     inflateDir: "string?",
     browser: "boolean?|string?",
     logFile: "boolean?|string?",
-    editor: "boolean?",
     https: "boolean?",
     serverOptions: "any?",
     httpsRedirect: "number?",
@@ -99,7 +97,6 @@ export interface Arguments {
   inflateSEA: boolean;
   inflateDir: string;
   services: string[];
-  editor: boolean;
   hotreload: boolean;
   watch: boolean;
   https: boolean;
@@ -142,7 +139,6 @@ export function parseArguments(): Arguments {
     migrateDown: boolean | null;
     compile: boolean | null;
     inflateSEA: boolean | null;
-    editor: boolean | null;
     inflateDir?: string | null;
     hotreload?: boolean | null;
     watch?: boolean | null;
@@ -182,7 +178,6 @@ export function parseArguments(): Arguments {
     generateDocAll: null,
     generateDocOut: null,
     generateDocType: null,
-    editor: null,
     inflateDir: null
   };
   const services: string[] = [];
@@ -491,22 +486,6 @@ export function parseArguments(): Arguments {
         flags.inflateSEA = true;
         flags.inflate = true;
         continue;
-      /*case "--install-types":
-        if (flags.inflate !== null || flags.installTypes !== null) {
-          console.error("bad arguments.");
-          console.error(usage);
-          process.exit(EXIT_CODES.BAD_ARGUMENTS);
-        }
-        flags.installTypes = true;
-        continue;*/
-      case "--editor":
-        if (flags.editor !== null) {
-          console.error("bad arguments.");
-          console.error(usage);
-          process.exit(EXIT_CODES.BAD_ARGUMENTS);
-        }
-        flags.editor = true;
-        continue;
       case "--install-miqrojson":
         if (flags.installMiqroJSON !== null) {
           console.error("bad arguments. --install-miqrojson already set.");
@@ -712,11 +691,6 @@ export function parseArguments(): Arguments {
         flags.browser = miqroRC.browser;
       }
     }
-    if (flags.editor === null) {
-      if (miqroRC.editor !== undefined) {
-        flags.editor = miqroRC.editor;
-      }
-    }
 
     if (flags.inflateParallel === null) {
       if (miqroRC.inflateParallel !== undefined) {
@@ -724,8 +698,6 @@ export function parseArguments(): Arguments {
       }
     }
   }
-
-  flags.editor = flags.editor ? flags.editor : false;
 
   if (services.length === 0 && (!flags.installTSConfig/* && !flags.installTypes*/ && !flags.installMiqroJSON)) {
     flags.inflateDir = flags.inflateDir ? flags.inflateDir : undefined;
@@ -764,11 +736,6 @@ export function parseArguments(): Arguments {
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.inflate && flags.editor) {
-    console.error("bad arguments. cannot use --inflate with --editor");
-    process.exit(EXIT_CODES.BAD_ARGUMENTS);
-  }
-
   if (flags.inflate && (/*flags.installTypes || */flags.installTSConfig || flags.installMiqroJSON || flags.install)) {
     console.error("bad arguments. cannot use --inflate with --install, --install-tsconfig or --install-miqrojson");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
@@ -794,27 +761,22 @@ export function parseArguments(): Arguments {
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.editor && (/*flags.installTypes || */flags.installTSConfig || flags.installMiqroJSON)) {
-    console.error("bad arguments. cannot use --editor with--install-types, --install-tsconfig or --install-miqrojson");
+  if (flags.test && (flags.watch || flags.hotreload || flags.compile || flags.inflate)) {
+    console.error("bad arguments. cannot use --inflage with --test");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.test && (flags.watch || flags.hotreload || flags.editor || flags.compile || flags.inflate)) {
-    console.error("bad arguments. cannot use --editor with --test");
-    process.exit(EXIT_CODES.BAD_ARGUMENTS);
-  }
-
-  if (flags.migrateUp && (flags.watch || flags.hotreload || flags.editor || flags.compile || flags.test || flags.migrateDown || flags.inflate)) {
+  if (flags.migrateUp && (flags.watch || flags.hotreload || flags.compile || flags.test || flags.migrateDown || flags.inflate)) {
     console.error("bad arguments. cannot use with --migrate-up");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.migrateDown && (flags.watch || flags.hotreload || flags.editor || flags.compile || flags.test || flags.migrateUp || flags.inflate)) {
+  if (flags.migrateDown && (flags.watch || flags.hotreload || flags.compile || flags.test || flags.migrateUp || flags.inflate)) {
     console.error("bad arguments. cannot use with --migrate-down");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
 
-  if (flags.generateDoc && (flags.watch || flags.hotreload || flags.editor || flags.compile || flags.test || flags.migrateUp || flags.inflate || flags.migrateDown)) {
+  if (flags.generateDoc && (flags.watch || flags.hotreload || flags.compile || flags.test || flags.migrateUp || flags.inflate || flags.migrateDown)) {
     console.error("bad arguments. cannot use with --generate-doc");
     process.exit(EXIT_CODES.BAD_ARGUMENTS);
   }
@@ -872,7 +834,6 @@ export function parseArguments(): Arguments {
     generateDocOut: flags.generateDocOut ? resolve(process.cwd(), flags.generateDocOut) : generateDocType === "MD" ? resolve(process.cwd(), "API.md") : resolve(process.cwd(), "API.json"),
     generateDocType,
     services,
-    editor: flags.editor ? true : false,
     https: flags.https ? true : false,
     httpsRedirect: flags.httpsRedirect ? flags.httpsRedirect : undefined,
     serverOptions: flags.serverOptions

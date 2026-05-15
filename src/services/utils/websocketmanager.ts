@@ -1,5 +1,4 @@
 import { Logger } from "@miqro/core";
-import { LOG_SOCKET_PATH } from "../../../editor/common/constants.js";
 import { ClusterWebSocketServer2 } from "./cluster-ws.js";
 import { WSConfig } from "../../types.js";
 import { LogProvider } from "./log.js";
@@ -9,7 +8,6 @@ export interface WebSocketManagerOptions {
   logger?: Logger | Console;
   loggerProvider?: LogProvider;
   name?: string;
-  avoidLogSocket?: boolean;
 }
 
 export class WebSocketManager {
@@ -24,7 +22,6 @@ export class WebSocketManager {
     this.logger = options && options.logger ? options.logger : null;
     this.name = options && options.name ? options.name : "WebSocketManager";
     this.loggerProvider = options && options.loggerProvider;
-    this.avoidLogSocket = options && options.avoidLogSocket ? options.avoidLogSocket : false;
   }
 
   public deleteWS(path: string) {
@@ -63,22 +60,18 @@ export class WebSocketManager {
 
   public replaceALLWSBuLOGSocket(list: WSConfig[]) {
     for (const path of this.runningGlobalWSMap.keys()) {
-      if (path !== LOG_SOCKET_PATH || !this.avoidLogSocket) {
-        this.deleteWS(path);
-      }
+      this.deleteWS(path);
     }
     for (const wsConfig of list) {
       if (!wsConfig.disabled) {
-        if (wsConfig.path !== LOG_SOCKET_PATH || !this.avoidLogSocket) {
-          if (this.runningGlobalWSMap.has(wsConfig.path)) {
-            throw new Error(`ws on path ${wsConfig.path} already setup!`);
-          }
-          this.logger?.debug("setting up websocket on [%s]", wsConfig.path);
-          const identifier = wsConfig.path.replaceAll("/", "_").toUpperCase();
-          const logger = this.loggerProvider && identifier.length >= 0 ? this.loggerProvider.getLogger(identifier.substring(identifier.charAt(0) === "_" ? 1 : 0)) : this.logger;
-          const server = new ClusterWebSocketServer2(this.name + wsConfig.path, wsConfig.path, logger, wsConfig);
-          this.runningGlobalWSMap.set(wsConfig.path, server);
+        if (this.runningGlobalWSMap.has(wsConfig.path)) {
+          throw new Error(`ws on path ${wsConfig.path} already setup!`);
         }
+        this.logger?.debug("setting up websocket on [%s]", wsConfig.path);
+        const identifier = wsConfig.path.replaceAll("/", "_").toUpperCase();
+        const logger = this.loggerProvider && identifier.length >= 0 ? this.loggerProvider.getLogger(identifier.substring(identifier.charAt(0) === "_" ? 1 : 0)) : this.logger;
+        const server = new ClusterWebSocketServer2(this.name + wsConfig.path, wsConfig.path, logger, wsConfig);
+        this.runningGlobalWSMap.set(wsConfig.path, server);
       }
     }
   }
@@ -117,9 +110,7 @@ export class WebSocketManager {
   public disconnectAllButLOGSocket() {
     try {
       for (const wsPath of this.runningGlobalWSMap.keys()) {
-        if (wsPath !== LOG_SOCKET_PATH || !this.avoidLogSocket) {
-          this.disconnectAllFrom(wsPath);
-        }
+        this.disconnectAllFrom(wsPath);
       }
     } catch (e) {
       this.logger?.error("error disconnecting web socket clients");
@@ -142,9 +133,7 @@ export class WebSocketManager {
     try {
       const wsServer = this.getWS(req.path);
       if (wsServer) {
-        if (LOG_SOCKET_PATH === req.path) {
-          req.editor = this.adminInterface;
-        }
+        req.editor = this.adminInterface;
         const ret = wsServer.onUpgrade(req, socket, head);
         delete req.editor;
         return ret;

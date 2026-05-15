@@ -75,6 +75,8 @@ export async function inflateAppForSea(logger: Logger, inflateDir: string, servi
 
   writeFile(logger, join(inflateDir, "sea", "app.cjs"), `const { createLogProviderOptions, createServerInterface, ServerRequestHandler, WebSocketManager, DBManager, App, LoggerHandler, LogProvider, LocalCache, ClusterCache } = require("./lib.cjs");
 
+const pg = require("pg");
+
 async function main() {
   const PORT = "${PORT}";
 
@@ -147,6 +149,7 @@ main().catch(e=>console.error(e));
     jsxFactory: "JSX.createElement",
     jsxFragment: "JSX.Fragment",
     platform: "node",
+    external: ["node:*"],
     outfile: join(inflateDir, "sea", "app.bundle.cjs")
   });
   const miqroRCPath = getMiqroJSONPath();

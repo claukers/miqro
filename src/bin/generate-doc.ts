@@ -5,7 +5,7 @@ import { getMDDoc } from "./doc-md.js";
 import { EXIT_CODES } from "../common/constants.js";
 import { InflatedResult } from "../services/app.js";
 import { RouteFileMap } from "../inflate/setup-http.js";
-import { inflateMD2HTML, inflateMDString2HTML } from "../inflate/md.js";
+import { inflateMDString2HTML } from "../inflate/md.js";
 
 export async function generateDocs(args: Arguments, logger: Logger, result: InflatedResult) {
   logger.info("writing [%s]", args.generateDocOut);

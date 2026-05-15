@@ -47,7 +47,6 @@ export async function initESBuild(logger: Logger) {
 ];*/
 
 export const NODEJS_EXTERNAL = [
-  "sqlite3",
   "pg",
   "node:*"
 ];

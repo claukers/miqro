@@ -8,13 +8,12 @@ import { createNodeRuntime } from "@miqro/jsx-node";
 import { getHotReloadScript } from "../services/hot-reload.js";
 import { RuntimeURL } from "@miqro/jsx";
 import { cwd } from "node:process";
-// import { assertGlobalTampered } from "../services/globals.js";
 import { getHTTPRouterPath, getStaticFilesPath } from "../common/paths.js";
 import { setupCORS } from "./setup-cors.js";
 import { setupAUTH } from "./setup-auth.js";
 import { getRoutes } from "../services/utils/get-route.js";
 import { describeFilePath, mkdirASync, writeFileASync } from "../common/fs.js";
-import { inflateMD2HTML } from "./md.js";
+import { inflateMDString2HTML } from "./md.js";
 import { MiddlewareConfig, ServerInterface, ServerRequest, ServerResponse } from "../types.js";
 import { setupMiddleware } from "./setup-middleware.js";
 import { setupError } from "./setup-error.js";
@@ -483,7 +482,7 @@ async function createRouterFromDirectory(importOptions: ImportJSXFileOptions, in
           case ".md": {
             switch (file.subExt) {
               case ".html": {
-                const code = await inflateMD2HTML(file.filePath, logger);
+                const code = await inflateMDString2HTML(readFileSync(file.filePath).toString());
                 const contentType = CONTENT_TYPE_MAP[".html"];
                 const path = join("/", dirname(relative(dir, file.filePath)), file.name);
                 routeFileMap[file.filePath] = {

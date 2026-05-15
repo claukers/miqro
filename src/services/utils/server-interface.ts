@@ -6,14 +6,30 @@ import { Miqro } from "../app.js";
 import { WebSocketManager } from "./websocketmanager.js";
 import { execSync } from "node:child_process";
 import { LogProvider } from "./log.js";
-import { HTMLEncode } from "../../../editor/common/html-encode.js";
-import { inflateMD2HTML } from "../../inflate/md.js";
 
 import { Parser } from "@miqro/parser";
 import { ClusterCache } from "./cluster-cache.js";
 import { LocalCache } from "./cache.js";
 import { middleware } from "./middleware.js";
 import { jwt } from "./jwt.js";
+import { inflateMDString2HTML } from "../../inflate/md.js";
+import { jsx2HTML } from "../../lib.js";
+
+function HTMLEncode(str: string): string {
+  let i = str.length;
+  const aRet: string[] = [];
+
+  while (i--) {
+    const iC = str[i].charCodeAt(0);
+    if (iC < 65 || iC > 127 || (iC > 90 && iC < 97)) {
+      aRet[i] = '&#' + iC + ';';
+    } else {
+      aRet[i] = str[i];
+    }
+  }
+  return aRet.join('');
+}
+
 
 // import { initGlobals } from "../globals.js";
 
@@ -32,8 +48,9 @@ export function createServerInterface(options: ServerInterfaceImplOptions): Serv
   // initGlobals();
   return Object.freeze<ServerInterface>({
     middleware,
+    getHTML: jsx2HTML,
     encodeHTML: HTMLEncode,
-    inflateMDtoHTML: inflateMD2HTML,
+    inflateMDtoHTML: inflateMDString2HTML,
     newParser() {
       return new Parser();
     },

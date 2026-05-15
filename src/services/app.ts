@@ -8,16 +8,11 @@ import { ImportJSXFileOptions, InflateError } from "../common/jsx.js";
 import { DBConfig, MigrateOptions, ServerInterface, ServerRequest, ServerResponse, WSConfig } from "../types.js";
 import { RouteFileMap } from "../inflate/setup-http.js";
 import { ServerConfigMap, setupServerConfig } from "../inflate/setup-server-config.js";
-import { BASEEDITOR_PATH, LOG_SOCKET_PATH, LOG_WRITE_EVENT } from "../../editor/common/constants.js";
-import editorWSConfig from "../../editor/ws.js";
-import editorServerConfig from "../../editor/server.js";
 
 import { ClusterCache } from "./utils/cluster-cache.js";
-import { createEditorRouter } from "./editor.js";
 import { EDITOR_CONFIG_KEY, HOT_RELOAD_PATH, HOT_RELOAD_SCRIPT_PATH } from "../common/constants.js";
 import { watchAndServer } from "../common/watch.js";
 import { LocalCache } from "./utils/cache.js";
-// import { initGlobals } from "./globals.js";
 import { EditorAdminInterface } from "../common/admin-interface.js";
 import { LogProvider, LogProviderOptions } from "./utils/log.js";
 import { initAssets } from "../common/assets.js";
@@ -28,7 +23,6 @@ import { LogConfigMap } from "../inflate/setup-log.js";
 import { createServerInterface } from "./utils/server-interface.js";
 import { getPORT, importMiqroJSON } from "../common/arguments.js";
 import { createLogProviderOptions } from "./utils/log-transport.js";
-import { createAdminInterface } from "./utils/admin-interface.js";
 import { dirname, join, relative, resolve } from "node:path";
 import { cwd } from "node:process";
 import { ServerOptions } from "node:https";
@@ -39,7 +33,6 @@ export interface MiqroOptions extends ImportJSXFileOptions {
   logger?: Logger;
   logProviderOptions?: LogProviderOptions;
   services: string[];
-  editor: boolean;
   port: string;
   browser?: string | boolean;
   logFile?: string | boolean;
@@ -109,7 +102,6 @@ export class Miqro {
     this.options = {
       noMinify: false,
       etag: true,
-      editor: false,
       name: "server",
       noBuild: false,
       port: getPORT(),
@@ -118,7 +110,6 @@ export class Miqro {
     };
 
     const loggerOptions = createLogProviderOptions(this);
-    loggerOptions.transports.push(createEditorLoggerTransport(this));
     this.loggerProvider = new LogProvider(loggerOptions);
 
     //if (!this.options.logger) {
@@ -160,8 +151,7 @@ export class Miqro {
     this.webSocketManager = new WebSocketManager({
       logger: this.logger,
       loggerProvider: this.loggerProvider,
-      name: `MiqroApplicationWebsocketManager[${this.options.name}]`,
-      avoidLogSocket: this.options.editor
+      name: `MiqroApplicationWebsocketManager[${this.options.name}]`
     });
     this.listener = this.listener.bind(this);
     //this.requestLoggerFactory = this.requestLoggerFactory.bind(this);
@@ -183,8 +173,6 @@ export class Miqro {
     });
 
     this.serverRequestHandler = ServerRequestHandler(this.serverInterface);
-
-    this.adminInterface = createAdminInterface(this);
 
     this.webSocketManager.adminInterface = this.adminInterface;
 
@@ -359,16 +347,6 @@ export class Miqro {
 
       /* setup server config before inflate app router and ws and bs for preload*/
       const { errors: serviceConfigErrors, serverConfigMap } = await this.loadServerConfig(options);
-
-      // editor WSConfig must be put a head of the service WSConfig to avoid LOG_SOCKET replacement
-      if (this.options.editor) {
-        this.logger?.debug("setting up editor on %s", BASEEDITOR_PATH);
-        const editorRouter = await createEditorRouter(this.adminInterface);
-        router.use(editorRouter);
-        this.logger?.debug("setting up log websocket on [%s]", LOG_SOCKET_PATH);
-        wsConfigList.push(editorWSConfig);
-        serverConfigMap[EDITOR_CONFIG_KEY] = editorServerConfig;
-      }
 
       if (this.options?.hotreload/* && !options?.inflateTests*/) {
         this.logger?.debug("setting up websocket on [%s]", HOT_RELOAD_PATH);
@@ -682,11 +660,6 @@ function reloadInflatedRouter(app: Miqro) {
   app.server.use(app.serverRequestHandler);
 
   app.server.use(LoggerHandler());
-  if (app.options.editor) {
-    app.server.use(async (req, res) => {
-      res.setHeader("x-uuid", req.uuid);
-    });
-  }
 
   app.server.use(app.inflated.router);
 }
@@ -729,33 +702,5 @@ export function notifiyServerConfigSync(app: Miqro, method: "unload" | "stop") {
         app.logger?.error(e);
       }
     });
-  }
-}
-
-function createEditorLoggerTransport(app: Miqro) {
-  return {
-    level: "trace" as LogLevel,
-    write: async (args) => {
-      try {
-        if (app.options.editor) {
-          try {
-            const ws = app.webSocketManager.getWS(LOG_SOCKET_PATH);
-            if (ws) {
-              //console.log("\n\n" + process.pid + " broadcasting " + LOG_SOCKET_PATH + "\n\n\n")
-              await ws.broadcast(JSON.stringify({
-                type: LOG_WRITE_EVENT,
-                level: args.level,
-                identifier: args.identifier,
-                out: args.out
-              }));
-            }
-          } catch (e) {
-            console.error(e);
-          }
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
   }
 }
