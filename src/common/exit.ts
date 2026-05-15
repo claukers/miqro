@@ -12,22 +12,22 @@ function cleanJSX(app: Miqro) {
     unlinkSync(getESBuildBinaryPath());
   }
   if (CLEAR_JSX_CACHE) {
-    /*app.logger?.trace("trying to clean up jsx.js installation at [%s]", getJSXJSPath());
-    if (existsSync(getJSXJSPath())) {
-      unlinkSync(getJSXJSPath());
-    }*/
-    const buildParendDir = resolve(JSX_TMP_DIR, String(process.pid));
-    app.logger?.trace("trying to clean up jsx build/import folders at [%s]", buildParendDir);
-    const buildDir = resolve(buildParendDir, "build");
-    const importDir = resolve(buildParendDir, "import");
-    if (existsSync(buildDir)) {
-      rmdirSync(buildDir);
-    }
-    if (existsSync(importDir)) {
-      rmdirSync(importDir);
-    }
-    if (existsSync(buildParendDir)) {
-      rmdirSync(buildParendDir);
+    try {
+      const buildParendDir = resolve(JSX_TMP_DIR, String(process.pid));
+      app.logger?.trace("trying to clean up jsx build/import folders at [%s]", buildParendDir);
+      const buildDir = resolve(buildParendDir, "build");
+      const importDir = resolve(buildParendDir, "import");
+      if (existsSync(buildDir)) {
+        rmdirSync(buildDir);
+      }
+      if (existsSync(importDir)) {
+        rmdirSync(importDir);
+      }
+      if (existsSync(buildParendDir)) {
+        rmdirSync(buildParendDir);
+      }
+    } catch (e) {
+      app.logger?.error(e);
     }
   }
 }
@@ -39,14 +39,8 @@ export function setupExitHandlers(app: Miqro) {
     app.logger?.error('Caught exception: ' + err);
     app.logger?.error(err);
     exceptionOccured = true;
-    /*if (app.server) {
-      notifiyServerConfigSync(app, "unload");
-      notifiyServerConfigSync(app, "stop");
-      app.webSocketManager.disconnectAll();
-      app.dbManager.closeAll();
-    }*/
     cleanJSX(app);
-    if (app.server) {
+    if (app.status === "started") {
       await app.stop();
     }
     process.exit(EXIT_CODES.ABNORMAL_UNCONTROLLED);
@@ -56,14 +50,8 @@ export function setupExitHandlers(app: Miqro) {
     if (exceptionOccured) {
       app.logger?.error('Exception occured');
     } else {
-      /*if (app.server) {
-        notifiyServerConfigSync(app, "unload");
-        notifiyServerConfigSync(app, "stop");
-        app.webSocketManager.disconnectAll();
-        app.dbManager.closeAll();
-      }*/
       cleanJSX(app);
-      if (app.server) {
+      if (app.status === "started") {
         app.stop();
       }
     }
@@ -73,14 +61,8 @@ export function setupExitHandlers(app: Miqro) {
     app.logger?.error('Unhandled rejection:');
     app.logger?.error(reason);
     exceptionOccured = true;
-    /*if (app.server) {
-      notifiyServerConfigSync(app, "unload");
-      notifiyServerConfigSync(app, "stop");
-      app.webSocketManager.disconnectAll();
-      app.dbManager.closeAll();
-    }*/
     cleanJSX(app);
-    if (app.server) {
+    if (app.status === "started") {
       await app.stop();
     }
     process.exit(EXIT_CODES.ABNORMAL_UNCONTROLLED);
@@ -88,7 +70,7 @@ export function setupExitHandlers(app: Miqro) {
 
   process.on("SIGTERM", async function () {
     app.logger?.info('SIGTERM received');
-    if (app.server) {
+    if (app.status === "started") {
       await Promise.race([
         app.stop(),
         new Promise(r => setTimeout(r, 5000))
@@ -99,7 +81,7 @@ export function setupExitHandlers(app: Miqro) {
 
   process.on('SIGHUP', async function () {
     app.logger?.info('SIGHUP received');
-    if (app.server) {
+    if (app.status === "started") {
       await Promise.race([
         app.stop(),
         new Promise(r => setTimeout(r, 5000))
@@ -115,7 +97,7 @@ export function setupExitHandlers(app: Miqro) {
 
   process.on('SIGINT', async function () {
     app.logger?.info('SIGINT received');
-    if (app.server) {
+    if (app.status === "started") {
       await Promise.race([
         app.stop(),
         new Promise(r => setTimeout(r, 5000))
