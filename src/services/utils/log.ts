@@ -34,7 +34,7 @@ export class LogProvider {
     let remoteAddress: string | undefined = "";
     try {
       const url = newURL(req.url ? req.url : "/") as URL;
-      query = url.searchParams.toString();
+      query = ""; //url.searchParams.toString();
       path = normalizePath(url.pathname); // normalized path
       method = req.method ? req.method.toUpperCase() as string : "GET";
       remoteAddress = req.socket.remoteAddress;
