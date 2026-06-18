@@ -38,8 +38,8 @@
     "@miqro/runner": "^2.0.3",
     "@miqro/test": "^0.2.10",
     "@miqro/test-http": "^0.1.4",
-    "esbuild": "^0.28.0",
+    "esbuild": "^0.28.1",
     "jose": "^6.2.3",
-    "marked": "^18.0.3"
+    "marked": "^18.0.5"
   }
 }
